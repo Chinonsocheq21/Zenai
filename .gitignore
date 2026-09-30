@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+data/cache/
+models/
+*.ckpt
+*.safetensors
+.ipynb_checkpoints/
+.DS_Store
