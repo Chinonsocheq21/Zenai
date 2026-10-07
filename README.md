@@ -8,6 +8,46 @@ Group 3 — Abraham Irabor · Fnu Soh Tah Fon · Joseph Williams · Chinonso Ege
 
 ---
 
+## What's in this folder
+
+Everything for ZenAI lives here. Open the files in the left column directly —
+the right column is the source they are built from.
+
+| Open this | Built from | What it is |
+|---|---|---|
+| `presentations/ZenAI-Midterm-Oct15.pptx` | `presentations/midterm-oct15.json` | The Oct 15 deck, 7 slides, **with speaker notes**. Slide 3 carries the rendered architecture diagram. |
+| `docs/ZenAI-Build-Plan.docx` | `docs/build-plan.md` | The full plan, Sep 30 → Dec 3 — scope, the three experiments, who owns what, the schedule. |
+| `docs/diagrams/*.png` | `docs/diagrams.md` | The four flowcharts as images: architecture, one-turn sequence, data model, timeline. Drop straight into a slide or a report. |
+| `docs/ZenAI-Diagrams-Source.docx` | `docs/diagrams.md` | The Mermaid source to paste into Lucidchart. |
+| `design/screens.html` | — | The five UI screens. **Double-click to open in a browser.** Also live at `https://zenai-screens.unv.run`. |
+| `design/screens-preview.png` | — | The same five screens as one image. |
+
+Then the project itself:
+
+| | |
+|---|---|
+| `src/zenai/` | The application — agents, API, database models |
+| `training/` | The classifiers. **This is the midterm.** |
+| `tests/` | What runs in CI |
+| `tools/build_deliverables.py` | Rebuilds the .pptx and .docx from their sources |
+
+### Regenerating the documents
+
+Edit the **source** (the `.json` or `.md`), never the `.pptx` or `.docx` —
+those are build output and get overwritten.
+
+```bash
+pip install python-pptx python-docx
+python3 tools/build_deliverables.py
+```
+
+### Re-rendering the diagrams
+
+Edit `docs/diagrams.md`, then paste the block into Lucidchart
+(Insert → Diagram as code → Mermaid) or re-render to PNG with any Mermaid tool.
+
+---
+
 ## The idea
 
 The known failure mode of an LLM counselor is **therapeutic drift**: under

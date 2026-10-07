@@ -56,10 +56,10 @@ flowchart TB
     CRISIS -->|"no risk"| ORCH
     ORCH --> MOOD
     MOOD --> CONV
-    ORCH -.routes to.-> ACAD
-    ORCH -.routes to.-> RELIEF
-    ORCH -.routes to.-> SCHED
-    ORCH -.routes to.-> REF
+    ORCH -.-> ACAD
+    ORCH -.-> RELIEF
+    ORCH -.-> SCHED
+    ORCH -.-> REF
     ACAD --> CONV
     RELIEF --> CONV
     SCHED --> CONV

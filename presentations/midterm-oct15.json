@@ -1,0 +1,81 @@
+{
+  "title": "ZenAI — Midterm Progress Report",
+  "theme": "ink",
+  "accent": "green",
+  "font": "sans",
+  "slides": [
+    {
+      "layout": "title",
+      "title": "ZenAI",
+      "subtitle": "An AI counselor that stays inside the protocol  ·  COSC 490 Project 5 · Group 3  ·  Oct 15, 2026",
+      "note": "PUT ALL FOUR NAMES ON THIS SLIDE: Abraham Irabor · Fnu Soh Tah Fon · Joseph Williams · Chinonso Egeolu. The rubric says 'present in team, grade individually' — a slide that doesn't name you is a slide that doesn't credit you. Add a one-line 'who did what' too.\n\n8 minutes. Slide 5 is the 10-point slide. If you run short, cut the demo, never slide 5."
+    },
+    {
+      "layout": "stat",
+      "body": "Drift",
+      "title": "Every AI counselor on the market drifts out of protocol",
+      "subtitle": "It starts giving advice, reassuring, quietly diagnosing — the three things a trained counselor is taught NOT to do. Nobody scores for it. Nobody publishes a drift rate. ZenAI refuses to send a reply that drifts.",
+      "note": "The thesis slide. Same slide in all three presentations.\n\nIf asked what's new: Woebot, Wysa, Youper, Replika and Ash all control drift with prompt instructions and hope. None of them score each response against the protocol and regenerate when it fails, and none publish a crisis-detection recall number. We do both.\n\nGround it in HIS references: NBK470241 is StatPearls Cognitive Behavior Therapy, and his other clinical link is Cleveland Clinic on ACT. Both are manualised protocols. Say 'we built to the references in the assignment' — that lands."
+    },
+    {
+      "layout": "bullets",
+      "title": "Architecture — ten agents, four tiers",
+      "bullets": [
+        "**Tier 0 · Safety rail, every turn** — Privacy Agent, then Crisis & Safety. Risk detected → escalate to campus counseling + 988, conversation **stops**",
+        "**Tier 1 · Core loop** — Orchestrator → Mood Check-In (trained) → Memory → Conversation (ACT/CBT) → **Fidelity Monitor**",
+        "**Tier 2 · Specialists, routed to** — Academic Stress · Stress-Relief · Wellness Schedule · Resource & Referral",
+        "**Tier 3 · Longitudinal** — Progress Agent, trends across weeks",
+        "**★ The Fidelity Monitor is the contribution** — scores every reply against the six ACT processes, blocks drift, regenerates"
+      ],
+      "note": "REPLACE with the Lucidchart render of diagram 1 (zenai-lucidchart-diagrams.md). Built components shaded, unbuilt outlined — the diagram filling in across three presentations IS the progress story.\n\nOn Oct 15 shaded: Orchestrator, Mood Check-In, Crisis & Safety, Privacy. Outlined: everything else.\n\nHave the sequence diagram (diagram 2) as a backup slide for 'how does it actually work?'"
+    },
+    {
+      "layout": "split",
+      "title": "Development environment",
+      "bullets": [
+        "`docker compose up` — api · worker · postgres+pgvector · redis",
+        "Schema from the ER model: sessions · turns · mood_points · fidelity_scores · escalations",
+        "GitHub Actions green on every PR; `main` branch-protected",
+        "Every model call logged to `runs` — latency and cost",
+        "Diagrams as code in the repo, rendered in Lucidchart"
+      ],
+      "image": "REPLACE: screenshot of `docker compose up` with services healthy + green CI check",
+      "note": "The rubric says verbatim 'show your development environment.' This slide is points. Screenshot it — do not run compose live unless rehearsed and fast.\n\nCode must be pushed to GitHub BEFORE class: 'All coding related should be uploaded to github.'"
+    },
+    {
+      "layout": "bullets",
+      "title": "Core area: two trained models",
+      "bullets": [
+        "**Data** — GoEmotions (58k) · dair-ai/emotion (20k) · EmpatheticDialogues (25k). Real datasets, held-out splits",
+        "**Model 1 · Distress classifier** — distilroberta fine-tune → overwhelm / anxiety / low mood / isolation / anger / neutral",
+        "macro-F1 [VALUE] vs TF-IDF+logistic baseline [VALUE] vs majority class [VALUE]",
+        "**Model 2 · Crisis classifier** — **optimised for recall, not accuracy**",
+        "recall [VALUE] · precision [VALUE] · full confusion matrix · chosen operating point and why",
+        "**The judgment:** a missed crisis and a false alarm are not the same error. We deliberately paid precision for recall — here is the threshold curve"
+      ],
+      "note": "*** THIS IS THE 10-POINT SLIDE. ***\n\nRubric: 'Core areas: for AI/ML related projects, it means the model and training. GUI/front end does not count at this stage.'\n\nFill every [VALUE] from the eval notebook. Do NOT present this with a placeholder on it — if a number isn't ready by Oct 13, cut the claim rather than estimating it.\n\nThe recall-over-precision asymmetry is the bit that reads as senior engineering judgment. Spend 30 seconds on it. Put the threshold curve on screen."
+    },
+    {
+      "layout": "bullets",
+      "title": "Live demo — 90 seconds",
+      "bullets": [
+        "`POST /analyze` — a student message in, distress distribution and risk score out",
+        "A crisis-flagged message → the escalation path fires, conversation stops",
+        "`GET /runs/{id}` — the full trace: which agents fired, in what order, what it cost",
+        "From FastAPI's `/docs` page — **no front end, by design**"
+      ],
+      "note": "Rehearse three times. Seed the database and cache model outputs so this works with the wifi off.\n\nIf asked why there's no UI: quote the rubric back — GUI doesn't count at this stage, so the effort went into the models. That answer shows you read it.\n\nUse a SAFE example message for the crisis demo, and say out loud that it's synthetic."
+    },
+    {
+      "layout": "bullets",
+      "title": "Next two weeks",
+      "bullets": [
+        "**Oct 22** — Conversation Agent on the written ACT/CBT protocol",
+        "**Oct 27** — Fidelity Monitor: every reply scored against the six ACT processes, drift rejected and regenerated",
+        "**Nov 3** — Experiment E1: 400 turns, monitor off vs on, 120 hand-audited → the drift rate",
+        "Target for Nov 5: fidelity numbers, and the Tier-2 specialists routed"
+      ],
+      "note": "Worth 5 points: 'your goals for the next two weeks and answers questions or suggestions.' Dated commitments.\n\nThen STOP. Leave 2 minutes for questions.\n\nPrepare for the ethics question — it WILL come. The answer: ZenAI is not a counselor and never claims to be, it escalates rather than treats, the safety rail runs before any therapy content is generated, and the same mechanism that keeps it in protocol is the one that keeps it safe. Lead with that rather than defending."
+    }
+  ]
+}

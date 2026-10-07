@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZenAI — Screens</title>
+<style>
+  :root{
+    --paper:#FBF9F6; --ink:#1C2620; --muted:#6B7A72; --line:#E4E0D8;
+    --accent:#2F6F5E; --accent-soft:#E3EFE9; --accent-line:#BFD9CE;
+    --crisis:#A93E2A; --crisis-soft:#FBEDE9; --crisis-line:#EBC9BF;
+    --warm:#C97A3E; --warm-soft:#FAEFE4;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#F1EEE8;font-family:var(--sans);color:var(--ink);
+       -webkit-font-smoothing:antialiased;padding:56px 40px 80px}
+
+  .masthead{max-width:1400px;margin:0 auto 44px}
+  .masthead h1{font-family:var(--serif);font-size:40px;font-weight:400;letter-spacing:-.4px}
+  .masthead p{color:var(--muted);font-size:15px;margin-top:10px;max-width:760px;line-height:1.6}
+  .masthead .tag{display:inline-block;font-size:11px;letter-spacing:1.4px;text-transform:uppercase;
+       color:var(--accent);background:var(--accent-soft);border:1px solid var(--accent-line);
+       padding:5px 10px;border-radius:999px;margin-bottom:16px}
+
+  .rail{display:flex;gap:40px;max-width:1400px;margin:0 auto;overflow-x:auto;padding-bottom:24px}
+  .slot{flex:0 0 auto;width:390px}
+  .slot > .label{font-size:12px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);
+       margin-bottom:12px;font-weight:600}
+  .slot > .sub{font-size:13px;color:var(--muted);margin:10px 2px 0;line-height:1.55}
+
+  .screen{width:390px;height:844px;background:var(--paper);border-radius:26px;
+       border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column;
+       box-shadow:0 12px 40px rgba(28,38,32,.10)}
+
+  .status{height:44px;display:flex;align-items:center;justify-content:space-between;
+       padding:0 22px;font-size:13px;font-weight:600;color:var(--ink);flex:0 0 auto}
+  .status .dots{display:flex;gap:4px;align-items:center}
+  .status .dots i{width:5px;height:5px;border-radius:50%;background:var(--ink);display:block;opacity:.75}
+
+  .nav{height:56px;display:flex;align-items:center;gap:12px;padding:0 20px;flex:0 0 auto;
+       border-bottom:1px solid var(--line)}
+  .mark{width:30px;height:30px;border-radius:9px;background:var(--accent);color:#fff;
+       font-family:var(--serif);font-size:15px;display:flex;align-items:center;justify-content:center}
+  .nav h2{font-size:16px;font-weight:600;letter-spacing:-.2px}
+  .nav .right{margin-left:auto;font-size:12px;color:var(--muted)}
+
+  .body{flex:1 1 auto;overflow:hidden;padding:20px}
+
+  .bubble{max-width:82%;padding:13px 15px;border-radius:16px;font-size:15px;line-height:1.55;margin-bottom:12px}
+  .from-zen{background:var(--accent-soft);border:1px solid var(--accent-line);
+       border-bottom-left-radius:5px;font-family:var(--serif);font-size:15.5px}
+  .from-me{background:var(--ink);color:#F6F4F0;margin-left:auto;border-bottom-right-radius:5px}
+  .whisper{font-size:11.5px;color:var(--muted);letter-spacing:.3px;margin:2px 2px 14px}
+
+  .composer{flex:0 0 auto;border-top:1px solid var(--line);padding:14px 18px 22px;display:flex;gap:10px;align-items:center}
+  .field{flex:1;height:44px;border:1px solid var(--line);border-radius:22px;background:#fff;
+       display:flex;align-items:center;padding:0 16px;color:#A3ADA7;font-size:15px}
+  .send{width:44px;height:44px;border-radius:22px;background:var(--accent);color:#fff;
+       display:flex;align-items:center;justify-content:center;font-size:17px}
+
+  h3.q{font-family:var(--serif);font-size:25px;font-weight:400;line-height:1.3;margin-bottom:6px}
+  p.help{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:22px}
+
+  .scale{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+  .opt{border:1px solid var(--line);background:#fff;border-radius:14px;padding:14px 16px;
+       display:flex;align-items:center;gap:13px;font-size:15px}
+  .opt .dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+  .opt.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent-line)}
+  .opt .note{margin-left:auto;font-size:12px;color:var(--muted)}
+
+  .cta{height:52px;border-radius:26px;background:var(--accent);color:#fff;display:flex;
+       align-items:center;justify-content:center;font-size:16px;font-weight:600}
+  .cta.ghost{background:transparent;color:var(--accent);border:1px solid var(--accent-line)}
+  .cta.dark{background:var(--ink)}
+
+  /* crisis */
+  .screen.alarm{background:var(--crisis-soft)}
+  .alarm .nav{border-bottom-color:var(--crisis-line)}
+  .alarm .mark{background:var(--crisis)}
+  .crisis-hd{font-family:var(--serif);font-size:27px;line-height:1.28;font-weight:400;margin-bottom:14px}
+  .crisis-p{font-size:15px;line-height:1.65;color:#5A3A32;margin-bottom:18px}
+  .rescue{background:#fff;border:1px solid var(--crisis-line);border-radius:16px;padding:16px;margin-bottom:12px}
+  .rescue .who{font-size:12px;letter-spacing:.7px;text-transform:uppercase;color:var(--crisis);font-weight:700;margin-bottom:7px}
+  .rescue .what{font-size:17px;font-weight:600;margin-bottom:3px}
+  .rescue .how{font-size:13.5px;color:var(--muted)}
+  .crisis-cta{height:52px;border-radius:26px;background:var(--crisis);color:#fff;display:flex;
+       align-items:center;justify-content:center;font-size:16px;font-weight:600;margin-bottom:10px}
+  .halt{border-top:1px solid var(--crisis-line);padding-top:14px;font-size:12.5px;
+       color:#7A5449;line-height:1.6}
+
+  /* privacy */
+  .row{display:flex;align-items:flex-start;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .row .txt{flex:1}
+  .row .t{font-size:15px;font-weight:600;margin-bottom:3px}
+  .row .d{font-size:12.5px;color:var(--muted);line-height:1.55}
+  .sw{width:46px;height:27px;border-radius:14px;background:#DBD6CC;flex:0 0 auto;position:relative;margin-top:2px}
+  .sw i{position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;
+       box-shadow:0 1px 3px rgba(0,0,0,.2);display:block}
+  .sw.on{background:var(--accent)} .sw.on i{left:22px}
+  .erase{margin-top:20px;border:1px solid var(--crisis-line);background:#fff;border-radius:14px;
+       padding:15px;font-size:13.5px;color:var(--crisis);text-align:center;font-weight:600}
+
+  /* progress */
+  .stat{display:flex;gap:10px;margin-bottom:20px}
+  .card{flex:1;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px}
+  .card .n{font-family:var(--serif);font-size:27px;line-height:1}
+  .card .k{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.35}
+  .chartbox{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:18px}
+  .chartbox .hd{font-size:13px;font-weight:600;margin-bottom:2px}
+  .chartbox .sh{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+  .bars{display:flex;align-items:flex-end;gap:7px;height:96px}
+  .bars div{flex:1;background:var(--accent);border-radius:4px 4px 2px 2px;opacity:.85}
+  .axis{display:flex;gap:7px;margin-top:8px}
+  .axis span{flex:1;text-align:center;font-size:10px;color:var(--muted)}
+  .theme{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .theme .pill{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--warm-soft);
+       color:var(--warm);border:1px solid #EBD7C2;margin-left:auto;font-weight:600}
+
+  .foot{max-width:1400px;margin:52px auto 0;padding-top:26px;border-top:1px solid #DED9D1;
+       font-size:12.5px;color:var(--muted);line-height:1.7}
+  .foot b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <span class="tag">COSC 490 · Project 5 · Group 3</span>
+  <h1>ZenAI — five screens</h1>
+  <p>An AI counselor that stays inside the protocol. These are real HTML, not pictures —
+     import this page with the <b>html.to.design</b> plugin and every frame arrives in Figma
+     as editable layers. The crisis screen is the one worth arguing about: it is the only
+     state where ZenAI stops talking.</p>
+</div>
+
+<div class="rail">
+
+  <!-- 1 · CHAT -->
+  <div class="slot">
+    <div class="label">01 — Conversation</div>
+    <div class="screen">
+      <div class="status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+      <div class="nav"><div class="mark">Z</div><h2>ZenAI</h2><span class="right">Private</span></div>
+      <div class="body">
+        <div class="bubble from-zen">You mentioned three exams this week. What's the one that's
+          sitting heaviest right now?</div>
+        <div class="bubble from-me">Data structures. I keep opening the notes and closing them.</div>
+        <div class="bubble from-zen">That opening-and-closing sounds exhausting on its own — separate
+          from the material. What happens in the moment just before you close it?</div>
+        <div class="whisper">✓ Checked against the ACT protocol · present-moment contact</div>
+      </div>
+      <div class="composer">
+        <div class="field">Say what's on your mind…</div>
+        <div class="send">↑</div>
+      </div>
+    </div>
+    <div class="sub">The reply is serif — ZenAI's voice reads as a person, the interface stays sans.
+      That one line under the message is the Fidelity Monitor, visible.</div>
+  </div>
+
+  <!-- 2 · MOOD -->
+  <div class="slot">
+    <div class="label">02 — Mood check-in</div>
+    <div class="screen">
+      <div class="status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+      <div class="nav"><div class="mark">Z</div><h2>Check in</h2><span class="right">Tue</span></div>
+      <div class="body">
+        <h3 class="q">How heavy is today?</h3>
+        <p class="help">No streaks, no score. This is only so you and ZenAI can see the shape
+          of a few weeks together.</p>
+        <div class="scale">
+          <div class="opt"><span class="dot" style="background:#7FA88F"></span>Light<span class="note">manageable</span></div>
+          <div class="opt"><span class="dot" style="background:#A8B57F"></span>A bit much</div>
+          <div class="opt on"><span class="dot" style="background:var(--warm)"></span>Heavy<span class="note">selected</span></div>
+          <div class="opt"><span class="dot" style="background:#B4633E"></span>Very heavy</div>
+          <div class="opt"><span class="dot" style="background:var(--crisis)"></span>I'm not okay</div>
+        </div>
+        <div class="cta">Continue</div>
+        <p class="help" style="margin-top:16px;margin-bottom:0">You can skip this. It will not ask twice.</p>
+      </div>
+    </div>
+    <div class="sub">Five points, worded as a student would say them — not 1–10, not emoji faces.
+      The bottom option routes straight to the crisis rail.</div>
+  </div>
+
+  <!-- 3 · CRISIS -->
+  <div class="slot">
+    <div class="label">03 — Crisis escalation</div>
+    <div class="screen alarm">
+      <div class="status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+      <div class="nav"><div class="mark">Z</div><h2>ZenAI</h2></div>
+      <div class="body">
+        <h3 class="crisis-hd">I'm stopping here, and I want to hand you to a person.</h3>
+        <p class="crisis-p">What you said is more than I should carry on my own. I'm not a counselor,
+          and this is the moment that matters most to get right.</p>
+
+        <div class="rescue">
+          <div class="who">Right now · 24 hours</div>
+          <div class="what">Call or text 988</div>
+          <div class="how">Suicide &amp; Crisis Lifeline · free · confidential</div>
+        </div>
+        <div class="rescue">
+          <div class="who">On campus</div>
+          <div class="what">MSU Counseling Center</div>
+          <div class="how">Same-day urgent appointments during term</div>
+        </div>
+
+        <div class="crisis-cta">Call 988</div>
+        <div class="cta ghost" style="border-color:var(--crisis-line);color:var(--crisis)">Text a counselor instead</div>
+
+        <div class="halt">ZenAI has paused this conversation. Nothing you wrote has been shared
+          with anyone. You can come back whenever you want.</div>
+      </div>
+    </div>
+    <div class="sub">The screen no competitor will show you. Different colour, no composer —
+      <b>the input is gone.</b> ZenAI cannot keep talking here even if you want it to.</div>
+  </div>
+
+  <!-- 4 · PRIVACY -->
+  <div class="slot">
+    <div class="label">04 — Privacy &amp; consent</div>
+    <div class="screen">
+      <div class="status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+      <div class="nav"><div class="mark">Z</div><h2>What ZenAI keeps</h2></div>
+      <div class="body">
+        <p class="help" style="margin-bottom:6px">Every switch is off until you turn it on.
+          Nothing here is ever shared with the university.</p>
+        <div class="row"><div class="txt"><div class="t">Remember my mood</div>
+          <div class="d">So the progress view has something to show.</div></div>
+          <div class="sw on"><i></i></div></div>
+        <div class="row"><div class="txt"><div class="t">Remember what helps</div>
+          <div class="d">"Walking worked last time" — brought back when it's relevant.</div></div>
+          <div class="sw on"><i></i></div></div>
+        <div class="row"><div class="txt"><div class="t">Remember my courses</div>
+          <div class="d">Lets the Academic Stress agent be specific.</div></div>
+          <div class="sw"><i></i></div></div>
+        <div class="row"><div class="txt"><div class="t">Keep full transcripts</div>
+          <div class="d">Off by default. Messages are redacted and summarised instead.</div></div>
+          <div class="sw"><i></i></div></div>
+        <div class="erase">Delete everything ZenAI remembers</div>
+      </div>
+    </div>
+    <div class="sub">Consent as the product surface, not a settings page nobody opens.
+      Defaults off, and the delete button is a real one.</div>
+  </div>
+
+  <!-- 5 · PROGRESS -->
+  <div class="slot">
+    <div class="label">05 — Progress</div>
+    <div class="screen">
+      <div class="status"><span>9:41</span><span class="dots"><i></i><i></i><i></i></span></div>
+      <div class="nav"><div class="mark">Z</div><h2>Six weeks</h2><span class="right">Only you</span></div>
+      <div class="body">
+        <div class="stat">
+          <div class="card"><div class="n">18</div><div class="k">conversations</div></div>
+          <div class="card"><div class="n">4</div><div class="k">check-ins this week</div></div>
+        </div>
+        <div class="chartbox">
+          <div class="hd">How heavy things felt</div>
+          <div class="sh">Lower is lighter. Midterms are the tall ones.</div>
+          <div class="bars">
+            <div style="height:44%"></div><div style="height:58%"></div><div style="height:88%"></div>
+            <div style="height:95%"></div><div style="height:62%"></div><div style="height:47%"></div>
+          </div>
+          <div class="axis"><span>W1</span><span>W2</span><span>W3</span><span>W4</span><span>W5</span><span>W6</span></div>
+        </div>
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">What keeps coming up</div>
+        <div class="theme">Exam weeks<span class="pill">9 times</span></div>
+        <div class="theme">Sleep<span class="pill">7 times</span></div>
+        <div class="theme">Feeling behind<span class="pill">5 times</span></div>
+      </div>
+    </div>
+    <div class="sub">No streaks and no score — gamifying distress is the mistake every
+      wellness app makes. Just the shape of six weeks, and what recurs.</div>
+  </div>
+
+</div>
+
+<div class="foot">
+  <b>Import into Figma:</b> Plugins → html.to.design → paste this page's URL → enable auto-layout.
+  All five frames arrive as editable layers.<br>
+  <b>Before any demo:</b> the campus counseling number on screen 03 is a placeholder —
+  verify the real one and put it in <code>.env</code> as <code>CAMPUS_COUNSELING_PHONE</code>.<br>
+  <b>Not midterm work.</b> The Oct 15 rubric says GUI does not count — this is November.
+</div>
+
+</body>
+</html>
