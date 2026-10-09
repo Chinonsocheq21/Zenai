@@ -25,17 +25,17 @@
       "note": "Walk it in this order, 60 seconds:\n\n1. TIER 0, every single turn — Privacy redacts, then Crisis & Safety scores risk. Risk detected and we escalate: 988, campus counseling, and the conversation STOPS. No therapy content is generated for that turn at all.\n2. TIER 1, the core loop — Orchestrator → Mood Check-In (the trained model) → Memory → Conversation on the ACT/CBT protocol → the Fidelity Monitor.\n3. TIER 2 — four specialists the orchestrator routes to, not always on.\n4. TIER 3 — the Progress agent, trends across weeks.\n\nTHE YELLOW BOX IS THE CONTRIBUTION. Every reply is scored against the six ACT processes before the student sees it; drift into advice, diagnosis or false reassurance is rejected and regenerated. Note the arrow looping back from the monitor to the Conversation Agent — that loop is the whole idea.\n\nBuilt today: Orchestrator, Mood Check-In, Crisis & Safety, Privacy. Everything else is scaffolded and scheduled.\n\nKeep diagram 2 (the one-turn sequence) as a backup slide for 'but how does it actually work?'"
     },
     {
-      "layout": "split",
+      "layout": "bullets",
       "title": "Development environment",
       "bullets": [
-        "`docker compose up` — api · worker · postgres+pgvector · redis",
-        "Schema from the ER model: sessions · turns · mood_points · fidelity_scores · escalations",
-        "GitHub Actions green on every PR; `main` branch-protected",
-        "Every model call logged to `runs` — latency and cost",
-        "Diagrams as code in the repo, rendered in Lucidchart"
+        "**github.com/Chinonsocheq21/Zenai** — 6 commits, CI green, verified from a clean clone",
+        "`./setup.sh` — one command from clone to a working trainer. No Docker required",
+        "`docker compose up` — api · postgres+pgvector · redis",
+        "9-table schema from the ER model: sessions · turns · mood_points · **fidelity_scores** · **escalations**",
+        "Diagrams as code in the repo, rendered to PNG — the map is never stale at a presentation",
+        "Every result reproducible: `results/` holds the metrics, `training/` the code that made them"
       ],
-      "image": "REPLACE: screenshot of `docker compose up` with services healthy + green CI check",
-      "note": "The rubric says verbatim 'show your development environment.' This slide is points. Screenshot it — do not run compose live unless rehearsed and fast.\n\nCode must be pushed to GitHub BEFORE class: 'All coding related should be uploaded to github.'"
+      "note": "ADD THE SCREENSHOT HERE once you have it: run `docker compose up`, let all services go healthy, screenshot the terminal, save it to artifacts/media/ and set this slide's \"image\" to that path with layout \"split\". Until then it renders as bullets, which is fine.\n\nThe rubric says verbatim 'show your development environment' — this slide is points. Do not try to run compose live unless it is rehearsed and fast.\n\nCode must be pushed to GitHub BEFORE class: 'All coding related should be uploaded to github.'"
     },
     {
       "layout": "bullets",
