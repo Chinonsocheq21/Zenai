@@ -123,6 +123,24 @@ def build_pptx(src="presentations/midterm-oct15.json",
                "Shaded = built.  Outlined = next.  The yellow box is the contribution.",
                13, MUTED, first=True, italic=True)
 
+        elif lay == "image":
+            img = s.get("image", "")
+            # deck paths are workspace-relative; the copy in this repo lives here
+            local = os.path.join("docs/diagrams", os.path.basename(img))
+            path = img if os.path.exists(img) else (local if os.path.exists(local) else None)
+            _p(_tf(sl, 0.8, 0.5, 11.8, 0.7), s.get("title", ""), 28, INK, first=True, font=SER)
+            _rule(sl, 0.8, 1.18, 1.3)
+            if path:
+                from PIL import Image as _PIL  # noqa
+                pic = sl.shapes.add_picture(path, Inches(0.8), Inches(1.5), width=Inches(11.8))
+                # if it overflows the slide, scale by height instead
+                if pic.height > Inches(5.2):
+                    sl.shapes._spTree.remove(pic._element)
+                    pic = sl.shapes.add_picture(path, Inches(0.8), Inches(1.5), height=Inches(5.2))
+                    pic.left = int((prs.slide_width - pic.width) / 2)
+            if s.get("subtitle"):
+                _p(_tf(sl, 0.8, 6.85, 11.8, 0.5), s["subtitle"], 13, MUTED, first=True, italic=True)
+
         elif lay in ("bullets", "split"):
             _p(_tf(sl, 0.8, 0.55, 11.8, 0.8), s["title"], 32, INK, first=True, font=SER)
             _rule(sl, 0.8, 1.32, 1.3)

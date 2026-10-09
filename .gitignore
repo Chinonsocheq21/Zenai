@@ -8,3 +8,7 @@ models/
 *.safetensors
 .ipynb_checkpoints/
 .DS_Store
+
+# fetched data and local env
+data/raw/
+.venv/
