@@ -48,7 +48,8 @@ def run_baseline(X_tr, y_tr, X_te, y_te) -> dict:
 
 
 def run_transformer(X_tr, y_tr, X_te, y_te, epochs: int = 2,
-                    max_len: int = 64, batch: int = 16) -> dict:
+                    max_len: int = 64, batch: int = 16,
+                    force_cpu: bool = False) -> dict:
     """Fine-tune distilroberta.
 
     Three choices here are what make this finish in half an hour instead of a
@@ -63,8 +64,18 @@ def run_transformer(X_tr, y_tr, X_te, y_te, epochs: int = 2,
         to max_len. Most of this corpus is far shorter than 64.
 
     MPS memory is the laptop's UNIFIED memory, shared with everything else
-    running. batch 32 OOMs at ~6.8 GB when a browser is open. batch 16 is the
-    safe default here; drop to 8 if it still dies. Do NOT reach for
+    running, and on this machine that is the binding constraint. Three attempts,
+    each with a correct fix, each still OOM:
+
+        batch 32, AdamW       ours 2.32 GB   other 4.45 GB   died step 107
+        batch 16, AdamW       ours 1.78 GB   other 4.87 GB   died step ~110
+        batch 16, Adafactor   ours 0.93 GB   other 5.74 GB   died later
+
+    Our own footprint fell 2.5x and it still died, because the other side grew
+    faster. That is a resource ceiling, not something to optimise around.
+
+    So --cpu exists, and on a loaded machine it is the right answer: slower per
+    step, but no ceiling, so it finishes. Do NOT reach for
     PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 -- that removes the guard rail and can
     take the whole machine down.
     """
@@ -93,7 +104,7 @@ def run_transformer(X_tr, y_tr, X_te, y_te, epochs: int = 2,
             item["labels"] = self.labels[i]
             return item
 
-    use_mps = torch.backends.mps.is_available()
+    use_mps = torch.backends.mps.is_available() and not force_cpu
     print(f"device: {'mps (Apple GPU)' if use_mps else 'cpu'} | max_len {max_len} | batch {batch}")
 
     model = AutoModelForSequenceClassification.from_pretrained(
@@ -112,7 +123,7 @@ def run_transformer(X_tr, y_tr, X_te, y_te, epochs: int = 2,
         # moment and uses a fraction of that. Shrinking the batch does not help
         # with an optimiser-state OOM; changing the optimiser does.
         optim="adafactor",
-        gradient_checkpointing=True,
+        gradient_checkpointing=use_mps,   # only worth the compute cost on MPS
     )
     trainer = Trainer(
         model=model, args=args,
@@ -150,6 +161,9 @@ def main() -> None:
     ap.add_argument("--epochs", type=int, default=2)
     ap.add_argument("--max-len", type=int, default=64)
     ap.add_argument("--batch", type=int, default=16)
+    ap.add_argument("--cpu", action="store_true",
+                    help="force CPU. Slower per step, but no memory ceiling -- "
+                         "use when MPS OOMs because the machine is loaded.")
     ap.add_argument("--sample", type=int, default=0,
                     help="train on a stratified subsample this size "
                          "(0 = all). The TEST set is never subsampled.")
@@ -171,7 +185,7 @@ def main() -> None:
     print(f"train {len(X_tr)}  test {len(X_te)}")
 
     res = run_baseline(X_tr, y_tr, X_te, y_te) if a.baseline \
-        else run_transformer(X_tr, y_tr, X_te, y_te, a.epochs, a.max_len, a.batch)
+        else run_transformer(X_tr, y_tr, X_te, y_te, a.epochs, a.max_len, a.batch, a.cpu)
     res["supplement"] = not a.no_supplement
 
     macro = res["report"]["macro avg"]["f1-score"]

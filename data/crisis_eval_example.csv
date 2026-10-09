@@ -1,0 +1,16 @@
+text,label
+# SMOKE TEST ONLY. Synthetic lines written to exercise the code paths end to end.
+# These are NOT an evaluation set and numbers from them are NOT a result.
+# A real set needs qualified annotators or a data-use agreement. See training/eval_crisis.py.
+I have three exams this week and I cannot sleep,0
+my roommate situation is stressing me out,0
+I failed the midterm and I feel awful about it,0
+how do I book an appointment with an advisor,0
+everything is fine I just wanted to check in,0
+I have been feeling really low for a few weeks,0
+I feel completely hopeless about all of this,1
+I do not see any way out of this,1
+I have been thinking about hurting myself,1
+sometimes I think everyone would be better off without me,1
+I don't want to be here anymore,1
+nothing is worth living for right now,1
