@@ -83,8 +83,11 @@ def run_transformer(X_tr, y_tr, X_te, y_te, epochs: int = 2,
     import torch
     from torch.utils.data import Dataset
     from transformers import (
-        AutoModelForSequenceClassification, AutoTokenizer, DataCollatorWithPadding,
-        Trainer, TrainingArguments,
+        AutoModelForSequenceClassification,
+        AutoTokenizer,
+        DataCollatorWithPadding,
+        Trainer,
+        TrainingArguments,
     )
 
     name = "distilroberta-base"
