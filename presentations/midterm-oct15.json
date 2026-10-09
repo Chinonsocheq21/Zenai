@@ -44,27 +44,35 @@
     },
     {
       "layout": "bullets",
-      "title": "Core area: two trained models",
+      "title": "Core area: the distress model",
       "bullets": [
-        "**Data** — GoEmotions (58k) · dair-ai/emotion (20k) · EmpatheticDialogues (25k). Real datasets, held-out splits",
-        "**Model 1 · Distress classifier** — distilroberta fine-tune → overwhelm / anxiety / low mood / isolation / anger / neutral",
-        "macro-F1 [VALUE] vs TF-IDF+logistic baseline [VALUE] vs majority class [VALUE]",
-        "**Model 2 · Crisis classifier** — **optimised for recall, not accuracy**",
-        "recall [VALUE] · precision [VALUE] · full confusion matrix · chosen operating point and why",
-        "**The judgment:** a missed crisis and a false alarm are not the same error. We deliberately paid precision for recall — here is the threshold curve"
+        "**Data** — GoEmotions (54,263) + an EmpatheticDialogues supplement → **86,868 examples**, 6 distress classes, held-out 15% split",
+        "**Trained and measured** — TF-IDF + logistic regression, class-balanced",
+        "**macro-F1 0.521**  ·  vs GoEmotions-only **0.445**  ·  vs majority-class **0.106**",
+        "Macro-F1, not accuracy — the set is 47% neutral, so accuracy would flatter and say nothing",
+        "**The finding we didn't expect to need:** GoEmotions has **no loneliness label at all**. `isolation` scored **0.00** — unpredictable. The supplement took it to **0.47**",
+        "**The finding we did expect:** `overwhelm` stays weak at **0.28**. We map GoEmotions' *confusion* onto it, and a student with three exams is overwhelmed, not confused. It needs its own labels, not more data",
+        "**In flight for Oct 15** — distilroberta fine-tune over the same split, and the recall-optimised crisis classifier"
       ],
-      "note": "*** THIS IS THE 10-POINT SLIDE. ***\n\nRubric: 'Core areas: for AI/ML related projects, it means the model and training. GUI/front end does not count at this stage.'\n\nFill every [VALUE] from the eval notebook. Do NOT present this with a placeholder on it — if a number isn't ready by Oct 13, cut the claim rather than estimating it.\n\nThe recall-over-precision asymmetry is the bit that reads as senior engineering judgment. Spend 30 seconds on it. Put the threshold curve on screen."
+      "note": "*** THIS IS THE 10-POINT SLIDE. ***\n\nRubric: 'Core areas: for AI/ML related projects, it means the model and training. GUI/front end does not count at this stage.'\n\nEVERY NUMBER HERE IS REAL, measured on 2026-10-09. Source: models/distress/metrics_baseline.json, metrics_baseline_nosupp.json, ablation_summary.json in the repo. Do not change them without re-running training/train_distress.py.\n\nLead with the isolation finding — a class that could not be predicted at all, because the dataset everybody uses has no label for loneliness. That is a real methodological result and it is the most interesting thing on this slide.\n\nBe straight about the last bullet. Saying 'the transformer is training and here is the baseline it has to beat' is stronger than implying it is done. If it IS done by Oct 13, replace that bullet with its numbers and say by how much it beat 0.521."
+    },
+    {
+      "layout": "image",
+      "title": "The ablation — does the supplement earn its place?",
+      "image": "artifacts/media/zenai-diagrams/05-ablation.png",
+      "subtitle": "Held-out 15% split · macro-F1 · TF-IDF + logistic regression, class-balanced",
+      "note": "The money chart. Spend 60 seconds here.\n\nThe argument in one line: we did not just throw more data at it — we identified a specific hole in the standard dataset, filled it from a second source, and measured what that bought. +0.076 macro-F1, and one class went from impossible to usable.\n\nIf asked why overwhelm got slightly WORSE: because the supplement shifted the class balance and overwhelm's source mapping was always weak. We are reporting it rather than hiding it, and the fix is hand-labelling, not more scraping."
     },
     {
       "layout": "bullets",
       "title": "Live demo — 90 seconds",
       "bullets": [
-        "`POST /analyze` — a student message in, distress distribution and risk score out",
-        "A crisis-flagged message → the escalation path fires, conversation stops",
-        "`GET /runs/{id}` — the full trace: which agents fired, in what order, what it cost",
+        "`POST /analyze` — a student message in, distress distribution and crisis risk out",
+        "A crisis-flagged message → **the escalation path fires and the conversation stops**",
+        "The safety ordering, live: Privacy → Crisis → everything else. **No therapy content is generated for a turn that trips the rail**",
         "From FastAPI's `/docs` page — **no front end, by design**"
       ],
-      "note": "Rehearse three times. Seed the database and cache model outputs so this works with the wifi off.\n\nIf asked why there's no UI: quote the rubric back — GUI doesn't count at this stage, so the effort went into the models. That answer shows you read it.\n\nUse a SAFE example message for the crisis demo, and say out loud that it's synthetic."
+      "note": "Rehearse three times. Seed the database and cache model outputs so this works with the wifi off.\n\nIf asked why there's no UI: quote the rubric back — GUI doesn't count at this stage, so the effort went into the models. That answer shows you read it.\n\nUse a SAFE example message for the crisis demo, and say out loud that it's synthetic.\n\nThe distress model is trained and loadable. The crisis rail currently runs on the recall-favouring lexicon floor with the classifier going in on top — say that plainly rather than implying the classifier is live. The lexicon is not a placeholder: it stays after training, ORed with the model, so the model can never talk the floor down."
     },
     {
       "layout": "bullets",

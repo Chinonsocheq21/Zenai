@@ -9,6 +9,16 @@ student*. Those overlap but are not the same construct, and two of our six
 classes have no good source label at all (see GAPS below).
 """
 
+# The 28 GoEmotions labels, IN DATASET INDEX ORDER. The parquet stores integer
+# ids, so this list is how they become names. Do not reorder.
+GOEMOTIONS_LABELS = [
+    "admiration", "amusement", "anger", "annoyance", "approval", "caring",
+    "confusion", "curiosity", "desire", "disappointment", "disapproval",
+    "disgust", "embarrassment", "excitement", "fear", "gratitude", "grief",
+    "joy", "love", "nervousness", "optimism", "pride", "realization", "relief",
+    "remorse", "sadness", "surprise", "neutral",
+]
+
 # The six classes ZenAI routes on.
 DISTRESS_CLASSES = [
     "anxiety",
