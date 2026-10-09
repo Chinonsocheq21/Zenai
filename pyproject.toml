@@ -8,8 +8,13 @@ dependencies = [
   "pydantic>=2.9", "pydantic-settings>=2.6",
   "sqlalchemy>=2.0", "alembic>=1.14", "psycopg[binary]>=3.2", "pgvector>=0.3",
   "redis>=5.2",
-  "transformers>=4.46", "torch>=2.5", "datasets>=3.1",
-  "scikit-learn>=1.5", "pandas>=2.2", "numpy>=2.0",
+  "transformers>=4.46", "torch>=2.2", "accelerate>=0.26",
+  "scikit-learn>=1.5", "pandas>=2.2",
+  # numpy MUST stay on 1.x: the torch wheels that still support Python 3.9 were
+  # built against the 1.x C API, and numpy 2 makes every tensor->array call fail
+  # with "Failed to initialize NumPy: _ARRAY_API not found" -- which surfaces as
+  # a silent exit, not an error. Drop this pin only when the project moves to 3.11.
+  "numpy<2",
   "matplotlib>=3.9",
 ]
 

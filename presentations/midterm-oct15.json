@@ -18,16 +18,11 @@
       "note": "The thesis slide. Same slide in all three presentations.\n\nIf asked what's new: Woebot, Wysa, Youper, Replika and Ash all control drift with prompt instructions and hope. None of them score each response against the protocol and regenerate when it fails, and none publish a crisis-detection recall number. We do both.\n\nGround it in HIS references: NBK470241 is StatPearls Cognitive Behavior Therapy, and his other clinical link is Cleveland Clinic on ACT. Both are manualised protocols. Say 'we built to the references in the assignment' — that lands."
     },
     {
-      "layout": "bullets",
+      "layout": "image",
       "title": "Architecture — ten agents, four tiers",
-      "bullets": [
-        "**Tier 0 · Safety rail, every turn** — Privacy Agent, then Crisis & Safety. Risk detected → escalate to campus counseling + 988, conversation **stops**",
-        "**Tier 1 · Core loop** — Orchestrator → Mood Check-In (trained) → Memory → Conversation (ACT/CBT) → **Fidelity Monitor**",
-        "**Tier 2 · Specialists, routed to** — Academic Stress · Stress-Relief · Wellness Schedule · Resource & Referral",
-        "**Tier 3 · Longitudinal** — Progress Agent, trends across weeks",
-        "**★ The Fidelity Monitor is the contribution** — scores every reply against the six ACT processes, blocks drift, regenerates"
-      ],
-      "note": "REPLACE with the Lucidchart render of diagram 1 (zenai-lucidchart-diagrams.md). Built components shaded, unbuilt outlined — the diagram filling in across three presentations IS the progress story.\n\nOn Oct 15 shaded: Orchestrator, Mood Check-In, Crisis & Safety, Privacy. Outlined: everything else.\n\nHave the sequence diagram (diagram 2) as a backup slide for 'how does it actually work?'"
+      "image": "artifacts/media/zenai-diagrams/01-architecture.png",
+      "subtitle": "Safety rail runs on every turn, before any therapy content exists · the yellow box is the contribution",
+      "note": "Walk it in this order, 60 seconds:\n\n1. TIER 0, every single turn — Privacy redacts, then Crisis & Safety scores risk. Risk detected and we escalate: 988, campus counseling, and the conversation STOPS. No therapy content is generated for that turn at all.\n2. TIER 1, the core loop — Orchestrator → Mood Check-In (the trained model) → Memory → Conversation on the ACT/CBT protocol → the Fidelity Monitor.\n3. TIER 2 — four specialists the orchestrator routes to, not always on.\n4. TIER 3 — the Progress agent, trends across weeks.\n\nTHE YELLOW BOX IS THE CONTRIBUTION. Every reply is scored against the six ACT processes before the student sees it; drift into advice, diagnosis or false reassurance is rejected and regenerated. Note the arrow looping back from the monitor to the Conversation Agent — that loop is the whole idea.\n\nBuilt today: Orchestrator, Mood Check-In, Crisis & Safety, Privacy. Everything else is scaffolded and scheduled.\n\nKeep diagram 2 (the one-turn sequence) as a backup slide for 'but how does it actually work?'"
     },
     {
       "layout": "split",
