@@ -24,6 +24,12 @@ dev = ["pytest>=8.3", "ruff>=0.8", "jupyter>=1.1"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+# src/ layout: say where first-party code lives, or CI and a local venv
+# classify `zenai` differently and sort imports in opposite orders.
+src = [".", "src"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["zenai", "training"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

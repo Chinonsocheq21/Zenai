@@ -15,7 +15,11 @@ echo "==> dependencies"
 .venv/bin/pip install --quiet \
   "scikit-learn" "pandas" "pyarrow" "numpy<2" \
   "torch" "transformers" "accelerate>=0.26" \
-  "python-pptx" "python-docx" "pillow"
+  "fastapi" "uvicorn" "pydantic-settings" "httpx" "sqlalchemy" "redis" "joblib" \
+  "eval_type_backport" \
+  "python-pptx" "python-docx" "pillow" "pytest" "ruff"
+# eval_type_backport: Pydantic on Python 3.9 cannot evaluate `int | None` in a
+# model without it, and /analyze dies on import. Pydantic's own documented fix.
 
 echo "==> data (once, ~30MB)"
 mkdir -p data/raw && cd data/raw
@@ -29,8 +33,12 @@ if [ ! -d empatheticdialogues ]; then
 fi
 cd ../..
 
+echo "==> train the baseline distress model (seconds) so /analyze has something to serve"
+.venv/bin/python -m training.train_distress --baseline > /dev/null && echo "    models/distress/tfidf.joblib"
+
 echo
 echo "Ready. Now:"
 echo "  .venv/bin/python -m training.datasets                      # class balance"
 echo "  .venv/bin/python -m training.train_distress --baseline     # seconds"
-echo "  .venv/bin/python -m training.train_distress                # ~20 min, CPU"
+echo "  .venv/bin/python -m training.train_distress --cpu --sample 12000   # transformer, ~1h"
+echo "  .venv/bin/uvicorn zenai.api.main:app --app-dir src            # then open /docs"

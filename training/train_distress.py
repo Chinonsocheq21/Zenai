@@ -38,6 +38,13 @@ def run_baseline(X_tr, y_tr, X_te, y_te) -> dict:
     )
     pipe.fit(X_tr, y_tr)
     pred = pipe.predict(X_te)
+
+    # Save the model itself, not only its scores -- /analyze serves this file
+    # when no fine-tuned transformer exists.
+    import joblib
+
+    OUT.mkdir(parents=True, exist_ok=True)
+    joblib.dump(pipe, OUT / "tfidf.joblib")
     return {
         "model": "tfidf+logreg",
         "report": classification_report(
@@ -139,6 +146,8 @@ def run_transformer(X_tr, y_tr, X_te, y_te, epochs: int = 2,
     pred_labels = [DISTRESS_CLASSES[i] for i in pred]
 
     OUT.mkdir(parents=True, exist_ok=True)
+    model.config.id2label = dict(enumerate(DISTRESS_CLASSES))
+    model.config.label2id = {c: i for i, c in enumerate(DISTRESS_CLASSES)}
     model.save_pretrained(OUT)
     tok.save_pretrained(OUT)
 
