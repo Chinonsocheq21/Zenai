@@ -35,7 +35,7 @@ HIGH_RISK = re.compile(
     r"|don'?t\s+want\s+to\s+(be\s+here|exist|wake\s+up)"
     r"|not\s+want\s+to\s+(be\s+here|exist)"
     r")\b",
-    re.I,
+    re.IGNORECASE,
 )
 ELEVATED = re.compile(
     r"\b("
@@ -50,7 +50,7 @@ ELEVATED = re.compile(
     r"|nothing\s+(matters|helps|changes)"
     r"|empty\s+inside"
     r")\b",
-    re.I,
+    re.IGNORECASE,
 )
 
 
