@@ -10,5 +10,5 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
       - run: pip install ruff pytest
-      - run: ruff check src training
-      - run: pytest -q || echo "no tests yet"
+      - run: ruff check src training tests
+      - run: pytest -q

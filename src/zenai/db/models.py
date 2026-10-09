@@ -8,7 +8,15 @@ from __future__ import annotations
 from datetime import date, datetime
 
 from sqlalchemy import (
-    JSON, Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text,
+    JSON,
+    Boolean,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
