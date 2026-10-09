@@ -76,6 +76,10 @@ Ten agents in four tiers — see `docs/diagrams.md` (Mermaid, paste into Lucidch
 
 ## Running it
 
+**First time on a new machine:** `./setup.sh` — makes the virtualenv, installs
+everything (including the two pins that are not optional, see below) and fetches
+the training data. Docker not required; works on macOS system Python 3.9.
+
 ```bash
 cp .env.example .env
 docker compose up
@@ -93,11 +97,18 @@ before Oct 15; the rubric says GUI does not count at this stage.
 | **2 · Crisis** | Risk classifier, **recall-optimised**, lexicon floor | `src/zenai/models/crisis.py` |
 | **3 · Fidelity** | ACT-process scorer (after the midterm) | — |
 
+> **Two dependency pins that are not optional.** `numpy<2`, because the torch
+> wheels that still support Python 3.9 were built against the NumPy 1.x C API and
+> NumPy 2 makes every tensor→array call fail with *"Failed to initialize NumPy:
+> _ARRAY_API not found"* — which shows up as a **silent exit, not an error**.
+> And `accelerate>=0.26`, without which `Trainer` refuses to start. `setup.sh`
+> handles both.
+
 ```bash
-python -m training.datasets                        # class balance first
-python -m training.train_distress --baseline       # TF-IDF, seconds
-python -m training.train_distress                  # distilroberta, ~15 min CPU
-python -m training.train_distress --no-supplement  # the ablation
+.venv/bin/python -m training.datasets                        # class balance first
+.venv/bin/python -m training.train_distress --baseline       # TF-IDF, seconds
+.venv/bin/python -m training.train_distress                  # distilroberta, ~15 min CPU
+.venv/bin/python -m training.train_distress --no-supplement  # the ablation
 ```
 
 **Read `training/taxonomy.py` before training.** Two of the six classes
