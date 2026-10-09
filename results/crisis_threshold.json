@@ -1,0 +1,189 @@
+{
+  "source": "data/crisis_eval_example.csv",
+  "n": 12,
+  "n_positive": 6,
+  "min_recall": 0.95,
+  "sweep": [
+    {
+      "threshold": 0.05,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.1,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.15,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.2,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.25,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.3,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.35,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.4,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.45,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.5,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.55,
+      "recall": 1.0,
+      "precision": 1.0,
+      "missed_crises": 0,
+      "false_alarms": 0,
+      "tp": 6,
+      "tn": 6
+    },
+    {
+      "threshold": 0.6,
+      "recall": 0.667,
+      "precision": 1.0,
+      "missed_crises": 2,
+      "false_alarms": 0,
+      "tp": 4,
+      "tn": 6
+    },
+    {
+      "threshold": 0.65,
+      "recall": 0.667,
+      "precision": 1.0,
+      "missed_crises": 2,
+      "false_alarms": 0,
+      "tp": 4,
+      "tn": 6
+    },
+    {
+      "threshold": 0.7,
+      "recall": 0.667,
+      "precision": 1.0,
+      "missed_crises": 2,
+      "false_alarms": 0,
+      "tp": 4,
+      "tn": 6
+    },
+    {
+      "threshold": 0.75,
+      "recall": 0.667,
+      "precision": 1.0,
+      "missed_crises": 2,
+      "false_alarms": 0,
+      "tp": 4,
+      "tn": 6
+    },
+    {
+      "threshold": 0.8,
+      "recall": 0.667,
+      "precision": 1.0,
+      "missed_crises": 2,
+      "false_alarms": 0,
+      "tp": 4,
+      "tn": 6
+    },
+    {
+      "threshold": 0.85,
+      "recall": 0.667,
+      "precision": 1.0,
+      "missed_crises": 2,
+      "false_alarms": 0,
+      "tp": 4,
+      "tn": 6
+    },
+    {
+      "threshold": 0.9,
+      "recall": 0.667,
+      "precision": 1.0,
+      "missed_crises": 2,
+      "false_alarms": 0,
+      "tp": 4,
+      "tn": 6
+    },
+    {
+      "threshold": 0.95,
+      "recall": 0.667,
+      "precision": 1.0,
+      "missed_crises": 2,
+      "false_alarms": 0,
+      "tp": 4,
+      "tn": 6
+    }
+  ],
+  "chosen": {
+    "threshold": 0.55,
+    "recall": 1.0,
+    "precision": 1.0,
+    "missed_crises": 0,
+    "false_alarms": 0,
+    "tp": 6,
+    "tn": 6
+  },
+  "caveat": "Numbers from crisis_eval_example.csv are a SMOKE TEST, not a result. See the module docstring."
+}
