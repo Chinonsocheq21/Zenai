@@ -105,6 +105,14 @@ def run_transformer(X_tr, y_tr, X_te, y_te, epochs: int = 2,
         learning_rate=2e-5, eval_strategy="epoch", save_strategy="no",
         logging_steps=100, report_to=[], use_cpu=not use_mps,
         dataloader_pin_memory=False,
+        # Adafactor, not AdamW. AdamW keeps two fp32 moments per parameter --
+        # ~650 MB of optimiser state for distilroberta, allocated regardless of
+        # batch size, which is exactly what was OOMing (the traceback lands in
+        # adamw.py, not in the forward pass). Adafactor factorises the second
+        # moment and uses a fraction of that. Shrinking the batch does not help
+        # with an optimiser-state OOM; changing the optimiser does.
+        optim="adafactor",
+        gradient_checkpointing=True,
     )
     trainer = Trainer(
         model=model, args=args,
