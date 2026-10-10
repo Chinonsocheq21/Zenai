@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from sqlalchemy import text
 
 router = APIRouter(tags=["health"])
 
@@ -9,6 +8,8 @@ def health() -> dict:
     """M0 acceptance test. All three read "ok" or M0 is not done."""
     out = {"db": "down", "redis": "down", "models": "down"}
     try:
+        from sqlalchemy import text
+
         from zenai.db.session import engine
 
         with engine.connect() as c:
