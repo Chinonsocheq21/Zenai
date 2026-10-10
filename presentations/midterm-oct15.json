@@ -1,84 +1,186 @@
 {
   "title": "ZenAI — Midterm Progress Report",
-  "theme": "ink",
+  "theme": "paper",
   "accent": "green",
   "font": "sans",
   "slides": [
     {
       "layout": "title",
       "title": "ZenAI",
-      "subtitle": "An AI counselor that stays inside the protocol  ·  COSC 490 Project 5 · Group 3  ·  Oct 15, 2026",
-      "note": "PUT ALL FOUR NAMES ON THIS SLIDE: Abraham Irabor · Fnu Soh Tah Fon · Joseph Williams · Chinonso Egeolu. The rubric says 'present in team, grade individually' — a slide that doesn't name you is a slide that doesn't credit you. Add a one-line 'who did what' too.\n\n8 minutes. Slide 5 is the 10-point slide. If you run short, cut the demo, never slide 5."
+      "subtitle": "An AI counselor that stays inside the protocol",
+      "note": "15 seconds. Say the one line: 'ZenAI is an AI counselor that stays inside the protocol — and when it can't, it stops.'\n\nBEFORE CLASS: add a one-line 'who did what' under the names. The course grades individually ('present in team, grade individually'). Only list what each person actually did.",
+      "objects": [
+        {
+          "id": "kicker",
+          "kind": "text",
+          "x": 8,
+          "y": 8,
+          "w": 84,
+          "h": 6,
+          "text": "COSC 490 · Project 5 · Group 3 · Midterm Progress Report · October 15, 2026",
+          "size": 13,
+          "align": "center",
+          "color": "muted",
+          "tracking": 1.5,
+          "uppercase": true
+        },
+        {
+          "id": "team",
+          "kind": "text",
+          "x": 8,
+          "y": 84,
+          "w": 84,
+          "h": 7,
+          "text": "Abraham Irabor  ·  Fnu Soh Tah Fon  ·  Joseph Williams  ·  Chinonso Egeolu",
+          "size": 15,
+          "weight": 600,
+          "align": "center",
+          "color": "accent"
+        }
+      ]
+    },
+    {
+      "layout": "image",
+      "title": "The concept, in 60 seconds",
+      "subtitle": "▶  Plays full-screen in ZenAI-Midterm-Oct15.pptx  ·  also at zenai-screens.unv.run/film",
+      "image": "artifacts/media/zenai-video/still-title.png",
+      "note": "PLAY THE FILM. 62 seconds. Click the video in PowerPoint, or open zenai-screens.unv.run/film as the backup.\n\nSay before it plays: 'This is an animated explainer of the design — what ZenAI does on one turn.'\n\nSay that sentence. It is a concept film, not a screen recording of running software: the Fidelity Monitor in it is designed and is being built Oct 16–27, and the scoring grid near the end is marked ILLUSTRATION. Framing it honestly costs nothing and protects you if someone asks 'is that running?'"
+    },
+    {
+      "layout": "split",
+      "title": "Under pressure, AI counselors drift",
+      "bullets": [
+        "They **give advice**, they **reassure**, they **quietly diagnose**",
+        "The three moves a trained counselor is taught never to make",
+        "Woebot, Wysa, Youper, Replika and Ash handle it the same way: **a prompt, and hope**",
+        "None of them publishes a drift rate. None publishes a crisis-detection recall."
+      ],
+      "image": "artifacts/media/zenai-video/still-drift-crop.png",
+      "note": "45 seconds. The problem in one sentence: the failure mode of an AI counselor isn't being rude — it's being helpful in exactly the wrong way.\n\nThe example on screen: a student says they keep opening their notes and closing them. The 'typical AI counselor' reassures ('you'll do great!'), gives advice ('make a study schedule'), and diagnoses ('sounds like test anxiety'). All three shut down the student's own processing."
+    },
+    {
+      "layout": "quote",
+      "subtitle": "Project 5 brief — and two of its five references are StatPearls on CBT and Cleveland Clinic on ACT. It asks for a protocol, not a chatbot.",
+      "body": "Develop [a] model for psychological counseling.",
+      "note": "20 seconds. This is the reframing, and it comes straight from Dr. Wang's own assignment page.\n\nThe Project 5 references are: Vertex AI, Agent Builder, Gemini Enterprise Agents, StatPearls 'Cognitive Behavior Therapy' (NCBI NBK470241), and Cleveland Clinic on Acceptance and Commitment Therapy. Two of five are manualised therapy protocols. So we built to a protocol."
+    },
+    {
+      "layout": "split",
+      "title": "ZenAI checks every reply before it is sent",
+      "bullets": [
+        "The **Fidelity Monitor** scores each draft against the six ACT processes",
+        "…and detects the three prohibited moves: advice, reassurance, diagnosis",
+        "A reply that drifts is **rejected and regenerated** before the student sees a word",
+        "Every score is logged — so drift becomes a number we can measure",
+        "Status: **designed, building Oct 16–27**"
+      ],
+      "image": "artifacts/media/zenai-video/still-fidelity-crop.png",
+      "note": "45 seconds. This is the contribution. Nothing on the market scores replies against the protocol and refuses to send the ones that fail.\n\nThe six ACT processes: acceptance, cognitive defusion, present-moment contact, self-as-context, values, committed action.\n\nBe straight about the last bullet. It is designed, it is in the schema (the fidelity_scores table exists), and it is the next two weeks of work. Saying that is stronger than implying it runs."
+    },
+    {
+      "layout": "split",
+      "title": "When it matters most, ZenAI stops talking",
+      "bullets": [
+        "The safety rail runs **before** any reply is drafted — privacy, then crisis",
+        "Risk detected → 988 and the MSU Counseling Center, human handoff",
+        "The text box disappears. ZenAI cannot keep talking, even if asked",
+        "No therapy content is generated for that turn at all"
+      ],
+      "image": "artifacts/media/zenai-video/still-crisis-crop.png",
+      "note": "40 seconds. Lead with this before anyone asks the ethics question — because someone will.\n\nZenAI is not a counselor and never claims to be. It is a support tool that escalates. The ordering is in the code, not a policy: /analyze runs privacy redaction, then the crisis check, and returns the escalation WITHOUT ever calling the distress model or generating a reply.\n\nBEFORE ANY DEMO: the real MSU Counseling Center number must be verified and set as CAMPUS_COUNSELING_PHONE in .env. It is still a placeholder."
+    },
+    {
+      "layout": "bullets",
+      "bullets": [
+        ""
+      ]
+    },
+    {
+      "layout": "image",
+      "title": "Ten agents, four tiers",
+      "subtitle": "Green tags are working in the repo today · grey tags are specified and scheduled · the gold box is the contribution",
+      "image": "artifacts/media/zenai-diagrams/01-architecture-slide.png",
+      "note": "60 seconds. Read it left to right — it is the life of one message.\n\n1. TIER 0, every turn: Privacy redacts, Crisis & Safety checks risk. Risk → escalate to 988 and campus counseling, and the conversation stops. BOTH ARE BUILT.\n2. TIER 1, the core loop: Orchestrator → Mood Check-In → Memory → Conversation → Fidelity Monitor. Mood Check-In is BUILT — it is the trained classifier on the next slides.\n3. Point at the gold box. A draft that drifts into advice, reassurance or diagnosis is sent back to be rewritten; the student never sees it. That is the contribution, and it is Oct 16–27.\n4. TIER 2 specialists are routed to when needed. TIER 3 tracks weeks, and the schema that logs every turn is built.\n\nThe tags are honest on purpose: built means it runs in the repo today. The diagram filling in from grey to green across the three reports IS the progress story."
+    },
+    {
+      "layout": "section",
+      "title": "Progress on the core area",
+      "subtitle": "The rubric: “for AI/ML projects, it means the model and training”",
+      "note": "5 seconds. This is the 10-point half of the rubric. Everything from here is measured."
+    },
+    {
+      "layout": "bullets",
+      "bullets": [
+        ""
+      ]
     },
     {
       "layout": "stat",
-      "body": "Drift",
-      "title": "Every AI counselor on the market drifts out of protocol",
-      "subtitle": "It starts giving advice, reassuring, quietly diagnosing — the three things a trained counselor is taught NOT to do. Nobody scores for it. Nobody publishes a drift rate. ZenAI refuses to send a reply that drifts.",
-      "note": "The thesis slide. Same slide in all three presentations.\n\nIf asked what's new: Woebot, Wysa, Youper, Replika and Ash all control drift with prompt instructions and hope. None of them score each response against the protocol and regenerate when it fails, and none publish a crisis-detection recall number. We do both.\n\nGround it in HIS references: NBK470241 is StatPearls Cognitive Behavior Therapy, and his other clinical link is Cleveland Clinic on ACT. Both are manualised protocols. Say 'we built to the references in the assignment' — that lands."
+      "title": "A class the standard dataset cannot see",
+      "subtitle": "GoEmotions — the dataset everyone reaches for — has no loneliness label. Our isolation class scored 0.00. Adding EmpatheticDialogues took it to 0.47.",
+      "body": "0 → 0.47",
+      "note": "40 seconds. The most interesting finding on the deck, so lead with it.\n\nWe mapped GoEmotions' 28 emotion labels onto 6 distress classes. Two had no clean source. isolation had NOTHING mapping to it — there is no loneliness label in GoEmotions — so it could not be predicted at all: F1 0.00.\n\nEmpatheticDialogues carries situation labels like 'lonely' and 'anxious'. Adding it created a class that did not previously exist: F1 0.47.\n\nAll numbers: results/ in the repo, held-out 15% split."
     },
     {
       "layout": "image",
-      "title": "Architecture — ten agents, four tiers",
-      "image": "artifacts/media/zenai-diagrams/01-architecture.png",
-      "subtitle": "Safety rail runs on every turn, before any therapy content exists · the yellow box is the contribution",
-      "note": "Walk it in this order, 60 seconds:\n\n1. TIER 0, every single turn — Privacy redacts, then Crisis & Safety scores risk. Risk detected and we escalate: 988, campus counseling, and the conversation STOPS. No therapy content is generated for that turn at all.\n2. TIER 1, the core loop — Orchestrator → Mood Check-In (the trained model) → Memory → Conversation on the ACT/CBT protocol → the Fidelity Monitor.\n3. TIER 2 — four specialists the orchestrator routes to, not always on.\n4. TIER 3 — the Progress agent, trends across weeks.\n\nTHE YELLOW BOX IS THE CONTRIBUTION. Every reply is scored against the six ACT processes before the student sees it; drift into advice, diagnosis or false reassurance is rejected and regenerated. Note the arrow looping back from the monitor to the Conversation Agent — that loop is the whole idea.\n\nBuilt today: Orchestrator, Mood Check-In, Crisis & Safety, Privacy. Everything else is scaffolded and scheduled.\n\nKeep diagram 2 (the one-turn sequence) as a backup slide for 'but how does it actually work?'"
-    },
-    {
-      "layout": "bullets",
-      "title": "Development environment",
-      "bullets": [
-        "**github.com/Chinonsocheq21/Zenai** — 6 commits, CI green, verified from a clean clone",
-        "`./setup.sh` — one command from clone to a working trainer. No Docker required",
-        "`docker compose up` — api · postgres+pgvector · redis",
-        "9-table schema from the ER model: sessions · turns · mood_points · **fidelity_scores** · **escalations**",
-        "Diagrams as code in the repo, rendered to PNG — the map is never stale at a presentation",
-        "Every result reproducible: `results/` holds the metrics, `training/` the code that made them"
-      ],
-      "note": "ADD THE SCREENSHOT HERE once you have it: run `docker compose up`, let all services go healthy, screenshot the terminal, save it to artifacts/media/ and set this slide's \"image\" to that path with layout \"split\". Until then it renders as bullets, which is fine.\n\nThe rubric says verbatim 'show your development environment' — this slide is points. Do not try to run compose live unless it is rehearsed and fast.\n\nCode must be pushed to GitHub BEFORE class: 'All coding related should be uploaded to github.'"
-    },
-    {
-      "layout": "bullets",
-      "title": "Core area: the distress model",
-      "bullets": [
-        "**Data** — GoEmotions (54,263) + an EmpatheticDialogues supplement → **86,868 examples**, 6 distress classes, held-out 15% split",
-        "**Trained and measured** — TF-IDF + logistic regression, class-balanced",
-        "**macro-F1 0.521**  ·  vs GoEmotions-only **0.445**  ·  vs majority-class **0.106**",
-        "Macro-F1, not accuracy — the set is 47% neutral, so accuracy would flatter and say nothing",
-        "**The finding we didn't expect to need:** GoEmotions has **no loneliness label at all**. `isolation` scored **0.00** — unpredictable. The supplement took it to **0.47**",
-        "**The finding we did expect:** `overwhelm` stays weak at **0.28**. We map GoEmotions' *confusion* onto it, and a student with three exams is overwhelmed, not confused. It needs its own labels, not more data",
-        "**In flight for Oct 15** — distilroberta fine-tune over the same split, and the recall-optimised crisis classifier"
-      ],
-      "note": "*** THIS IS THE 10-POINT SLIDE. ***\n\nRubric: 'Core areas: for AI/ML related projects, it means the model and training. GUI/front end does not count at this stage.'\n\nEVERY NUMBER HERE IS REAL, measured on 2026-10-09. Source: models/distress/metrics_baseline.json, metrics_baseline_nosupp.json, ablation_summary.json in the repo. Do not change them without re-running training/train_distress.py.\n\nLead with the isolation finding — a class that could not be predicted at all, because the dataset everybody uses has no label for loneliness. That is a real methodological result and it is the most interesting thing on this slide.\n\nBe straight about the last bullet. Saying 'the transformer is training and here is the baseline it has to beat' is stronger than implying it is done. If it IS done by Oct 13, replace that bullet with its numbers and say by how much it beat 0.521."
-    },
-    {
-      "layout": "image",
-      "title": "The ablation — does the supplement earn its place?",
+      "title": "+0.076 macro-F1 — measured, not assumed",
+      "subtitle": "Held-out 15% split · TF-IDF + logistic regression, class-balanced · 86,868 examples · majority-class baseline 0.106",
       "image": "artifacts/media/zenai-diagrams/05-ablation.png",
-      "subtitle": "Held-out 15% split · macro-F1 · TF-IDF + logistic regression, class-balanced",
-      "note": "The money chart. Spend 60 seconds here.\n\nThe argument in one line: we did not just throw more data at it — we identified a specific hole in the standard dataset, filled it from a second source, and measured what that bought. +0.076 macro-F1, and one class went from impossible to usable.\n\nIf asked why overwhelm got slightly WORSE: because the supplement shifted the class balance and overwhelm's source mapping was always weak. We are reporting it rather than hiding it, and the fix is hand-labelling, not more scraping."
+      "note": "50 seconds. The ablation.\n\nMajority class 0.106 → GoEmotions only 0.445 → with the supplement 0.521.\n\nWhy macro-F1 and not accuracy: the set is 47% neutral, so accuracy would flatter and say nothing.\n\nThe honest part, and say it: overwhelm stays weak at 0.28. We predicted that — we map GoEmotions' 'confusion' onto it, and a student with three exams is overwhelmed, not confused. It needs its own hand-labels, not more data. That is in the next two weeks.\n\nIf asked about a transformer: distilroberta is set up and runs, and this 0.521 is the number it has to beat."
     },
     {
       "layout": "bullets",
-      "title": "Live demo — 90 seconds",
+      "title": "Crisis detection: recall first, and honest about data",
       "bullets": [
-        "`POST /analyze` — a student message in, distress distribution and crisis risk out",
-        "A crisis-flagged message → **the escalation path fires and the conversation stops**",
-        "The safety ordering, live: Privacy → Crisis → everything else. **No therapy content is generated for a turn that trips the rail**",
-        "From FastAPI's `/docs` page — **no front end, by design**"
+        "**The rule:** a missed crisis and a false alarm are not the same error — the threshold is set by a recall floor, not by F1",
+        "**Built:** an evaluation harness that sweeps the threshold and states the precision we paid for the recall",
+        "**It found a bug on its first run:** the lexicon caught 1 of 6 obvious paraphrases — “hurting myself” did not match “hurt myself”. Fixed, and pinned by tests",
+        "**The honest limit:** there is no public labelled crisis corpus. The ones that exist are access-controlled, rightly. A real recall number needs qualified annotators or a data-use agreement",
+        "The lexicon stays as a floor under any future model: **max(model, lexicon)**"
       ],
-      "note": "Rehearse three times. Seed the database and cache model outputs so this works with the wifi off.\n\nIf asked why there's no UI: quote the rubric back — GUI doesn't count at this stage, so the effort went into the models. That answer shows you read it.\n\nUse a SAFE example message for the crisis demo, and say out loud that it's synthetic.\n\nThe distress model is trained and loadable. The crisis rail currently runs on the recall-favouring lexicon floor with the classifier going in on top — say that plainly rather than implying the classifier is live. The lexicon is not a placeholder: it stays after training, ORed with the model, so the model can never talk the floor down."
+      "note": "50 seconds. This slide is where you earn credibility.\n\nThe judgment: an unnecessary escalation costs a student one awkward message; a missed one costs something we are not willing to risk. So we pick the loosest threshold whose false-alarm rate is tolerable, and say what we paid.\n\nThe bug story is worth telling: our first detector looked like it worked. The harness showed it missed 'hurting myself' because it only knew 'hurt myself'. A detector that misses an obvious rewording looks like it is working when it is not.\n\nDo NOT quote a crisis recall number. We do not have a legitimate labelled set, and saying so plainly is the stronger answer."
+    },
+    {
+      "layout": "split",
+      "title": "A repository anyone can run",
+      "bullets": [
+        "**github.com/Chinonsocheq21/Zenai**",
+        "`./setup.sh` — clone to working trainer in one command, no Docker needed",
+        "CI on every push: lint, plus 7 tests that can fail the build",
+        "Every number on these slides is reproducible from `results/` and `training/`",
+        "Docker Compose: API · Postgres + pgvector · Redis"
+      ],
+      "image": "artifacts/media/zenai-video/github-repo-crop.png",
+      "note": "30 seconds. The rubric says 'show your development environment' — this is points.\n\nThe point to make: a stranger can clone this and reproduce every number on the previous slides with one command. setup.sh fetches the data, builds the environment and pins the two dependencies that otherwise fail silently.\n\nCode must be pushed BEFORE class — the rubric: 'All coding related should be uploaded to github.'"
     },
     {
       "layout": "bullets",
-      "title": "Next two weeks",
+      "title": "Live: one message through the safety rail",
       "bullets": [
-        "**Oct 22** — Conversation Agent on the written ACT/CBT protocol",
-        "**Oct 27** — Fidelity Monitor: every reply scored against the six ACT processes, drift rejected and regenerated",
-        "**Nov 3** — Experiment E1: 400 turns, monitor off vs on, 120 hand-audited → the drift rate",
-        "Target for Nov 5: fidelity numbers, and the Tier-2 specialists routed"
+        "`POST /analyze` — from FastAPI’s `/docs` page",
+        "Ordinary stress → a distress distribution, and the conversation continues",
+        "Crisis language → the escalation fires and **no reply is generated**",
+        "No front end today, by design — the rubric scores the model. The five screens are designed and wait for November"
       ],
-      "note": "Worth 5 points: 'your goals for the next two weeks and answers questions or suggestions.' Dated commitments.\n\nThen STOP. Leave 2 minutes for questions.\n\nPrepare for the ethics question — it WILL come. The answer: ZenAI is not a counselor and never claims to be, it escalates rather than treats, the safety rail runs before any therapy content is generated, and the same mechanism that keeps it in protocol is the one that keeps it safe. Lead with that rather than defending."
+      "note": "90 seconds, rehearsed three times.\n\nRun from the repo:\n  .venv/bin/uvicorn zenai.api.main:app --app-dir src\nOpen http://127.0.0.1:8000/docs → POST /analyze → Try it out.\n\nMessage 1: 'I have three exams this week and I cannot sleep' → distress scores, escalate false.\nMessage 2 (say out loud it is a synthetic example): 'I don't want to be here anymore' → escalate true, 988 + campus counseling, note says no therapy content generated.\n\nIf asked why no UI: quote the rubric — GUI does not count at this stage, so the effort went into the model. That answer shows you read it.\n\nBackup if the laptop misbehaves: the film at zenai-screens.unv.run/film shows the same flow."
+    },
+    {
+      "layout": "bullets",
+      "title": "The next two weeks",
+      "bullets": [
+        "**Oct 20** — the ACT/CBT protocol written down, with the prohibited moves defined precisely enough to score",
+        "**Oct 22** — Conversation Agent drafting on that protocol",
+        "**Oct 27** — Fidelity Monitor scoring every reply; drift rejected and regenerated",
+        "**Oct 29** — Experiment E1: drift rate with the monitor off vs on, 120 turns hand-audited",
+        "**Ongoing** — hand-label overwhelm (stuck at 0.28); fine-tune distilroberta against the 0.521 baseline"
+      ],
+      "note": "30 seconds. Worth 5 points on its own: 'your goals for the next two weeks.' Dated commitments, not intentions.\n\nConfirm these dates with the team before class — say who owns each.\n\nThen stop and take questions. Leave two minutes."
+    },
+    {
+      "layout": "quote",
+      "subtitle": "ZenAI · Abraham Irabor · Fnu Soh Tah Fon · Joseph Williams · Chinonso Egeolu",
+      "body": "Not a counselor. A support tool that knows when to step back.",
+      "note": "Close on this line and stop talking. Then: 'Questions?'"
     }
   ]
 }

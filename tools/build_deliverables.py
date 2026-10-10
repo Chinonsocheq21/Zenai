@@ -56,110 +56,226 @@ def split_bold(text: str):
 
 
 # --------------------------------------------------------------------- PPTX
-def _tf(slide, x, y, w, h):
-    box = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
-    tf = box.text_frame
+# The deck's look comes from the ZenAI film itself: warm paper, deep green,
+# heavy sans headlines, serif for anything ZenAI "says".
+FILM_PAPER = RGBColor(0xF8, 0xF7, 0xF3)
+CRISIS = RGBColor(0xA9, 0x3E, 0x2A)
+WHITE = RGBColor(0xFF, 0xFF, 0xFF)
+HEAD = "Helvetica Neue"
+MONO = "Menlo"
+SW, SH = 13.333, 7.5          # 16:9, inches
+
+MEDIA_DIRS = ["", "presentations/media", "docs/diagrams"]
+FILM = "presentations/media/zenai-film.mp4"
+
+
+def _resolve(path: str):
+    """Deck paths are workspace-relative; this repo keeps copies in
+    presentations/media and docs/diagrams. Find whichever exists."""
+    if not path:
+        return None
+    for d in MEDIA_DIRS:
+        cand = os.path.join(d, path) if d == "" else os.path.join(d, os.path.basename(path))
+        if os.path.exists(cand):
+            return cand
+    return None
+
+
+def _runs(p, text, size, color, bold=False, font=HEAD, italic=False):
+    """Inline markdown: **bold** and `code`."""
+    for part in re.split(r"(\*\*[^*]+\*\*|`[^`]+`)", text or ""):
+        if not part:
+            continue
+        r = p.add_run()
+        if part.startswith("**"):
+            r.text, b, f = part[2:-2], True, font
+        elif part.startswith("`"):
+            r.text, b, f = part[1:-1], bold, MONO
+        else:
+            r.text, b, f = part, bold, font
+        r.font.size = Pt(size if f != MONO else size * 0.9)
+        r.font.color.rgb = color
+        r.font.bold = b
+        r.font.italic = italic
+        r.font.name = f
+
+
+def _box(slide, x, y, w, h, anchor=MSO_ANCHOR.TOP):
+    tb = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
+    tf = tb.text_frame
     tf.word_wrap = True
+    tf.vertical_anchor = anchor
     tf.margin_left = tf.margin_right = tf.margin_top = tf.margin_bottom = 0
     return tf
 
 
-def _p(tf, text, size, color=INK, bold=False, first=False, after=8,
-       align=PP_ALIGN.LEFT, italic=False, font="Helvetica Neue"):
-    p = tf.paragraphs[0] if first else tf.add_paragraph()
+def _text(slide, x, y, w, h, text, size, color=INK, bold=False, align=PP_ALIGN.LEFT,
+          font=HEAD, italic=False, anchor=MSO_ANCHOR.TOP, spacing=1.08):
+    tf = _box(slide, x, y, w, h, anchor)
+    p = tf.paragraphs[0]
     p.alignment = align
-    p.space_after = Pt(after)
-    for chunk, b in split_bold(clean(text)):
-        r = p.add_run(); r.text = chunk
-        r.font.size = Pt(size); r.font.color.rgb = color
-        r.font.bold = bold or b; r.font.italic = italic; r.font.name = font
-    return p
+    p.line_spacing = spacing
+    _runs(p, text, size, color, bold, font, italic)
+    return tf
 
 
-def _rule(slide, x, y, w, color=GREEN, h=0.035):
+def _rect(slide, x, y, w, h, fill, line=None):
     s = slide.shapes.add_shape(1, Inches(x), Inches(y), Inches(w), Inches(h))
-    s.fill.solid(); s.fill.fore_color.rgb = color
-    s.line.fill.background(); s.shadow.inherit = False
+    s.fill.solid()
+    s.fill.fore_color.rgb = fill
+    if line is None:
+        s.line.fill.background()
+    else:
+        s.line.color.rgb = line
+        s.line.width = Pt(0.75)
+    s.shadow.inherit = False
+    return s
+
+
+def _picture(slide, path, x, y, w, h, border=True):
+    """Fit inside the box, keep aspect, centre."""
+    from PIL import Image
+
+    iw, ih = Image.open(path).size
+    scale = min(w / iw, h / ih)
+    pw, ph = iw * scale, ih * scale
+    px, py = x + (w - pw) / 2, y + (h - ph) / 2
+    if border:
+        _rect(slide, px - 0.04, py - 0.04, pw + 0.08, ph + 0.08, WHITE, LINE)
+    slide.shapes.add_picture(path, Inches(px), Inches(py), Inches(pw), Inches(ph))
+    return px, py, pw, ph
+
+
+def _title(slide, text, y=0.55):
+    _text(slide, 0.75, y, 11.8, 0.9, text, 30, INK, bold=True)
+    _rect(slide, 0.75, y + 0.88, 0.9, 0.05, GREEN)
+
+
+def _footer(slide, n, total):
+    _text(slide, 0.75, 7.02, 6, 0.3, "ZenAI  ·  COSC 490  ·  Group 3", 9.5, MUTED)
+    _text(slide, SW - 2.75, 7.02, 2.0, 0.3, f"{n} / {total}", 9.5, MUTED, align=PP_ALIGN.RIGHT)
+
+
+def _bullets(slide, x, y, w, h, items, size=18):
+    tf = _box(slide, x, y, w, h)
+    for i, b in enumerate(items):
+        p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+        p.space_after = Pt(size * 0.75)
+        p.line_spacing = 1.1
+        r = p.add_run()
+        r.text = "●  "
+        r.font.size = Pt(size * 0.55)
+        r.font.color.rgb = GREEN
+        r.font.name = HEAD
+        _runs(p, b, size, INK)
 
 
 def build_pptx(src="presentations/midterm-oct15.json",
-               out="presentations/ZenAI-Midterm-Oct15.pptx",
-               diagram="docs/diagrams/01-architecture.png"):
+               out="presentations/ZenAI-Midterm-Oct15.pptx"):
     deck = json.load(open(src))
     prs = Presentation()
-    prs.slide_width, prs.slide_height = Inches(13.333), Inches(7.5)
+    prs.slide_width, prs.slide_height = Inches(SW), Inches(SH)
     blank = prs.slide_layouts[6]
+    def has_content(sl):
+        return bool(sl.get("title") or sl.get("body") or sl.get("image")
+                    or any((b or "").strip() for b in sl.get("bullets", []))
+                    or sl.get("objects"))
 
-    for i, s in enumerate(deck["slides"]):
+    # A slide with nothing on it (e.g. an accidental "add slide" in the editor)
+    # is skipped rather than shipped blank. Original indices are kept so the
+    # film slide is still found by position.
+    slides = [(k, x) for k, x in enumerate(deck["slides"]) if has_content(x)]
+    skipped = len(deck["slides"]) - len(slides)
+    if skipped:
+        print(f"   skipped {skipped} empty slide(s)")
+    total = len(slides)
+    film_done = False
+
+    for n, (i, s) in enumerate(slides):
         lay = s.get("layout")
         sl = prs.slides.add_slide(blank)
-        sl.background.fill.solid(); sl.background.fill.fore_color.rgb = PAPER
-        note = s.get("note", "")
+        bg = GREEN if lay == "section" else FILM_PAPER
+        sl.background.fill.solid()
+        sl.background.fill.fore_color.rgb = bg
+        img = _resolve(s.get("image", ""))
 
         if lay == "title":
-            _rule(sl, 1.0, 2.35, 1.6)
-            _p(_tf(sl, 1.0, 2.7, 11.3, 2.0), s["title"], 66, INK, first=True, font=SER, after=14)
-            _p(_tf(sl, 1.0, 4.35, 10.5, 1.6), s.get("subtitle", ""), 17, MUTED, first=True)
-            _p(_tf(sl, 1.0, 6.3, 11.3, 0.5), TEAM, 14, GREEN, first=True, bold=True)
+            # the film's logo lockup: green rounded mark + serif wordmark
+            mark = sl.shapes.add_shape(5, Inches(4.05), Inches(2.72), Inches(1.15), Inches(1.15))
+            mark.fill.solid(); mark.fill.fore_color.rgb = GREEN
+            mark.line.fill.background(); mark.shadow.inherit = False
+            mtf = mark.text_frame; mtf.vertical_anchor = MSO_ANCHOR.MIDDLE
+            mp = mtf.paragraphs[0]; mp.alignment = PP_ALIGN.CENTER
+            _runs(mp, "Z", 50, WHITE, font=SER)
+            _text(sl, 5.45, 2.48, 5.5, 1.6, s["title"], 96, INK, font=SER,
+                  anchor=MSO_ANCHOR.MIDDLE)
+            _text(sl, 1.5, 4.35, 10.33, 0.7, s.get("subtitle", ""), 24, GREEN,
+                  align=PP_ALIGN.CENTER)
+            for o in s.get("objects", []):
+                if o.get("kind") != "text":
+                    continue
+                col = GREEN if o.get("color") == "accent" else MUTED
+                t = o["text"].upper() if o.get("uppercase") else o["text"]
+                _text(sl, SW * o["x"] / 100, SH * o["y"] / 100, SW * o["w"] / 100,
+                      SH * o["h"] / 100, t, o.get("size", 14), col,
+                      bold=(o.get("weight", 400) >= 600), align=PP_ALIGN.CENTER)
 
-        elif lay == "stat":
-            box = sl.shapes.add_shape(1, Inches(0.9), Inches(1.5), Inches(3.5), Inches(2.6))
-            box.fill.solid(); box.fill.fore_color.rgb = SOFT
-            box.line.color.rgb = GREEN; box.line.width = Pt(2); box.shadow.inherit = False
-            box.text_frame.word_wrap = True
-            box.text_frame.vertical_anchor = MSO_ANCHOR.MIDDLE
-            _p(box.text_frame, s.get("body", ""), 60, GREEN, first=True,
-               align=PP_ALIGN.CENTER, font=SER)
-            _p(_tf(sl, 5.0, 1.5, 7.5, 1.6), s.get("title", ""), 30, INK,
-               first=True, font=SER, after=16)
-            _p(_tf(sl, 5.0, 3.3, 7.5, 3.0), s.get("subtitle", ""), 16, MUTED, first=True)
-
-        elif lay == "bullets" and i == 2 and os.path.exists(diagram):
-            # the architecture slide carries the real rendered diagram
-            _p(_tf(sl, 0.8, 0.55, 11.8, 0.7), s["title"], 30, INK, first=True, font=SER)
-            _rule(sl, 0.8, 1.25, 1.3)
-            sl.shapes.add_picture(diagram, Inches(2.55), Inches(1.55), height=Inches(5.15))
-            _p(_tf(sl, 0.8, 6.85, 11.8, 0.5),
-               "Shaded = built.  Outlined = next.  The yellow box is the contribution.",
-               13, MUTED, first=True, italic=True)
+        elif lay == "image" and i == 1 and os.path.exists(FILM) and not film_done:
+            # THE FILM: a real embedded video, plays in PowerPoint and Keynote
+            _title(sl, s.get("title", ""))
+            vw = 8.8                      # leaves room for the caption above the footer
+            vh = vw * 9 / 16
+            vx, vy = (SW - vw) / 2, 1.7
+            _rect(sl, vx - 0.05, vy - 0.05, vw + 0.1, vh + 0.1, WHITE, LINE)
+            sl.shapes.add_movie(FILM, Inches(vx), Inches(vy), Inches(vw), Inches(vh),
+                                poster_frame_image=img, mime_type="video/mp4")
+            _text(sl, 0.75, vy + vh + 0.14, 11.8, 0.3,
+                  "▶  Click to play  ·  62 seconds  ·  backup: zenai-screens.unv.run/film",
+                  12.5, MUTED, align=PP_ALIGN.CENTER)
+            film_done = True
 
         elif lay == "image":
-            img = s.get("image", "")
-            # deck paths are workspace-relative; the copy in this repo lives here
-            local = os.path.join("docs/diagrams", os.path.basename(img))
-            path = img if os.path.exists(img) else (local if os.path.exists(local) else None)
-            _p(_tf(sl, 0.8, 0.5, 11.8, 0.7), s.get("title", ""), 28, INK, first=True, font=SER)
-            _rule(sl, 0.8, 1.18, 1.3)
-            if path:
-                from PIL import Image as _PIL  # noqa
-                pic = sl.shapes.add_picture(path, Inches(0.8), Inches(1.5), width=Inches(11.8))
-                # if it overflows the slide, scale by height instead
-                if pic.height > Inches(5.2):
-                    sl.shapes._spTree.remove(pic._element)
-                    pic = sl.shapes.add_picture(path, Inches(0.8), Inches(1.5), height=Inches(5.2))
-                    pic.left = int((prs.slide_width - pic.width) / 2)
+            _title(sl, s.get("title", ""))
+            if img:
+                _picture(sl, img, 0.75, 1.72, 11.83, 4.75)
             if s.get("subtitle"):
-                _p(_tf(sl, 0.8, 6.85, 11.8, 0.5), s["subtitle"], 13, MUTED, first=True, italic=True)
+                _text(sl, 0.75, 6.55, 11.83, 0.4, s["subtitle"], 12, MUTED,
+                      align=PP_ALIGN.CENTER, italic=True)
 
-        elif lay in ("bullets", "split"):
-            _p(_tf(sl, 0.8, 0.55, 11.8, 0.8), s["title"], 32, INK, first=True, font=SER)
-            _rule(sl, 0.8, 1.32, 1.3)
-            wide = 11.8 if lay == "bullets" else 7.1
-            tf = _tf(sl, 0.8, 1.85, wide, 5.0)
-            for j, b in enumerate(s.get("bullets", [])):
-                _p(tf, "—   " + b, 17, INK, first=(j == 0), after=15)
-            if lay == "split":
-                ph = sl.shapes.add_shape(1, Inches(8.3), Inches(1.85), Inches(4.2), Inches(4.4))
-                ph.fill.solid(); ph.fill.fore_color.rgb = RGBColor(0xF2, 0xEF, 0xE9)
-                ph.line.color.rgb = LINE; ph.shadow.inherit = False
-                ph.text_frame.word_wrap = True
-                ph.text_frame.vertical_anchor = MSO_ANCHOR.MIDDLE
-                _p(ph.text_frame,
-                   "[ screenshot: docker compose up,\n4 services healthy + green CI ]",
-                   13, MUTED, first=True, align=PP_ALIGN.CENTER, italic=True)
+        elif lay == "split":
+            _title(sl, s.get("title", ""))
+            _bullets(sl, 0.75, 1.85, 5.6, 4.9, s.get("bullets", []), size=18.5)
+            if img:
+                _picture(sl, img, 6.65, 1.8, 5.95, 4.9)
 
-        if note:
-            sl.notes_slide.notes_text_frame.text = note
+        elif lay == "bullets":
+            _title(sl, s.get("title", ""))
+            _bullets(sl, 0.75, 1.9, 11.8, 4.95, s.get("bullets", []), size=23)
+
+        elif lay == "quote":
+            _text(sl, 0.9, 1.35, 1.2, 1.2, "“", 120, GREEN, font=SER)
+            _text(sl, 1.6, 2.15, 10.2, 2.6, s.get("body", ""), 42, INK, font=SER,
+                  anchor=MSO_ANCHOR.MIDDLE, spacing=1.12)
+            _rect(sl, 1.6, 5.0, 0.9, 0.05, GREEN)
+            _text(sl, 1.6, 5.25, 10.2, 1.2, s.get("subtitle", ""), 15, MUTED)
+
+        elif lay == "section":
+            _text(sl, 1.0, 2.6, 11.3, 1.3, s.get("title", ""), 54, WHITE, bold=True)
+            _text(sl, 1.0, 4.0, 11.3, 1.0, s.get("subtitle", ""), 20,
+                  RGBColor(0xD6, 0xE8, 0xDF))
+
+        elif lay == "stat":
+            _text(sl, 0.75, 1.15, 11.83, 2.6, s.get("body", ""), 128, GREEN, bold=True,
+                  align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+            _text(sl, 1.5, 3.95, 10.33, 0.8, s.get("title", ""), 30, INK, bold=True,
+                  align=PP_ALIGN.CENTER)
+            _text(sl, 2.0, 4.85, 9.33, 1.6, s.get("subtitle", ""), 17, MUTED,
+                  align=PP_ALIGN.CENTER, spacing=1.2)
+
+        if lay not in ("title", "section"):
+            _footer(sl, n + 1, total)
+        if s.get("note"):
+            sl.notes_slide.notes_text_frame.text = s["note"]
 
     prs.save(out)
     return out
