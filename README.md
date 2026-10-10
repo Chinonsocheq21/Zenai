@@ -74,6 +74,29 @@ Ten agents in four tiers — see `docs/diagrams.md` (Mermaid, paste into Lucidch
 - **Tier 2 · routed** — Academic Stress · Stress-Relief · Wellness Schedule · Resource & Referral
 - **Tier 3 · longitudinal** — Progress
 
+## The console
+
+The working frontend. It sends a message through the real pipeline on your
+machine and shows each stage of the turn as it runs.
+
+```bash
+./setup.sh                                                   # once
+PYTHONPATH=src .venv/bin/uvicorn zenai.api.main:app --port 8000
+```
+
+Open **http://127.0.0.1:8000**. The raw API is still at `/docs`.
+
+What it shows is exactly what runs, and nothing more. Privacy, the crisis check
+and the mood model are live. Memory, the Conversation Agent, the Fidelity
+Monitor and sending a reply are drawn in gold as **not built yet** — the API's
+`trace` reports them that way, and the console draws the trace. When the crisis
+rail trips, every later stage is skipped and the text box disappears.
+
+The header says **campus line: NOT SET** until `CAMPUS_COUNSELING_PHONE` is set
+in `.env`. Set it before any demo.
+
+![console](docs/console/02-crisis.png)
+
 ## Running it
 
 **First time on a new machine:** `./setup.sh` — makes the virtualenv, installs

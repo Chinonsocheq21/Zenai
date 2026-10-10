@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZenAI — console</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%232F6F5E%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2219%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Georgia%22%3EZ%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --paper:#F8F7F3; --ink:#1C2620; --muted:#6B7A72; --line:#E4E0D8;
+    --green:#2F6F5E; --soft:#E3EFE9; --softline:#BFD9CE;
+    --red:#A93E2A; --redsoft:#FBEDE9; --redline:#EBC9BF;
+    --gold:#B8860B; --goldsoft:#FFF4D6; --warm:#C97A3E;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+    --mono:ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  button{font:inherit;cursor:pointer}
+
+  header{height:64px;display:flex;align-items:center;gap:14px;padding:0 28px;border-bottom:1px solid var(--line);background:#fff}
+  .mark{width:34px;height:34px;border-radius:9px;background:var(--green);color:#fff;font-family:var(--serif);
+        font-size:18px;display:flex;align-items:center;justify-content:center}
+  header h1{font-family:var(--serif);font-weight:400;font-size:22px}
+  header .sub{color:var(--muted);font-size:13px;letter-spacing:.4px}
+  header .right{margin-left:auto;display:flex;gap:10px;align-items:center}
+  .badge{font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:#fff}
+  .badge.ok{color:var(--green);border-color:var(--softline);background:var(--soft)}
+  .badge.bad{color:var(--red);border-color:var(--redline);background:var(--redsoft)}
+
+  main{display:grid;grid-template-columns:440px 1fr;grid-template-rows:minmax(0,1fr);height:calc(100% - 64px);overflow:hidden}
+
+  /* ---------- chat column ---------- */
+  .chat{border-right:1px solid var(--line);display:flex;flex-direction:column;background:var(--paper);min-height:0}
+  .chat.alarm{background:var(--redsoft)}
+  .log{flex:1;overflow-y:auto;padding:22px 22px 8px}
+  .empty{color:var(--muted);font-size:14px;line-height:1.6;margin-top:6px}
+  .empty b{color:var(--ink)}
+  .me{background:var(--ink);color:#F6F4F0;padding:12px 15px;border-radius:16px;border-bottom-right-radius:5px;
+      max-width:86%;margin:0 0 8px auto;font-size:15px;line-height:1.5;width:fit-content}
+  .read{font-size:12px;color:var(--muted);text-align:right;margin:0 2px 10px;font-family:var(--mono)}
+  .noreply{border:1.5px dashed var(--line);border-radius:14px;padding:11px 14px;font-size:13px;color:var(--muted);
+           line-height:1.5;margin:0 0 18px;max-width:86%;background:#fff}
+  .noreply b{color:var(--ink);font-weight:600}
+  .composer{border-top:1px solid var(--line);padding:12px 16px 14px;background:#fff;flex:0 0 auto}
+  .row{display:flex;gap:10px}
+  textarea{flex:1;resize:none;height:46px;border:1px solid var(--line);border-radius:23px;padding:12px 16px;
+           font:15px var(--sans);color:var(--ink);background:#fff;outline:none}
+  textarea:focus{border-color:var(--softline)}
+  .send{width:46px;height:46px;border-radius:23px;border:0;background:var(--green);color:#fff;font-size:18px}
+  .send:disabled{opacity:.45;cursor:default}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+  .chip{font-size:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:6px 11px}
+  .chip:hover{border-color:var(--softline);background:var(--soft)}
+  .chip.chip-crisis{color:var(--red);border-color:var(--redline);background:var(--redsoft)}
+
+  /* crisis takeover */
+  .crisis{padding:30px 24px;display:none;overflow-y:auto}
+  .alarm .crisis{display:block}
+  .alarm .log,.alarm .composer{display:none}
+  .crisis h2{font-family:var(--serif);font-weight:400;font-size:27px;line-height:1.28;margin-bottom:12px}
+  .crisis p{font-size:15px;line-height:1.65;color:#5A3A32;margin-bottom:18px}
+  .rescue{background:#fff;border:1px solid var(--redline);border-radius:16px;padding:15px 16px;margin-bottom:11px}
+  .rescue .who{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:6px}
+  .rescue .what{font-size:18px;font-weight:600}
+  .rescue .how{font-size:13px;color:var(--muted);margin-top:2px}
+  .rescue .how.unset{color:var(--red);font-weight:600}
+  .halt{border-top:1px solid var(--redline);padding-top:14px;margin-top:8px;font-size:12.5px;color:#7A5449;line-height:1.6}
+  .reset{margin-top:16px;border:1px solid var(--redline);background:#fff;color:var(--red);border-radius:999px;padding:9px 16px;font-size:13px}
+
+  /* ---------- trace column ---------- */
+  .trace{padding:26px 34px;overflow-y:auto;min-height:0}
+  .kicker{font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .trace h3{font-size:24px;font-weight:700;margin:6px 0 4px;letter-spacing:-.2px}
+  .trace .lede{color:var(--muted);font-size:14px;line-height:1.55;max-width:760px}
+
+  .rail{display:grid;grid-template-columns:repeat(7,1fr);margin:26px 0 22px;position:relative}
+  .rail:before{content:"";position:absolute;left:7%;right:7%;top:15px;height:2px;background:var(--line)}
+  .stage{text-align:center;position:relative}
+  .dot{width:32px;height:32px;border-radius:50%;margin:0 auto 9px;border:2px dashed #C9C3B8;background:var(--paper);
+       display:flex;align-items:center;justify-content:center;font-size:14px;color:#fff;transition:all .25s}
+  .stage .nm{font-size:11px;letter-spacing:.9px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .stage .ms{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:3px;min-height:14px}
+  .stage.done .dot{border:0;background:var(--green)}
+  .stage.done .nm{color:var(--green)}
+  .stage.escalated .dot{border:0;background:var(--red)}
+  .stage.escalated .nm{color:var(--red)}
+  .stage.skipped .dot{border:2px solid #DCD7CE;background:#EFECE6;color:#B5AFA5}
+  .stage.pending .dot{border:2px dashed var(--gold);background:var(--goldsoft);color:var(--gold)}
+  .stage.pending .nm{color:var(--gold)}
+
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px}
+  .card.wide{grid-column:1/-1}
+  .card .ct{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between}
+  .card .ct span:last-child{font-family:var(--mono);letter-spacing:0;text-transform:none;font-weight:400}
+  .redacted{font-family:var(--mono);font-size:13.5px;line-height:1.6;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+  .redacted mark{background:var(--soft);color:var(--green);border-radius:4px;padding:0 3px;font-weight:700}
+
+  .meter{height:14px;border-radius:7px;background:linear-gradient(90deg,#E3EFE9 0%,#F4E7D8 45%,#FBEDE9 100%);position:relative;margin:16px 0 8px}
+  .needle{position:absolute;top:-6px;width:4px;height:26px;border-radius:2px;background:var(--ink);transition:left .35s}
+  .thresh{position:absolute;top:-10px;bottom:-10px;width:0;border-left:2px dashed var(--red)}
+  .thresh span{position:absolute;top:-18px;left:-30px;font-size:10px;color:var(--red);font-family:var(--mono);white-space:nowrap}
+  .riskline{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+  .riskline b{font-size:22px;color:var(--ink);font-family:var(--mono)}
+
+  .bars .b{display:grid;grid-template-columns:150px 1fr 48px;align-items:center;gap:10px;margin-bottom:8px;font-size:13.5px}
+  .bars .tr{height:12px;border-radius:6px;background:#F1EEE8;overflow:hidden}
+  .bars .fl{height:100%;border-radius:6px;background:#8FB3A4;transition:width .4s}
+  .bars .b.top .fl{background:var(--green)}
+  .bars .b.top{font-weight:700}
+  .bars .v{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right}
+  .muted{color:var(--muted);font-size:13.5px;line-height:1.55}
+
+  .pend{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.5}
+  .pend:last-child{border-bottom:0}
+  .pend .tag{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border-radius:999px;padding:3px 9px;flex:0 0 auto;margin-top:1px}
+  .tag.pending{background:var(--goldsoft);color:var(--gold);border:1px solid #EBD7A8}
+  .tag.skipped{background:#EFECE6;color:#8D877C;border:1px solid #DCD7CE}
+
+  .foot{margin-top:22px;font-size:12px;color:var(--muted);line-height:1.6}
+  .foot code{font-family:var(--mono)}
+  .err{background:var(--redsoft);border:1px solid var(--redline);color:var(--red);border-radius:12px;padding:12px 14px;font-size:13.5px;margin-top:16px;display:none}
+</style>
+</head>
+<body>
+<header>
+  <div class="mark">Z</div>
+  <h1>ZenAI</h1>
+  <span class="sub">console · COSC 490 · Group 3</span>
+  <div class="right">
+    <span class="badge" id="b-model">model: …</span>
+    <span class="badge" id="b-phone">campus line: …</span>
+    <span class="badge ok">nothing leaves this machine</span>
+  </div>
+</header>
+
+<main>
+  <section class="chat" id="chat">
+    <div class="log" id="log">
+      <p class="empty">Type what a student might say at 2 a.m., or tap an example below.<br><br>
+      Every message goes through the <b>real</b> pipeline running on this laptop — privacy, then the
+      crisis check, then the mood model. The trace on the right shows exactly what ran.</p>
+    </div>
+    <div class="composer">
+      <div class="row">
+        <textarea id="msg" placeholder="Say what's on your mind…" maxlength="4000"></textarea>
+        <button class="send" id="send" title="Send">↑</button>
+      </div>
+      <div class="chips">
+        <button class="chip" data-t="I have three exams this week and I cannot sleep">Exams, no sleep</button>
+        <button class="chip" data-t="My roommate keeps bringing people over and I feel like I have nowhere to go">Roommate</button>
+        <button class="chip" data-t="I've been so lonely since I moved here, nobody really talks to me">Lonely</button>
+        <button class="chip" data-t="Email my advisor at chege4@morgan.edu or text me on 443-555-0182, my ID is 12345678">Redaction</button>
+        <button class="chip chip-crisis" data-t="I don't want to be here anymore">Crisis (synthetic)</button>
+      </div>
+    </div>
+
+    <div class="crisis" id="crisis">
+      <h2>I'm stopping here, and I want to hand you to a person.</h2>
+      <p>What you said is more than I should carry on my own. I'm not a counselor, and this is the moment that matters most to get right.</p>
+      <div class="rescue"><div class="who">Right now · 24 hours</div><div class="what" id="c-hot">Call or text 988</div><div class="how">Suicide &amp; Crisis Lifeline · free · confidential</div></div>
+      <div class="rescue"><div class="who">On campus</div><div class="what" id="c-campus">Counseling Center</div><div class="how" id="c-phone">—</div></div>
+      <div class="halt">ZenAI has paused this conversation. There is no text box on this screen on purpose — ZenAI cannot keep talking here, even if asked. Nothing you wrote has been shared with anyone.</div>
+      <button class="reset" id="reset">Start a new conversation (demo)</button>
+    </div>
+  </section>
+
+  <section class="trace">
+    <div class="kicker">Turn trace</div>
+    <h3 id="t-title">Waiting for a message</h3>
+    <p class="lede" id="t-lede">Seven stages, in the order the architecture runs them. Green ran. Red stopped the turn. Gold is designed and not built yet — shown here so nothing looks finished that isn't.</p>
+
+    <div class="rail" id="rail"></div>
+    <div class="cards" id="cards"></div>
+    <div class="err" id="err"></div>
+
+    <p class="foot">Served by the ZenAI API at <code id="origin"></code> · endpoint <code>POST /analyze</code> ·
+      raw API at <a href="/docs">/docs</a>. The distress model is the trained classifier in
+      <code>models/distress/</code>; the crisis check is the recall-first rail in <code>zenai/models/crisis.py</code>.</p>
+  </section>
+</main>
+
+<script>
+const STAGES = [
+  ["privacy","Privacy"],["crisis","Crisis"],["mood","Mood"],["memory","Memory"],
+  ["conversation","Draft"],["fidelity","Fidelity"],["send","Send"]];
+const LABEL = {anxiety:"Anxiety", low_mood:"Low mood", anger:"Anger", overwhelm:"Overwhelm",
+               isolation:"Isolation", neutral_or_positive:"Neutral / positive"};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+$("origin").textContent = location.origin;
+
+function drawRail(trace) {
+  const by = Object.fromEntries((trace || []).map(s => [s.stage, s]));
+  $("rail").innerHTML = STAGES.map(([k, nm]) => {
+    const s = by[k];
+    const icon = !s ? "" : s.status === "done" ? "✓" : s.status === "escalated" ? "!" : s.status === "pending" ? "…" : "–";
+    return `<div class="stage ${s ? s.status : ""}" data-k="${k}"><div class="dot">${icon}</div>
+      <div class="nm">${nm}</div><div class="ms">${s && s.ms != null ? s.ms.toFixed(1) + " ms" : ""}</div></div>`;
+  }).join("");
+}
+drawRail([]);
+
+async function reveal(trace) {
+  // stages light up in order; the timings shown are the real measured ones
+  const shown = [];
+  for (const s of trace) {
+    shown.push(s); drawRail(shown);
+    await sleep(s.status === "done" || s.status === "escalated" ? 230 : 90);
+  }
+}
+
+function card(title, right, body, wide) {
+  return `<div class="card ${wide ? "wide" : ""}"><div class="ct"><span>${title}</span><span>${right || ""}</span></div>${body}</div>`;
+}
+
+function render(d, original) {
+  const by = Object.fromEntries(d.trace.map(s => [s.stage, s]));
+  const marked = esc(d.redacted_text).replace(/\[(EMAIL|PHONE|SSN|ID|URL|HANDLE)\]/g, "<mark>[$1]</mark>");
+  let html = card("01 · Privacy — what the rest of the system sees", by.privacy.detail,
+                  `<div class="redacted">${marked}</div>`, true);
+
+  const pct = Math.min(100, d.crisis_risk * 100);
+  html += card("02 · Crisis check", by.crisis.detail,
+    `<div class="riskline"><span>risk</span><b>${d.crisis_risk.toFixed(2)}</b></div>
+     <div class="meter"><div class="thresh" style="left:${THRESH * 100}%"><span>escalate ≥ ${THRESH.toFixed(2)}</span></div>
+       <div class="needle" style="left:calc(${pct}% - 2px)"></div></div>
+     <p class="muted">${d.escalate ? "<b style='color:var(--red)'>Escalated.</b> Nothing after this stage ran." :
+       "Below the threshold. The threshold is set low on purpose — a missed crisis and a false alarm are not the same error."}</p>`);
+
+  if (d.escalate) {
+    html += card("03 · Mood", "not run",
+      `<p class="muted">The mood model never saw this message. When the crisis rail trips, the turn ends there — no therapy content is generated at all.</p>`);
+  } else {
+    const rows = Object.entries(d.distress).sort((a, b) => b[1] - a[1]);
+    const top = rows.length ? rows[0][1] : 0;
+    html += card("03 · Mood check-in" + (top < CONFIDENT ? " — low confidence" : ""),
+                 d.distress_model ? "model: " + d.distress_model : "",
+      `<div class="bars">${rows.map(([k, v], i) => `<div class="b ${i === 0 ? "top" : ""}"><span>${LABEL[k] || k}</span>
+        <div class="tr"><div class="fl" style="width:${(v * 100).toFixed(1)}%"></div></div><span class="v">${(v * 100).toFixed(0)}%</span></div>`).join("")}</div>`);
+  }
+
+  // mood already has its own card above, so leave it out of the list
+  const rest = d.trace.filter(s => (s.status === "pending" || s.status === "skipped") && s.stage !== "mood");
+  if (rest.length) {
+    html += card("04–07 · The rest of the turn", "",
+      rest.map(s => `<div class="pend"><span class="tag ${s.status}">${s.status === "pending" ? "not built yet" : "skipped"}</span>
+        <span><b>${(STAGES.find(x => x[0] === s.stage) || [, s.stage])[1]}</b> — ${esc(s.detail)}</span></div>`).join(""), true);
+  }
+  $("cards").innerHTML = html;
+}
+
+let THRESH = 0.35;
+const CONFIDENT = 0.40;   // below this the top class is a guess, and the console says so
+let busy = false;
+
+async function send(text) {
+  text = (text || "").trim();
+  if (!text || busy) return;
+  busy = true; $("send").disabled = true; $("err").style.display = "none";
+  const log = $("log");
+  if (log.querySelector(".empty")) log.innerHTML = "";
+  log.insertAdjacentHTML("beforeend", `<div class="me">${esc(text)}</div>`);
+  log.scrollTop = log.scrollHeight;
+  $("msg").value = "";
+  $("t-title").textContent = "Running…";
+  try {
+    const r = await fetch("/analyze", {method: "POST", headers: {"Content-Type": "application/json"},
+                                       body: JSON.stringify({text})});
+    if (!r.ok) throw new Error("API answered " + r.status);
+    const d = await r.json();
+    const crisisStage = d.trace.find(s => s.stage === "crisis");
+    const m = /threshold ([0-9.]+)/.exec(crisisStage ? crisisStage.detail : "");
+    if (m) THRESH = parseFloat(m[1]);
+    await reveal(d.trace);
+    render(d, text);
+    if (d.escalate) {
+      $("t-title").textContent = "Escalated — the conversation stopped here";
+      $("t-lede").textContent = "The crisis rail tripped, so the turn ended after stage 2. The student sees a hand-off to people, and no text box.";
+      $("c-hot").textContent = "Call or text " + d.escalation.hotline;
+      $("c-campus").textContent = d.escalation.campus;
+      const unset = d.escalation.phone === "NOT CONFIGURED";
+      $("c-phone").textContent = unset ? "Phone number not configured — set CAMPUS_COUNSELING_PHONE in .env" : d.escalation.phone;
+      $("c-phone").className = "how" + (unset ? " unset" : "");
+      $("chat").classList.add("alarm");
+    } else {
+      const topP = d.distress[d.primary_emotion] || 0;
+      const sure = topP >= CONFIDENT;
+      const readAs = sure ? (LABEL[d.primary_emotion] || d.primary_emotion).toLowerCase()
+                          : "no clear distress signal";
+      $("t-title").textContent = sure ? "Read as " + readAs : "No clear distress signal";
+      $("t-lede").textContent = "Privacy and the crisis check passed, and the mood model scored the message. The stages in gold are designed and scheduled — ZenAI does not write replies yet.";
+      log.insertAdjacentHTML("beforeend",
+        `<div class="read">${sure ? "read as " + readAs + " · " + Math.round(topP * 100) + "%" : "no clear signal · top guess " + Math.round(topP * 100) + "%"} · risk ${d.crisis_risk.toFixed(2)}</div>
+         <div class="noreply"><b>No reply yet.</b> The Conversation Agent and the Fidelity Monitor that checks its drafts are scheduled for Oct 16–27. This console shows only what runs today.</div>`);
+      log.scrollTop = log.scrollHeight;
+    }
+  } catch (e) {
+    $("err").textContent = "Could not reach the ZenAI API (" + e.message + "). Is the server running?";
+    $("err").style.display = "block";
+    $("t-title").textContent = "Waiting for a message";
+  } finally {
+    busy = false; $("send").disabled = false; $("msg").focus();
+  }
+}
+
+$("send").onclick = () => send($("msg").value);
+$("msg").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send($("msg").value); } });
+document.querySelectorAll(".chip").forEach(c => c.onclick = () => send(c.dataset.t));
+$("reset").onclick = () => {
+  $("chat").classList.remove("alarm");
+  $("log").innerHTML = "";
+  $("cards").innerHTML = ""; drawRail([]);
+  $("t-title").textContent = "Waiting for a message";
+  $("t-lede").textContent = "Seven stages, in the order the architecture runs them. Green ran. Red stopped the turn. Gold is designed and not built yet.";
+};
+
+// header badges: which model is being served, and whether the campus line is set
+fetch("/analyze", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({text: "hello"})})
+  .then(r => r.json()).then(d => {
+    $("b-model").textContent = "model: " + (d.distress_model || "—");
+    $("b-model").className = "badge ok";
+  }).catch(() => { $("b-model").textContent = "API offline"; $("b-model").className = "badge bad"; });
+fetch("/analyze", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({text: "I don't want to be here anymore"})})
+  .then(r => r.json()).then(d => {
+    const unset = !d.escalation || d.escalation.phone === "NOT CONFIGURED";
+    $("b-phone").textContent = unset ? "campus line: NOT SET" : "campus line: set";
+    $("b-phone").className = "badge " + (unset ? "bad" : "ok");
+  }).catch(() => {});
+</script>
+</body>
+</html>
