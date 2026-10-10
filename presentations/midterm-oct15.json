@@ -90,12 +90,6 @@
       "note": "40 seconds. Lead with this before anyone asks the ethics question — because someone will.\n\nZenAI is not a counselor and never claims to be. It is a support tool that escalates. The ordering is in the code, not a policy: /analyze runs privacy redaction, then the crisis check, and returns the escalation WITHOUT ever calling the distress model or generating a reply.\n\nBEFORE ANY DEMO: the real MSU Counseling Center number must be verified and set as CAMPUS_COUNSELING_PHONE in .env. It is still a placeholder."
     },
     {
-      "layout": "bullets",
-      "bullets": [
-        ""
-      ]
-    },
-    {
       "layout": "image",
       "title": "Ten agents, four tiers",
       "subtitle": "Green tags are working in the repo today · grey tags are specified and scheduled · the gold box is the contribution",
@@ -107,12 +101,6 @@
       "title": "Progress on the core area",
       "subtitle": "The rubric: “for AI/ML projects, it means the model and training”",
       "note": "5 seconds. This is the 10-point half of the rubric. Everything from here is measured."
-    },
-    {
-      "layout": "bullets",
-      "bullets": [
-        ""
-      ]
     },
     {
       "layout": "stat",
@@ -154,15 +142,17 @@
       "note": "30 seconds. The rubric says 'show your development environment' — this is points.\n\nThe point to make: a stranger can clone this and reproduce every number on the previous slides with one command. setup.sh fetches the data, builds the environment and pins the two dependencies that otherwise fail silently.\n\nCode must be pushed BEFORE class — the rubric: 'All coding related should be uploaded to github.'"
     },
     {
-      "layout": "bullets",
+      "layout": "split",
       "title": "Live: one message through the safety rail",
       "bullets": [
-        "`POST /analyze` — from FastAPI’s `/docs` page",
-        "Ordinary stress → a distress distribution, and the conversation continues",
-        "Crisis language → the escalation fires and **no reply is generated**",
-        "No front end today, by design — the rubric scores the model. The five screens are designed and wait for November"
+        "The **ZenAI console** — the real pipeline, running on this laptop",
+        "Ordinary stress → privacy, crisis check, mood score, in **under 10 ms**",
+        "“Lonely since I moved here” → **isolation, 96%** — the class the standard dataset couldn’t see",
+        "Crisis language → the rail trips, **every later stage is skipped**, the text box disappears",
+        "Stages not built yet are shown in gold, so nothing looks finished that isn’t"
       ],
-      "note": "90 seconds, rehearsed three times.\n\nRun from the repo:\n  .venv/bin/uvicorn zenai.api.main:app --app-dir src\nOpen http://127.0.0.1:8000/docs → POST /analyze → Try it out.\n\nMessage 1: 'I have three exams this week and I cannot sleep' → distress scores, escalate false.\nMessage 2 (say out loud it is a synthetic example): 'I don't want to be here anymore' → escalate true, 988 + campus counseling, note says no therapy content generated.\n\nIf asked why no UI: quote the rubric — GUI does not count at this stage, so the effort went into the model. That answer shows you read it.\n\nBackup if the laptop misbehaves: the film at zenai-screens.unv.run/film shows the same flow."
+      "note": "90 seconds, rehearsed three times.\n\nSTART IT BEFORE CLASS (from the repo folder):\n  PYTHONPATH=src .venv/bin/uvicorn zenai.api.main:app --port 8000\nOpen http://127.0.0.1:8000 — the console loads. The model loads at startup, so the first message is instant.\n\nRun in this order:\n1. 'Exams, no sleep' → anxiety. Point at the seven stages lighting up: three green, four gold. 'Gold is designed and scheduled — we show it so nothing looks finished that isn't.'\n2. 'Lonely' → isolation 96%. 'This is the class the standard dataset could not predict at all — slide 9.'\n3. 'Redaction' → the email, phone and student ID are replaced before anything reads them.\n4. 'Crisis (synthetic)' — SAY IT IS A SYNTHETIC EXAMPLE — → the rail trips at 0.99, every later stage is skipped, the text box disappears, and it hands off to 988 and the counseling center.\n\nCHECK THE HEADER BEFORE CLASS: it must say 'campus line: set'. If it says NOT SET, the crisis screen shows a missing number on the projector.\n\nIf asked why ZenAI doesn't reply: the Conversation Agent needs a language model and the Fidelity Monitor that checks its drafts — that is the next two weeks, and it's the contribution.\n\nBackup: the raw API is at /docs, and the film at zenai-screens.unv.run/film shows the same flow.",
+      "image": "artifacts/media/zenai-console/02-crisis.png"
     },
     {
       "layout": "bullets",
