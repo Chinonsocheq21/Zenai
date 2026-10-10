@@ -118,7 +118,8 @@ before Oct 15; the rubric says GUI does not count at this stage.
 |---|---|---|
 | **1 · Distress** | 6-class classifier over GoEmotions + EmpatheticDialogues | `training/train_distress.py` |
 | **2 · Crisis** | Risk classifier, **recall-optimised**, lexicon floor | `src/zenai/models/crisis.py` |
-| **3 · Fidelity** | ACT-process scorer (after the midterm) | — |
+| **3 · Fidelity — drift** | Detects advice and reassurance in a candidate reply, sentence by sentence. ESConv, split by conversation: macro-F1 **0.590** vs 0.269 baseline | `training/train_drift.py` |
+| **3b · Fidelity — ACT processes** | Scores replies against the six ACT processes; needs the written protocol | — |
 
 > **Two dependency pins that are not optional.** `numpy<2`, because the torch
 > wheels that still support Python 3.9 were built against the NumPy 1.x C API and
@@ -132,6 +133,7 @@ before Oct 15; the rubric says GUI does not count at this stage.
 .venv/bin/python -m training.train_distress --baseline       # TF-IDF, seconds
 .venv/bin/python -m training.train_distress                  # distilroberta, ~15 min CPU
 .venv/bin/python -m training.train_distress --no-supplement  # the ablation
+.venv/bin/python -m training.train_drift           # the Fidelity Monitor's drift detector
 ```
 
 **Read `training/taxonomy.py` before training.** Two of the six classes

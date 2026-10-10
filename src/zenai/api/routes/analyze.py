@@ -29,7 +29,7 @@ STAGES = ["privacy", "crisis", "mood", "memory", "conversation", "fidelity", "se
 NOT_BUILT = {
     "memory": "Memory & Personalization — designed, not built yet",
     "conversation": "Conversation Agent (ACT/CBT) — needs a language model; scheduled Oct 22",
-    "fidelity": "Fidelity Monitor — scheduled Oct 16–27",
+    "fidelity": "drift detector trained — no draft to check until the Conversation Agent exists (see the Fidelity Monitor tab)",
 }
 
 
