@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from zenai.api.routes import analyze, health
+from zenai.api.routes import analyze, fidelity, health
 
 
 @asynccontextmanager
@@ -19,6 +19,13 @@ async def lifespan(_: FastAPI):
         classify("warm up")
     except RuntimeError as e:  # no trained model yet: the API still starts
         print(f"[zenai] distress model not loaded: {e}")
+    try:
+        from zenai.models import fidelity
+
+        if fidelity.available():
+            fidelity.check("warm up.")
+    except RuntimeError as e:
+        print(f"[zenai] drift detector not loaded: {e}")
     yield
 
 
@@ -30,6 +37,7 @@ app = FastAPI(
 )
 app.include_router(health.router)
 app.include_router(analyze.router)
+app.include_router(fidelity.router)
 
 # The console is served by the API itself: one process, no CORS, nothing to
 # configure on demo day. Open http://127.0.0.1:8000/ .

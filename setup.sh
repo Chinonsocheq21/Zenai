@@ -31,10 +31,12 @@ if [ ! -d empatheticdialogues ]; then
   curl -sLO https://dl.fbaipublicfiles.com/parlai/empatheticdialogues/empatheticdialogues.tar.gz
   tar xzf empatheticdialogues.tar.gz
 fi
+[ -f ESConv.json ] || curl -sL -o ESConv.json https://huggingface.co/datasets/thu-coai/esconv/resolve/main/ESConv.json
 cd ../..
 
 echo "==> train the baseline distress model (seconds) so /analyze has something to serve"
 .venv/bin/python -m training.train_distress --baseline > /dev/null && echo "    models/distress/tfidf.joblib"
+.venv/bin/python -m training.train_drift > /dev/null && echo "    models/fidelity/drift.joblib"
 
 echo
 echo "Ready. Now:"

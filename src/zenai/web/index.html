@@ -123,6 +123,30 @@
   .foot{margin-top:22px;font-size:12px;color:var(--muted);line-height:1.6}
   .foot code{font-family:var(--mono)}
   .err{background:var(--redsoft);border:1px solid var(--redline);color:var(--red);border-radius:12px;padding:12px 14px;font-size:13.5px;margin-top:16px;display:none}
+
+  .tabs{display:flex;gap:6px;margin-bottom:14px}
+  .tab{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;padding:7px 14px;font-size:12px;
+       letter-spacing:1px;text-transform:uppercase;font-weight:700}
+  .tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tab .new{background:var(--gold);color:#fff;border-radius:999px;padding:1px 6px;font-size:9.5px;margin-left:6px}
+  .fbox{display:flex;gap:10px;margin:18px 0 10px}
+  .fbox textarea{height:76px;border-radius:14px}
+  .fbtn{border:0;background:var(--ink);color:#fff;border-radius:14px;padding:0 18px;font-weight:600}
+  .verdict{border-radius:14px;padding:14px 18px;font-weight:700;font-size:17px;margin:16px 0}
+  .verdict.bad{background:var(--redsoft);color:var(--red);border:1px solid var(--redline)}
+  .verdict.ok{background:var(--soft);color:var(--green);border:1px solid var(--softline)}
+  .verdict small{display:block;font-weight:400;font-size:13px;color:var(--muted);margin-top:3px}
+  .sent{padding:9px 12px;border-radius:10px;margin-bottom:6px;font-family:var(--serif);font-size:15.5px;line-height:1.5;border:1px solid var(--line);background:#fff}
+  .sent.hit{background:#FDF3EF;border-color:var(--redline)}
+  .sent .pills{font-family:var(--sans);margin-top:4px;display:flex;gap:6px;flex-wrap:wrap}
+  .pill{font-size:11px;border-radius:999px;padding:2px 8px;border:1px solid var(--line);color:var(--muted)}
+  .pill.hit{background:var(--red);color:#fff;border-color:var(--red)}
+  .mv{display:grid;grid-template-columns:120px 1fr 60px;gap:12px;align-items:center;margin:10px 0;font-size:14px}
+  .mv .tr{height:12px;border-radius:6px;background:#F1EEE8;position:relative}
+  .mv .fl{height:100%;border-radius:6px;background:#8FB3A4}
+  .mv .fl.hit{background:var(--red)}
+  .mv .th{position:absolute;top:-5px;bottom:-5px;border-left:2px dashed var(--ink)}
+  .mv .v{font-family:var(--mono);font-size:12px;text-align:right}
 </style>
 </head>
 <body>
@@ -169,6 +193,11 @@
   </section>
 
   <section class="trace">
+    <div class="tabs">
+      <button class="tab on" data-tab="trace">Turn trace</button>
+      <button class="tab" data-tab="fid">Fidelity Monitor<span class="new">trained</span></button>
+    </div>
+    <div id="tab-trace">
     <div class="kicker">Turn trace</div>
     <h3 id="t-title">Waiting for a message</h3>
     <p class="lede" id="t-lede">Seven stages, in the order the architecture runs them. Green ran. Red stopped the turn. Gold is designed and not built yet — shown here so nothing looks finished that isn't.</p>
@@ -176,6 +205,31 @@
     <div class="rail" id="rail"></div>
     <div class="cards" id="cards"></div>
     <div class="err" id="err"></div>
+
+    </div>
+
+    <div id="tab-fid" hidden>
+      <div class="kicker">Fidelity Monitor · drift detector</div>
+      <h3>Would this reply be sent?</h3>
+      <p class="lede">ZenAI does not write drafts yet, so paste one — or tap an example from the film. The detector
+        reads it sentence by sentence for the moves a counselor is taught not to make. A flagged draft is rejected
+        and rewritten before any student sees it.</p>
+      <div class="fbox">
+        <textarea id="draft" placeholder="Paste a candidate reply…" maxlength="4000"></textarea>
+        <button class="fbtn" id="fcheck">Check</button>
+      </div>
+      <div class="chips">
+        <button class="chip" data-d="You've got this! Try breaking your notes into 25-minute blocks.">Film: drifting reply</button>
+        <button class="chip" data-d="That opening-and-closing sounds exhausting on its own — separate from the material. What happens in the moment just before you close it?">Film: stays in protocol</button>
+        <button class="chip" data-d="Don't worry, you'll do great! Just make a study schedule and stick to it. Sounds like test anxiety.">Typical AI counselor</button>
+        <button class="chip" data-d="It sounds like you've been carrying a lot on your own this week.">A reflection</button>
+      </div>
+      <div id="fout"></div>
+      <p class="foot">Trained on ESConv — 18,153 supporter replies from 1,300 conversations, split by conversation so no
+        conversation is in both training and test. Held-out macro-F1 <b>0.590</b> against a 0.269 baseline.
+        Thresholds lean toward recall: a false flag costs one rewrite, a miss puts drift in front of a student.
+        Diagnosis is not detected yet — there is no labelled data for it, and the screen says so rather than calling it clear.</p>
+    </div>
 
     <p class="foot">Served by the ZenAI API at <code id="origin"></code> · endpoint <code>POST /analyze</code> ·
       raw API at <a href="/docs">/docs</a>. The distress model is the trained classifier in
@@ -310,7 +364,7 @@ async function send(text) {
 
 $("send").onclick = () => send($("msg").value);
 $("msg").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send($("msg").value); } });
-document.querySelectorAll(".chip").forEach(c => c.onclick = () => send(c.dataset.t));
+document.querySelectorAll("[data-t]").forEach(c => c.onclick = () => send(c.dataset.t));
 $("reset").onclick = () => {
   $("chat").classList.remove("alarm");
   $("log").innerHTML = "";
@@ -318,6 +372,46 @@ $("reset").onclick = () => {
   $("t-title").textContent = "Waiting for a message";
   $("t-lede").textContent = "Seven stages, in the order the architecture runs them. Green ran. Red stopped the turn. Gold is designed and not built yet.";
 };
+
+
+// ---------- tabs ----------
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x === t));
+  $("tab-trace").hidden = t.dataset.tab !== "trace";
+  $("tab-fid").hidden = t.dataset.tab !== "fid";
+});
+
+// ---------- fidelity monitor ----------
+const MV = {advice: "Advice", reassurance: "Reassurance", diagnosis: "Diagnosis"};
+async function checkDraft(text) {
+  text = (text || "").trim(); if (!text) return;
+  $("draft").value = text;
+  $("fout").innerHTML = '<p class="muted" style="margin-top:14px">Checking…</p>';
+  try {
+    const r = await fetch("/fidelity/check", {method: "POST", headers: {"Content-Type": "application/json"},
+                                              body: JSON.stringify({reply: text})});
+    if (!r.ok) throw new Error((await r.json()).detail || r.status);
+    const d = await r.json();
+    const flagged = Object.entries(d.moves).filter(([, v]) => v.flagged).map(([k]) => MV[k].toLowerCase());
+    let h = `<div class="verdict ${d.drift ? "bad" : "ok"}">${d.drift ? "Drift — rejected, would be rewritten" : "Passes — would be sent"}
+      <small>${d.drift ? "Flagged: " + flagged.join(" + ") + "." : "No prohibited move above its threshold."}</small></div>`;
+    h += d.sentences.map(sn => {
+      const hits = ["advice", "reassurance"].filter(m => sn[m] >= d.moves[m].threshold);
+      return `<div class="sent ${hits.length ? "hit" : ""}">${esc(sn.text)}<div class="pills">${
+        ["advice", "reassurance"].map(m => `<span class="pill ${hits.includes(m) ? "hit" : ""}">${m} ${sn[m].toFixed(2)}</span>`).join("")}</div></div>`;
+    }).join("");
+    h += `<div class="card" style="margin-top:14px"><div class="ct"><span>Strongest sentence per move</span><span>dashed line = threshold</span></div>` +
+      ["advice", "reassurance"].map(m => { const v = d.moves[m];
+        return `<div class="mv"><b>${MV[m]}</b><div class="tr"><div class="fl ${v.flagged ? "hit" : ""}" style="width:${v.score * 100}%"></div>
+          <div class="th" style="left:${v.threshold * 100}%"></div></div><span class="v">${v.score.toFixed(2)}</span></div>`; }).join("") +
+      `<div class="mv"><b>Diagnosis</b><span class="muted">${esc(d.moves.diagnosis.status)}</span><span></span></div></div>`;
+    $("fout").innerHTML = h;
+  } catch (e) {
+    $("fout").innerHTML = `<div class="err" style="display:block">Could not check the draft (${esc(e.message)}).</div>`;
+  }
+}
+$("fcheck").onclick = () => checkDraft($("draft").value);
+document.querySelectorAll("[data-d]").forEach(c => c.onclick = () => checkDraft(c.dataset.d));
 
 // header badges: which model is being served, and whether the campus line is set
 fetch("/analyze", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({text: "hello"})})

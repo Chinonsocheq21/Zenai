@@ -68,14 +68,14 @@
       "layout": "split",
       "title": "ZenAI checks every reply before it is sent",
       "bullets": [
-        "The **Fidelity Monitor** scores each draft against the six ACT processes",
-        "…and detects the three prohibited moves: advice, reassurance, diagnosis",
-        "A reply that drifts is **rejected and regenerated** before the student sees a word",
-        "Every score is logged — so drift becomes a number we can measure",
-        "Status: **designed, building Oct 16–27**"
+        "The **Fidelity Monitor** reads each draft sentence by sentence, before the student sees it",
+        "It detects the prohibited moves: **advice** and **reassurance** today, diagnosis next",
+        "A draft that drifts is **rejected and rewritten** — this is the film’s example, running for real",
+        "Every score is logged, so drift becomes a number we can measure",
+        "Status: **drift detector trained**; scoring against the six ACT processes is next"
       ],
-      "image": "artifacts/media/zenai-video/still-fidelity-crop.png",
-      "note": "45 seconds. This is the contribution. Nothing on the market scores replies against the protocol and refuses to send the ones that fail.\n\nThe six ACT processes: acceptance, cognitive defusion, present-moment contact, self-as-context, values, committed action.\n\nBe straight about the last bullet. It is designed, it is in the schema (the fidelity_scores table exists), and it is the next two weeks of work. Saying that is stronger than implying it runs."
+      "image": "artifacts/media/zenai-console/03-fidelity-drift.png",
+      "note": "45 seconds. This is the contribution, and the screenshot is the real console, not the film.\n\nThe film's drifting reply — 'You've got this! Try breaking your notes into 25-minute blocks.' — is rejected for BOTH moves, and the detector points at the exact sentence carrying each one: 'You've got this!' is reassurance, 'Try breaking…' is advice. The film's in-protocol reply passes.\n\nBe straight about what's next: the drift-detection half is trained; scoring against the six ACT processes needs Joseph's written protocol, and diagnosis needs labelled examples — there is no public dataset for it."
     },
     {
       "layout": "split",
@@ -117,6 +117,13 @@
       "note": "50 seconds. The ablation.\n\nMajority class 0.106 → GoEmotions only 0.445 → with the supplement 0.521.\n\nWhy macro-F1 and not accuracy: the set is 47% neutral, so accuracy would flatter and say nothing.\n\nThe honest part, and say it: overwhelm stays weak at 0.28. We predicted that — we map GoEmotions' 'confusion' onto it, and a student with three exams is overwhelmed, not confused. It needs its own hand-labels, not more data. That is in the next two weeks.\n\nIf asked about a transformer: distilroberta is set up and runs, and this 0.521 is the number it has to beat."
     },
     {
+      "layout": "stat",
+      "body": "0.59",
+      "title": "The drift detector, measured on conversations it never saw",
+      "subtitle": "Trained on ESConv — 18,153 supporter replies hand-labelled by strategy. Split by conversation, not by reply. Catches 77% of advice and 60% of reassurance; majority baseline 0.27.",
+      "note": "40 seconds. The second trained model — and the first half of the contribution.\n\nESConv labels every supporter reply with its strategy. Two of them are exactly our prohibited moves: 'Providing Suggestions' is advice-giving, 'Affirmation and Reassurance' is reassurance.\n\nThe methodological point worth making: we split by CONVERSATION. Split by individual reply and turns from the same conversation land in both training and test — that would have scored 0.612 instead of 0.590. We report the honest one.\n\nThresholds lean toward recall: a false flag costs one rewrite, a miss puts drift in front of a student.\n\nThe weak number, said plainly: reassurance precision is 0.34, because ESConv lumps healthy validation ('that sounds hard') in with false reassurance ('you'll be fine'). A reflection still passes — the threshold was chosen so it would.\n\nSource: results/drift_detector.json."
+    },
+    {
       "layout": "bullets",
       "title": "Crisis detection: recall first, and honest about data",
       "bullets": [
@@ -147,22 +154,22 @@
       "bullets": [
         "The **ZenAI console** — the real pipeline, running on this laptop",
         "Ordinary stress → privacy, crisis check, mood score, in **under 10 ms**",
-        "“Lonely since I moved here” → **isolation, 96%** — the class the standard dataset couldn’t see",
+        "“Lonely since I moved here” → **isolation, 96%**",
         "Crisis language → the rail trips, **every later stage is skipped**, the text box disappears",
-        "Stages not built yet are shown in gold, so nothing looks finished that isn’t"
+        "**Fidelity Monitor tab** → the film’s drifting reply, rejected; the in-protocol reply, sent"
       ],
-      "note": "90 seconds, rehearsed three times.\n\nSTART IT BEFORE CLASS (from the repo folder):\n  PYTHONPATH=src .venv/bin/uvicorn zenai.api.main:app --port 8000\nOpen http://127.0.0.1:8000 — the console loads. The model loads at startup, so the first message is instant.\n\nRun in this order:\n1. 'Exams, no sleep' → anxiety. Point at the seven stages lighting up: three green, four gold. 'Gold is designed and scheduled — we show it so nothing looks finished that isn't.'\n2. 'Lonely' → isolation 96%. 'This is the class the standard dataset could not predict at all — slide 9.'\n3. 'Redaction' → the email, phone and student ID are replaced before anything reads them.\n4. 'Crisis (synthetic)' — SAY IT IS A SYNTHETIC EXAMPLE — → the rail trips at 0.99, every later stage is skipped, the text box disappears, and it hands off to 988 and the counseling center.\n\nCHECK THE HEADER BEFORE CLASS: it must say 'campus line: set'. If it says NOT SET, the crisis screen shows a missing number on the projector.\n\nIf asked why ZenAI doesn't reply: the Conversation Agent needs a language model and the Fidelity Monitor that checks its drafts — that is the next two weeks, and it's the contribution.\n\nBackup: the raw API is at /docs, and the film at zenai-screens.unv.run/film shows the same flow.",
+      "note": "90 seconds, rehearsed three times.\n\nSTART IT BEFORE CLASS (from the repo folder):\n  PYTHONPATH=src .venv/bin/uvicorn zenai.api.main:app --port 8000\nOpen http://127.0.0.1:8000 — the console loads. The model loads at startup, so the first message is instant.\n\nRun in this order:\n1. 'Exams, no sleep' → anxiety. Point at the seven stages lighting up: three green, four gold. 'Gold is designed and scheduled — we show it so nothing looks finished that isn't.'\n2. 'Lonely' → isolation 96%. 'This is the class the standard dataset could not predict at all — slide 9.'\n3. 'Redaction' → the email, phone and student ID are replaced before anything reads them.\n4. Switch to the FIDELITY MONITOR tab → 'Film: drifting reply' → rejected for advice + reassurance, each sentence marked. Then 'Film: stays in protocol' → passes. 'This is the scene from the film, running for real.'\n5. Back to Turn trace → 'Crisis (synthetic)' — SAY IT IS A SYNTHETIC EXAMPLE — → the rail trips at 0.99, every later stage is skipped, the text box disappears, and it hands off to 988 and the counseling center.\n\nCHECK THE HEADER BEFORE CLASS: it must say 'campus line: set'. If it says NOT SET, the crisis screen shows a missing number on the projector.\n\nIf asked why ZenAI doesn't reply: the Conversation Agent needs a language model and the Fidelity Monitor that checks its drafts — that is the next two weeks, and it's the contribution.\n\nBackup: the raw API is at /docs, and the film at zenai-screens.unv.run/film shows the same flow.",
       "image": "artifacts/media/zenai-console/02-crisis.png"
     },
     {
       "layout": "bullets",
       "title": "The next two weeks",
       "bullets": [
-        "**Oct 20** — the ACT/CBT protocol written down, with the prohibited moves defined precisely enough to score",
-        "**Oct 22** — Conversation Agent drafting on that protocol",
-        "**Oct 27** — Fidelity Monitor scoring every reply; drift rejected and regenerated",
+        "**Oct 20** — the ACT/CBT protocol written down, with diagnosis defined precisely enough to label",
+        "**Oct 22** — Conversation Agent drafting replies on that protocol",
+        "**Oct 27** — Fidelity Monitor in the loop: every draft checked; drift rewritten before it is sent",
         "**Oct 29** — Experiment E1: drift rate with the monitor off vs on, 120 turns hand-audited",
-        "**Ongoing** — hand-label overwhelm (stuck at 0.28); fine-tune distilroberta against the 0.521 baseline"
+        "**Ongoing** — hand-label overwhelm (0.28) and diagnosis; fine-tune distilroberta against 0.521"
       ],
       "note": "30 seconds. Worth 5 points on its own: 'your goals for the next two weeks.' Dated commitments, not intentions.\n\nConfirm these dates with the team before class — say who owns each.\n\nThen stop and take questions. Leave two minutes."
     },
