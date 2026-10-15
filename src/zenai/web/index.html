@@ -147,6 +147,27 @@
   .mv .fl.hit{background:var(--red)}
   .mv .th{position:absolute;top:-5px;bottom:-5px;border-left:2px dashed var(--ink)}
   .mv .v{font-family:var(--mono);font-size:12px;text-align:right}
+
+  .zen{background:var(--soft);border:1px solid var(--softline);border-radius:16px;border-bottom-left-radius:5px;
+       padding:12px 15px;max-width:88%;margin:0 0 6px;font-family:var(--serif);font-size:15.5px;line-height:1.55}
+  .zen.unchecked{background:#fff;border-style:dashed}
+  .drafts{margin:0 0 16px;font-size:12px;color:var(--muted)}
+  .drafts summary{cursor:pointer;font-family:var(--mono);list-style:none}
+  .drafts summary::-webkit-details-marker{display:none}
+  .drafts .rej{margin:6px 0 0;padding:8px 11px;border-radius:10px;background:#FDF3EF;border:1px solid var(--redline);
+               font-family:var(--serif);font-size:13.5px;color:#7A5449;text-decoration:line-through;text-decoration-color:rgba(169,62,42,.45)}
+  .drafts .why{font-family:var(--sans);font-size:11.5px;color:var(--red);margin-top:3px;text-decoration:none;display:block}
+  .thinking{font-size:12.5px;color:var(--muted);font-family:var(--mono);margin:0 0 14px}
+  .mon{display:flex;align-items:center;gap:8px;margin-top:9px;font-size:12px;color:var(--muted)}
+  .mon input{accent-color:var(--green);width:15px;height:15px}
+  .mon b.off{color:var(--red)}
+  .att{padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px;line-height:1.5}
+  .att:last-child{border-bottom:0}
+  .att .v{font-size:10.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;border-radius:999px;padding:2px 8px;margin-right:8px}
+  .att .v.no{background:var(--redsoft);color:var(--red);border:1px solid var(--redline)}
+  .att .v.ok{background:var(--soft);color:var(--green);border:1px solid var(--softline)}
+  .att .v.na{background:#EFECE6;color:#8D877C;border:1px solid #DCD7CE}
+  .att q{font-family:var(--serif);quotes:"\201C" "\201D"}
 </style>
 </head>
 <body>
@@ -180,6 +201,7 @@
         <button class="chip" data-t="Email my advisor at chege4@morgan.edu or text me on 443-555-0182, my ID is 12345678">Redaction</button>
         <button class="chip chip-crisis" data-t="I don't want to be here anymore">Crisis (synthetic)</button>
       </div>
+      <label class="mon"><input type="checkbox" id="monitor" checked> Fidelity Monitor <b id="mon-state">on</b> — every draft is checked before it is sent</label>
     </div>
 
     <div class="crisis" id="crisis">
@@ -231,7 +253,7 @@
         Diagnosis is not detected yet — there is no labelled data for it, and the screen says so rather than calling it clear.</p>
     </div>
 
-    <p class="foot">Served by the ZenAI API at <code id="origin"></code> · endpoint <code>POST /analyze</code> ·
+    <p class="foot">Served by the ZenAI API at <code id="origin"></code> · endpoints <code>POST /chat</code> and <code>POST /analyze</code> ·
       raw API at <a href="/docs">/docs</a>. The distress model is the trained classifier in
       <code>models/distress/</code>; the crisis check is the recall-first rail in <code>zenai/models/crisis.py</code>.</p>
   </section>
@@ -298,6 +320,16 @@ function render(d, original) {
         <div class="tr"><div class="fl" style="width:${(v * 100).toFixed(1)}%"></div></div><span class="v">${(v * 100).toFixed(0)}%</span></div>`).join("")}</div>`);
   }
 
+  if (d.attempts && d.attempts.length) {
+    html += card("05–06 · Draft and Fidelity Monitor", d.monitor === false ? "monitor OFF" : `${d.attempts.length} draft(s)`,
+      d.attempts.map((a, i) => {
+        const v = !a.checked ? '<span class="v na">not checked</span>'
+                : a.drift ? '<span class="v no">rejected</span>' : '<span class="v ok">passed</span>';
+        const why = a.drift ? " — " + Object.entries(a.flagged).map(([m, x]) => `${m} ${x.score.toFixed(2)} on “${esc(x.sentence)}”`).join("; ") : "";
+        return `<div class="att">${v}<b>Draft ${i + 1}</b> <q>${esc(a.draft)}</q><span class="muted">${why}</span></div>`;
+      }).join("") + (d.fallback ? '<div class="att"><span class="v ok">fallback</span>Every rewrite drifted, so the protocol-safe reply was sent instead.</div>' : ""), true);
+  }
+
   // mood already has its own card above, so leave it out of the list
   const rest = d.trace.filter(s => (s.status === "pending" || s.status === "skipped") && s.stage !== "mood");
   if (rest.length) {
@@ -311,6 +343,7 @@ function render(d, original) {
 let THRESH = 0.35;
 const CONFIDENT = 0.40;   // below this the top class is a guess, and the console says so
 let busy = false;
+const HISTORY = [];   // this conversation only -- the redacted turns, never the raw text
 
 async function send(text) {
   text = (text || "").trim();
@@ -323,8 +356,15 @@ async function send(text) {
   $("msg").value = "";
   $("t-title").textContent = "Running…";
   try {
-    const r = await fetch("/analyze", {method: "POST", headers: {"Content-Type": "application/json"},
-                                       body: JSON.stringify({text})});
+    log.insertAdjacentHTML("beforeend", `<div class="thinking" id="thinking">ZenAI is drafting · the monitor checks it before you see it…</div>`);
+    log.scrollTop = log.scrollHeight;
+    const monitor = $("monitor").checked;
+    let r = await fetch("/chat", {method: "POST", headers: {"Content-Type": "application/json"},
+                                  body: JSON.stringify({text, history: HISTORY, monitor})});
+    if (r.status === 503) {   // no language model configured: show the pipeline without a reply
+      r = await fetch("/analyze", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({text})});
+    }
+    const th = $("thinking"); if (th) th.remove();
     if (!r.ok) throw new Error("API answered " + r.status);
     const d = await r.json();
     const crisisStage = d.trace.find(s => s.stage === "crisis");
@@ -347,10 +387,25 @@ async function send(text) {
       const readAs = sure ? (LABEL[d.primary_emotion] || d.primary_emotion).toLowerCase()
                           : "no clear distress signal";
       $("t-title").textContent = sure ? "Read as " + readAs : "No clear distress signal";
-      $("t-lede").textContent = "Privacy and the crisis check passed, and the mood model scored the message. The stages in gold are designed and scheduled — ZenAI does not write replies yet.";
-      log.insertAdjacentHTML("beforeend",
-        `<div class="read">${sure ? "read as " + readAs + " · " + Math.round(topP * 100) + "%" : "no clear signal · top guess " + Math.round(topP * 100) + "%"} · risk ${d.crisis_risk.toFixed(2)}</div>
-         <div class="noreply"><b>No reply yet.</b> The Conversation Agent and the Fidelity Monitor that checks its drafts are scheduled for Oct 16–27. This console shows only what runs today.</div>`);
+      const readLine = `<div class="read">${sure ? "read as " + readAs + " · " + Math.round(topP * 100) + "%" : "no clear signal · top guess " + Math.round(topP * 100) + "%"} · risk ${d.crisis_risk.toFixed(2)}</div>`;
+      if (d.reply) {
+        const rejected = (d.attempts || []).filter(a => a.drift);
+        $("t-lede").textContent = d.monitor === false
+          ? "Monitor OFF: the first draft was sent unchecked. This is the baseline experiment E1 compares against."
+          : rejected.length
+            ? `The Fidelity Monitor rejected ${rejected.length} draft(s) and had them rewritten before anything was sent.`
+            : "The first draft passed the Fidelity Monitor and was sent.";
+        log.insertAdjacentHTML("beforeend", readLine +
+          `<div class="zen ${d.monitor === false ? "unchecked" : ""}">${esc(d.reply)}</div>` +
+          (rejected.length ? `<details class="drafts"><summary>▸ ${rejected.length} draft(s) rejected by the Fidelity Monitor</summary>${
+             rejected.map(a => `<div class="rej">${esc(a.draft)}<span class="why">${Object.entries(a.flagged).map(([m, x]) => m + " " + x.score.toFixed(2)).join(" · ")}</span></div>`).join("")}</details>`
+           : `<div class="drafts">${d.monitor === false ? "monitor off · sent unchecked" : "passed the Fidelity Monitor first time"}</div>`));
+        HISTORY.push({role: "user", content: d.redacted_text}, {role: "assistant", content: d.reply});
+      } else {
+        $("t-lede").textContent = "Privacy and the crisis check passed, and the mood model scored the message. No language model is configured, so no reply was written.";
+        log.insertAdjacentHTML("beforeend", readLine +
+          `<div class="noreply"><b>No reply.</b> Add XAI_API_KEY to .env to let ZenAI write replies.</div>`);
+      }
       log.scrollTop = log.scrollHeight;
     }
   } catch (e) {
@@ -363,11 +418,13 @@ async function send(text) {
 }
 
 $("send").onclick = () => send($("msg").value);
+$("monitor").onchange = () => { const on = $("monitor").checked;
+  $("mon-state").textContent = on ? "on" : "OFF"; $("mon-state").className = on ? "" : "off"; };
 $("msg").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send($("msg").value); } });
 document.querySelectorAll("[data-t]").forEach(c => c.onclick = () => send(c.dataset.t));
 $("reset").onclick = () => {
   $("chat").classList.remove("alarm");
-  $("log").innerHTML = "";
+  $("log").innerHTML = ""; HISTORY.length = 0;
   $("cards").innerHTML = ""; drawRail([]);
   $("t-title").textContent = "Waiting for a message";
   $("t-lede").textContent = "Seven stages, in the order the architecture runs them. Green ran. Red stopped the turn. Gold is designed and not built yet.";

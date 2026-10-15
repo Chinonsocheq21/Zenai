@@ -12,3 +12,7 @@ data/cache/
 # fetched data and local env
 data/raw/
 .venv/
+
+# conversation logs (redacted, but still not for GitHub)
+data/turns.jsonl
+data/turns.test.jsonl

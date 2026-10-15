@@ -23,7 +23,7 @@ dev = ["pytest>=8.3", "ruff>=0.8", "jupyter>=1.1"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py39"   # the dev machine runs 3.9; never "upgrade" into 3.11-only APIs
 # src/ layout: say where first-party code lives, or CI and a local venv
 # classify `zenai` differently and sort imports in opposite orders.
 src = [".", "src"]

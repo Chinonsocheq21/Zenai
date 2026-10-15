@@ -32,3 +32,14 @@ def test_a_reflection_is_not_mistaken_for_reassurance():
 def test_diagnosis_is_reported_as_undetected_not_as_clear():
     d = fidelity.check("Sounds like test anxiety.")["moves"]["diagnosis"]
     assert d["score"] is None and "not detected" in d["status"]
+
+
+def test_the_safe_fallback_passes_the_monitor_with_margin():
+    """The fallback is what a student gets when every rewrite drifts. If our own
+    detector would reject it, the loop has no safe exit."""
+    from zenai.agents.conversation import SAFE_FALLBACK
+
+    r = fidelity.check(SAFE_FALLBACK)
+    assert r["drift"] is False
+    for move in ("advice", "reassurance"):
+        assert r["moves"][move]["score"] < r["moves"][move]["threshold"] - 0.15

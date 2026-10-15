@@ -11,6 +11,13 @@ class Settings(BaseSettings):
     # A missed crisis and a false alarm are not the same kind of error.
     CRISIS_THRESHOLD: float = 0.35
 
+    # Language model for the Conversation Agent. The key lives in .env only.
+    XAI_API_KEY: str = ""
+    LLM_MODEL: str = "grok-4.3"
+    LLM_BASE_URL: str = "https://api.x.ai/v1"
+    # How many times a drifting draft may be rewritten before the safe fallback.
+    MAX_REWRITES: int = 2
+
     CRISIS_HOTLINE: str = "988"
     CAMPUS_COUNSELING_NAME: str = "Morgan State University Counseling Center"
     # Verified 2026-10-15 on morgan.edu/counseling-center/about-us/contact-us.
