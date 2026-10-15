@@ -98,16 +98,16 @@
     },
     {
       "layout": "split",
-      "title": "Built on Google Cloud Agent Platform",
+      "title": "Also in progress: Google Cloud Agent Platform",
       "bullets": [
-        "Project **ZenAI** (`zenai-511701`) — Dr. Wang’s own reference stack",
-        "**Conversation Agent** — greets students, assesses their emotional state, routes to specialized sub-agents",
-        "**Crisis and Safety Agent** — routes crisis inquiries to dedicated counseling resources",
-        "**The design:** our trained models wrap these agents — the crisis rail runs **before** every turn, the Fidelity Monitor checks every draft **after** it",
-        "Next: connect the Agent Builder Conversation Agent to the pipeline so its drafts go through the monitor"
+        "Project **ZenAI** (`zenai-511701`) on Dr. Wang’s reference stack",
+        "**Conversation Agent** — greets students, assesses their emotional state, routes to sub-agents",
+        "**Crisis and Safety Agent** — routes crisis inquiries to counseling resources",
+        "**Status:** both agents are created; the team member who built them will demo what they do",
+        "**Open question:** whether this becomes the Conversation Agent’s engine — either way, every draft passes the Fidelity Monitor"
       ],
       "image": "artifacts/media/zenai-team/agent-builder-agents.png",
-      "note": "40 seconds. WHOEVER BUILT THIS SHOULD PRESENT THIS SLIDE — the course grades individually, and this is the work in the team's Canvas submission (the two Agent Builder screenshots).\n\nThe point to make: two halves that fit together. Agent Builder (Gemini) is where the conversation happens. Our trained models are the guard rails around it — privacy and the crisis rail before the agent sees a message, the Fidelity Monitor on every draft before the student sees it.\n\nBe precise about status: the two agents are created in Agent Builder; connecting them to the pipeline is the next two weeks. Don't claim they're integrated today."
+      "note": "30 seconds — ONLY IF THE PERSON WHO BUILT THIS IS PRESENTING IT. If they aren't in the room or can't speak to it, delete this slide before class: the rest of the deck stands on its own.\n\nDon't describe what these agents do beyond the descriptions on screen — nobody else on the team has seen them run.\n\nThe honest framing: our pipeline is the core; this is a candidate engine for the one stage that needs a language model."
     },
     {
       "layout": "section",
@@ -179,7 +179,7 @@
       "title": "The next two weeks",
       "bullets": [
         "**Oct 20** — the ACT/CBT protocol written down, with diagnosis defined precisely enough to label",
-        "**Oct 22** — the Agent Builder Conversation Agent drafting on that protocol, connected to the pipeline",
+        "**Oct 22** — Conversation Agent drafting replies on that protocol (engine: Gemini or Grok, behind one function)",
         "**Oct 27** — Fidelity Monitor in the loop: every draft checked; drift rewritten before it is sent",
         "**Oct 29** — Experiment E1: drift rate with the monitor off vs on, 120 turns hand-audited",
         "**Ongoing** — hand-label overwhelm (0.28) and diagnosis; fine-tune distilroberta against 0.521"
