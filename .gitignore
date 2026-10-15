@@ -16,3 +16,5 @@ data/raw/
 # conversation logs (redacted, but still not for GitHub)
 data/turns.jsonl
 data/turns.test.jsonl
+# E1 answer keys and raw logs name each reply's condition -- never public
+data/e1-keys/

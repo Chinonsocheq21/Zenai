@@ -1,0 +1,25 @@
+{
+  "tag": "pilot-v0",
+  "model": "grok-4.3",
+  "protocol": "v0 -- agents/conversation.py PROTOCOL_V0 (958 chars)",
+  "messages": 40,
+  "escalated_and_excluded": 0,
+  "audited_pairs": 40,
+  "sheets": {
+    "replies_to_audit": 80,
+    "rejected_drafts_to_audit": 18
+  },
+  "detector_view_NOT_THE_RESULT": {
+    "monitor_off_replies_flagged_pct": 27.5,
+    "first_drafts_flagged_pct": 25.0,
+    "first_drafts_flagged_by_move": {
+      "reassurance": 8,
+      "advice": 3
+    },
+    "mean_drafts_per_turn_monitor_on": 1.35,
+    "fallback_rate_pct": 5.0,
+    "median_turn_seconds_monitor_on": 5.0
+  },
+  "how_to_get_the_result": "Fill audit_replies.csv blind, then join data/e1-keys/pilot-v0.csv (kept off GitHub so the audit stays blind): drift rate = replies marked Y on any move / replies, per condition. Fill audit_rejected.csv: false-rejection rate = N / rows.",
+  "early_read_by_eye_NOT_THE_AUDIT": "Of the 18 rejected drafts, nearly all read as protocol-faithful reflection, acceptance or open questions rather than drift (e.g. 'There's space here for those feelings to be present' rejected as advice). The detector learned from peer support, where validation is labelled reassurance. The team's audit of audit_rejected.csv is the measurement."
+}
