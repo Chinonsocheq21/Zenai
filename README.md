@@ -92,8 +92,9 @@ Monitor and sending a reply are drawn in gold as **not built yet** — the API's
 `trace` reports them that way, and the console draws the trace. When the crisis
 rail trips, every later stage is skipped and the text box disappears.
 
-The header says **campus line: NOT SET** until `CAMPUS_COUNSELING_PHONE` is set
-in `.env`. Set it before any demo.
+The crisis hand-off shows the Morgan Counseling Center (443-885-3130, weekdays
+8:30–5) and Morgan's 24/7 crisis line (1-800-422-0009), both verified on
+morgan.edu on 2026-10-15. Override with `CAMPUS_COUNSELING_PHONE` in `.env`.
 
 ![console](docs/console/02-crisis.png)
 
@@ -158,6 +159,5 @@ one-line "who did what" — the course grades individually.
 
 ## Before the demo
 
-- [ ] Set `CAMPUS_COUNSELING_PHONE` in `.env` — **verify the real number**
 - [ ] Seed the database and cache model outputs so the demo runs offline
 - [ ] Use synthetic text for the crisis demo, and say out loud that it is synthetic

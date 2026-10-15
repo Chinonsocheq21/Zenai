@@ -13,7 +13,10 @@ class Settings(BaseSettings):
 
     CRISIS_HOTLINE: str = "988"
     CAMPUS_COUNSELING_NAME: str = "Morgan State University Counseling Center"
-    CAMPUS_COUNSELING_PHONE: str = ""
+    # Verified 2026-10-15 on morgan.edu/counseling-center/about-us/contact-us.
+    # The office line alone is not enough: the scenario this exists for is 2 a.m.,
+    # when the office is closed, so the 24/7 line is part of the value.
+    CAMPUS_COUNSELING_PHONE: str = "443-885-3130 (weekdays 8:30–5) · 24/7: 1-800-422-0009"
 
 
 settings = Settings()
