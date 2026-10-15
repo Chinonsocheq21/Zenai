@@ -97,6 +97,19 @@
       "note": "60 seconds. Read it left to right — it is the life of one message.\n\n1. TIER 0, every turn: Privacy redacts, Crisis & Safety checks risk. Risk → escalate to 988 and campus counseling, and the conversation stops. BOTH ARE BUILT.\n2. TIER 1, the core loop: Orchestrator → Mood Check-In → Memory → Conversation → Fidelity Monitor. Mood Check-In is BUILT — it is the trained classifier on the next slides.\n3. Point at the gold box. A draft that drifts into advice, reassurance or diagnosis is sent back to be rewritten; the student never sees it. That is the contribution, and it is Oct 16–27.\n4. TIER 2 specialists are routed to when needed. TIER 3 tracks weeks, and the schema that logs every turn is built.\n\nThe tags are honest on purpose: built means it runs in the repo today. The diagram filling in from grey to green across the three reports IS the progress story."
     },
     {
+      "layout": "split",
+      "title": "Built on Google Cloud Agent Platform",
+      "bullets": [
+        "Project **ZenAI** (`zenai-511701`) — Dr. Wang’s own reference stack",
+        "**Conversation Agent** — greets students, assesses their emotional state, routes to specialized sub-agents",
+        "**Crisis and Safety Agent** — routes crisis inquiries to dedicated counseling resources",
+        "**The design:** our trained models wrap these agents — the crisis rail runs **before** every turn, the Fidelity Monitor checks every draft **after** it",
+        "Next: connect the Agent Builder Conversation Agent to the pipeline so its drafts go through the monitor"
+      ],
+      "image": "artifacts/media/zenai-team/agent-builder-agents.png",
+      "note": "40 seconds. WHOEVER BUILT THIS SHOULD PRESENT THIS SLIDE — the course grades individually, and this is the work in the team's Canvas submission (the two Agent Builder screenshots).\n\nThe point to make: two halves that fit together. Agent Builder (Gemini) is where the conversation happens. Our trained models are the guard rails around it — privacy and the crisis rail before the agent sees a message, the Fidelity Monitor on every draft before the student sees it.\n\nBe precise about status: the two agents are created in Agent Builder; connecting them to the pipeline is the next two weeks. Don't claim they're integrated today."
+    },
+    {
       "layout": "section",
       "title": "Progress on the core area",
       "subtitle": "The rubric: “for AI/ML projects, it means the model and training”",
@@ -158,7 +171,7 @@
         "Crisis language → the rail trips, **every later stage is skipped**, the text box disappears",
         "**Fidelity Monitor tab** → the film’s drifting reply, rejected; the in-protocol reply, sent"
       ],
-      "note": "90 seconds, rehearsed three times.\n\nSTART IT BEFORE CLASS (from the repo folder):\n  PYTHONPATH=src .venv/bin/uvicorn zenai.api.main:app --port 8000\nOpen http://127.0.0.1:8000 — the console loads. The model loads at startup, so the first message is instant.\n\nRun in this order:\n1. 'Exams, no sleep' → anxiety. Point at the seven stages lighting up: three green, four gold. 'Gold is designed and scheduled — we show it so nothing looks finished that isn't.'\n2. 'Lonely' → isolation 96%. 'This is the class the standard dataset could not predict at all — slide 9.'\n3. 'Redaction' → the email, phone and student ID are replaced before anything reads them.\n4. Switch to the FIDELITY MONITOR tab → 'Film: drifting reply' → rejected for advice + reassurance, each sentence marked. Then 'Film: stays in protocol' → passes. 'This is the scene from the film, running for real.'\n5. Back to Turn trace → 'Crisis (synthetic)' — SAY IT IS A SYNTHETIC EXAMPLE — → the rail trips at 0.99, every later stage is skipped, the text box disappears, and it hands off to 988 and the counseling center.\n\nThe header should read 'campus line: set'. The crisis screen shows the Counseling Center (443-885-3130, weekdays) and Morgan's 24/7 line (1-800-422-0009) — both verified on morgan.edu on Oct 15.\n\nIf asked why ZenAI doesn't reply: the Conversation Agent needs a language model and the Fidelity Monitor that checks its drafts — that is the next two weeks, and it's the contribution.\n\nBackup: the raw API is at /docs, and the film at zenai-screens.unv.run/film shows the same flow.",
+      "note": "90 seconds, rehearsed three times.\n\nSTART IT BEFORE CLASS (from the repo folder):\n  PYTHONPATH=src .venv/bin/uvicorn zenai.api.main:app --port 8000\nOpen http://127.0.0.1:8000 — the console loads. The model loads at startup, so the first message is instant.\n\nRun in this order:\n1. 'Exams, no sleep' → anxiety. Point at the seven stages lighting up: three green, four gold. 'Gold is designed and scheduled — we show it so nothing looks finished that isn't.'\n2. 'Lonely' → isolation 96%. 'This is the class the standard dataset could not predict at all — slide 9.'\n3. 'Redaction' → the email, phone and student ID are replaced before anything reads them.\n4. Switch to the FIDELITY MONITOR tab → 'Film: drifting reply' → rejected for advice + reassurance, each sentence marked. Then 'Film: stays in protocol' → passes. 'This is the scene from the film, running for real.'\n5. Back to Turn trace → 'Crisis (synthetic)' — SAY IT IS A SYNTHETIC EXAMPLE — → the rail trips at 0.99, every later stage is skipped, the text box disappears, and it hands off to 988 and the counseling center.\n\nThe header should read 'campus line: set'. The crisis screen shows the Counseling Center (443-885-3130, weekdays) and Morgan's 24/7 line (1-800-422-0009) — both verified on morgan.edu on Oct 15.\n\nIf asked why ZenAI doesn't reply here: the Conversation Agent lives in Google Cloud Agent Builder (previous slides); connecting it so its drafts pass through this pipeline and the Fidelity Monitor is the next two weeks.\n\nBackup: the raw API is at /docs, and the film at zenai-screens.unv.run/film shows the same flow.",
       "image": "artifacts/media/zenai-console/02-crisis.png"
     },
     {
@@ -166,7 +179,7 @@
       "title": "The next two weeks",
       "bullets": [
         "**Oct 20** — the ACT/CBT protocol written down, with diagnosis defined precisely enough to label",
-        "**Oct 22** — Conversation Agent drafting replies on that protocol",
+        "**Oct 22** — the Agent Builder Conversation Agent drafting on that protocol, connected to the pipeline",
         "**Oct 27** — Fidelity Monitor in the loop: every draft checked; drift rewritten before it is sent",
         "**Oct 29** — Experiment E1: drift rate with the monitor off vs on, 120 turns hand-audited",
         "**Ongoing** — hand-label overwhelm (0.28) and diagnosis; fine-tune distilroberta against 0.521"

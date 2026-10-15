@@ -28,7 +28,7 @@ router = APIRouter(tags=["analyze"])
 STAGES = ["privacy", "crisis", "mood", "memory", "conversation", "fidelity", "send"]
 NOT_BUILT = {
     "memory": "Memory & Personalization — designed, not built yet",
-    "conversation": "Conversation Agent (ACT/CBT) — needs a language model; scheduled Oct 22",
+    "conversation": "Conversation Agent — created in Google Cloud Agent Builder; connecting it to this pipeline is next",
     "fidelity": "drift detector trained — no draft to check until the Conversation Agent exists (see the Fidelity Monitor tab)",
 }
 
