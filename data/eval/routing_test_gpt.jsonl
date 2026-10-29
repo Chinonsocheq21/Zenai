@@ -1,0 +1,100 @@
+{"text": "I completely bombed my chemistry exam.", "label": "academic"}
+{"text": "this paper is confusing me so bad", "label": "academic"}
+{"text": "My grades keep slipping even though I study hard.", "label": "academic"}
+{"text": "Professor moved the deadline up, and now I'm panicking about finishing the assignment.", "label": "academic"}
+{"text": "I’m three chapters behind in biology.", "label": "academic"}
+{"text": "Why can’t I understand calculus at all?", "label": "academic"}
+{"text": "I got a C on a project I worked really hard on, and I feel defeated.", "label": "academic"}
+{"text": "these discussion posts are wearing me out fr", "label": "academic"}
+{"text": "I’m worried I might fail this class.", "label": "academic"}
+{"text": "My professor’s feedback on my essay was harsh, and now I doubt my writing.", "label": "academic"}
+{"text": "midterms got me questioning every answer", "label": "academic"}
+{"text": "I cannot focus on this reading assignment.", "label": "academic"}
+{"text": "My group project partners are not doing their share, and the final presentation is coming up.", "label": "academic"}
+{"text": "I studied, but the test questions made no sense.", "label": "academic"}
+{"text": "I have no idea how to begin my history paper.", "label": "academic"}
+{"text": "Seeing my GPA drop has been really upsetting.", "label": "academic"}
+{"text": "I missed two assignments and feel academically stuck.", "label": "academic"}
+{"text": "This statistics class is much harder than I expected.", "label": "academic"}
+{"text": "I’m anxious about presenting my research to the class.", "label": "academic"}
+{"text": "finals are cooking me ngl", "label": "academic"}
+{"text": "my shoulders are tight and won’t relax", "label": "stress_relief"}
+{"text": "My heart is racing, and I need to calm down right now.", "label": "stress_relief"}
+{"text": "I feel jittery for no obvious reason.", "label": "stress_relief"}
+{"text": "can you help me settle down in this moment", "label": "stress_relief"}
+{"text": "My jaw is clenched so hard.", "label": "stress_relief"}
+{"text": "I’m pacing around and cannot sit still.", "label": "stress_relief"}
+{"text": "Everything feels intense, and my body is stuck on high alert.", "label": "stress_relief"}
+{"text": "my hands are shaky rn", "label": "stress_relief"}
+{"text": "I need a quick way to release this tension.", "label": "stress_relief"}
+{"text": "My chest feels tight whenever I get overwhelmed.", "label": "stress_relief"}
+{"text": "I feel restless and wound up.", "label": "stress_relief"}
+{"text": "How do I slow my breathing when I’m suddenly tense?", "label": "stress_relief"}
+{"text": "I cannot get my muscles to loosen up.", "label": "stress_relief"}
+{"text": "I’m buzzing with nervous energy and need to ground myself.", "label": "stress_relief"}
+{"text": "my stomach is in knots right now", "label": "stress_relief"}
+{"text": "I feel shaky and overstimulated at the moment.", "label": "stress_relief"}
+{"text": "My pulse feels fast, and I cannot settle down.", "label": "stress_relief"}
+{"text": "need something quick to calm these nerves", "label": "stress_relief"}
+{"text": "I’m physically tense from head to toe.", "label": "stress_relief"}
+{"text": "right now I feel too keyed up to relax", "label": "stress_relief"}
+{"text": "My sleep schedule is completely backwards.", "label": "wellness"}
+{"text": "I keep skipping breakfast because my mornings feel rushed.", "label": "wellness"}
+{"text": "Working late shifts is leaving me exhausted every day.", "label": "wellness"}
+{"text": "i need a healthier daily routine fr", "label": "wellness"}
+{"text": "There never seems to be enough time for exercise or basic chores.", "label": "wellness"}
+{"text": "I’ve been living on snacks instead of real meals.", "label": "wellness"}
+{"text": "Balancing my job and personal responsibilities is draining me.", "label": "wellness"}
+{"text": "I stay up way too late scrolling.", "label": "wellness"}
+{"text": "My week is so packed that I never get downtime.", "label": "wellness"}
+{"text": "I’m exhausted from commuting, working, and handling everything at home.", "label": "wellness"}
+{"text": "how do i stop wasting my whole morning", "label": "wellness"}
+{"text": "I haven’t been consistent with meals lately.", "label": "wellness"}
+{"text": "My routine falls apart every weekend.", "label": "wellness"}
+{"text": "I’m struggling to make time for laundry, movement, and cooking.", "label": "wellness"}
+{"text": "Eight hours in bed still doesn’t leave me refreshed.", "label": "wellness"}
+{"text": "My work hours keep throwing off my whole week.", "label": "wellness"}
+{"text": "I feel worn out from having too much on my plate every day.", "label": "wellness"}
+{"text": "I need better balance between responsibilities and personal time.", "label": "wellness"}
+{"text": "Meal planning feels impossible with my current routine.", "label": "wellness"}
+{"text": "I’ve been running on empty all week.", "label": "wellness"}
+{"text": "Where can I find counseling at Morgan State?", "label": "referral"}
+{"text": "who can i talk to on campus about personal stuff", "label": "referral"}
+{"text": "How do I make an appointment with a counselor?", "label": "referral"}
+{"text": "Is there somewhere at Morgan where I can get tutoring?", "label": "referral"}
+{"text": "I need food assistance; which campus office should I contact?", "label": "referral"}
+{"text": "Where do I apply for disability accommodations?", "label": "referral"}
+{"text": "Can you point me toward emergency housing help?", "label": "referral"}
+{"text": "who do i call if i need professional support", "label": "referral"}
+{"text": "How can I connect with an academic adviser?", "label": "referral"}
+{"text": "Is there a campus service that helps students afford groceries?", "label": "referral"}
+{"text": "I would like to speak with a therapist; where should I start?", "label": "referral"}
+{"text": "What office handles accessibility support at Morgan State?", "label": "referral"}
+{"text": "Can you tell me how to join a support group?", "label": "referral"}
+{"text": "where can i get help finding stable housing", "label": "referral"}
+{"text": "I need someone to talk to confidentially. Who is available?", "label": "referral"}
+{"text": "How do I request a tutor for math?", "label": "referral"}
+{"text": "Could you give me the contact information for campus counseling?", "label": "referral"}
+{"text": "What resources can help me pay for meals?", "label": "referral"}
+{"text": "Where should I go to discuss testing accommodations?", "label": "referral"}
+{"text": "Is there a hotline or campus person I can contact for emotional support?", "label": "referral"}
+{"text": "I miss my family back home.", "label": "general"}
+{"text": "my roommate and i are not getting along", "label": "general"}
+{"text": "I feel lonely even around other people.", "label": "general"}
+{"text": "This breakup has me feeling really low.", "label": "general"}
+{"text": "My best friend keeps ignoring my messages.", "label": "general"}
+{"text": "I’m having a hard time fitting in here.", "label": "general"}
+{"text": "family drama is getting on my last nerve", "label": "general"}
+{"text": "I feel like nobody really understands me.", "label": "general"}
+{"text": "My partner and I keep arguing about trust.", "label": "general"}
+{"text": "hey, just wanted somebody to chat with", "label": "general"}
+{"text": "I’m homesick and missing everything familiar.", "label": "general"}
+{"text": "A close friend shared my private business with other people.", "label": "general"}
+{"text": "I feel left out by my friend group.", "label": "general"}
+{"text": "My parents keep comparing me to my siblings.", "label": "general"}
+{"text": "I’m disappointed that my friendship ended so suddenly.", "label": "general"}
+{"text": "today just feels kind of sad and gray", "label": "general"}
+{"text": "My cousin and I had a huge argument.", "label": "general"}
+{"text": "I keep thinking about my ex and feeling stuck.", "label": "general"}
+{"text": "Everybody seems connected, but I feel invisible.", "label": "general"}
+{"text": "what’s good, chatbot? how are you today", "label": "general"}

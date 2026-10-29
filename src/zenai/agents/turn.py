@@ -1,6 +1,6 @@
 """One full turn: message in, checked reply out.
 
-    privacy -> crisis -> mood -> memory -> draft -> fidelity -> send
+    privacy -> crisis -> mood -> route -> memory -> draft -> fidelity -> send
 
 The order is the safety design. The crisis rail runs before the language model
 ever sees the message; the Fidelity Monitor runs on every draft before the
@@ -35,7 +35,7 @@ def _stage(stage, status, ms=None, detail=""):
 
 def run(text: str, history: list[dict] | None = None, monitor: bool = True,
         memory: list[str] | None = None) -> dict:
-    from zenai.agents import conversation
+    from zenai.agents import conversation, resources, specialists
     from zenai.agents.privacy import redact
     from zenai.models import fidelity
     from zenai.models.crisis import score_risk
@@ -54,7 +54,7 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     trace.append(_stage("crisis", "escalated" if escalate else "done", _ms(t),
                         f"risk {risk:.2f} vs threshold {settings.CRISIS_THRESHOLD:.2f}"))
     if escalate:
-        for s in ("mood", "memory", "conversation", "fidelity", "send"):
+        for s in ("mood", "route", "memory", "conversation", "fidelity", "send"):
             trace.append(_stage(s, "skipped", detail="not run — the crisis rail stops the turn here"))
         out = {"escalate": True, "crisis_risk": risk, "redacted_text": redacted, "reply": None,
                "attempts": [], "trace": trace,
@@ -70,6 +70,11 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     mood = max(dist, key=dist.get)
     trace.append(_stage("mood", "done", _ms(t), f"{mood} {dist[mood]:.0%} · model: {which()}"))
 
+    t = time.perf_counter()
+    spec = specialists.route(redacted, mood)
+    cards = resources.cards(spec["resources"]) if spec["id"] == "referral" else []
+    trace.append(_stage("route", "done", _ms(t), f"{spec['name']} · {spec['why']}"))
+
     if memory:
         trace.append(_stage("memory", "done", None,
                             f"{len(memory)} note(s) the student chose to keep, from their own device"))
@@ -82,7 +87,7 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     t_draft = time.perf_counter()
     llm_ms = 0
     for i in range(1 + (settings.MAX_REWRITES if monitor else 0)):
-        d = conversation.draft(redacted, history, mood.replace("_", " "), feedback, memory)
+        d = conversation.draft(redacted, history, mood.replace("_", " "), feedback, memory, spec["focus"])
         llm_ms += d["ms"]
         if not monitor:
             attempts.append({"draft": d["text"], "checked": False})
@@ -112,7 +117,8 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     trace.append(_stage("send", "done", None, "reply sent"))
 
     out = {"escalate": False, "crisis_risk": risk, "redacted_text": redacted, "distress": dist,
-           "primary_emotion": mood, "reply": reply, "attempts": attempts, "fallback": fallback,
+           "primary_emotion": mood, "specialist": {k: spec[k] for k in ("id", "name", "why")},
+           "resources": cards, "reply": reply, "attempts": attempts, "fallback": fallback,
            "monitor": monitor, "trace": trace, "total_ms": _ms(t_draft)}
     _log(out, monitor)
     return out
@@ -126,6 +132,7 @@ def _log(out: dict, monitor: bool) -> None:
             f.write(json.dumps({
                 "at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "monitor": monitor, "text": out["redacted_text"], "escalate": out["escalate"],
+                "specialist": (out.get("specialist") or {}).get("id"),
                 "reply": out.get("reply"), "attempts": out.get("attempts", []),
                 "fallback": out.get("fallback", False),
             }) + "\n")

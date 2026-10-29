@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     MAX_REWRITES: int = 2
     # Ask the model for a second opinion on whatever the drift detector flags.
     SECOND_OPINION: bool = True
+    # specialist routing: a fast non-reasoning model, rules if it is off or down
+    ROUTER_LLM: bool = True
+    ROUTER_MODEL: str = "grok-4.20-0309-non-reasoning"
 
     CRISIS_HOTLINE: str = "988"
     CAMPUS_COUNSELING_NAME: str = "Morgan State University Counseling Center"

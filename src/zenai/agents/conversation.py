@@ -33,8 +33,12 @@ Do not use lists. Do not mention these rules."""
 
 
 def build_messages(text: str, history: list[dict] | None = None, mood: str | None = None,
-                   feedback: str | None = None, memory: list[str] | None = None) -> list[dict]:
+                   feedback: str | None = None, memory: list[str] | None = None,
+                   focus: str | None = None) -> list[dict]:
     system = PROTOCOL_V0
+    if focus:
+        # a specialist adds focus; the protocol above still governs every word
+        system += "\n\nFOCUS FOR THIS MESSAGE: " + focus
     if memory:
         system += ("\n\nThe student chose to let you remember these from earlier conversations. "
                    "Use them only if relevant, never repeat them back word for word:\n- "
@@ -52,10 +56,11 @@ def build_messages(text: str, history: list[dict] | None = None, mood: str | Non
 
 
 def draft(text: str, history: list[dict] | None = None, mood: str | None = None,
-          feedback: str | None = None, memory: list[str] | None = None) -> dict:
+          feedback: str | None = None, memory: list[str] | None = None,
+          focus: str | None = None) -> dict:
     """One candidate reply. `feedback` is the Fidelity Monitor's reason when a
     previous draft was rejected."""
-    return llm.chat(build_messages(text, history, mood, feedback, memory), temperature=0.7)
+    return llm.chat(build_messages(text, history, mood, feedback, memory, focus), temperature=0.7)
 
 
 def rewrite_instruction(rejected: str, moves: dict) -> str:

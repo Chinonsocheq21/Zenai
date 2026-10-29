@@ -1,0 +1,786 @@
+{
+  "test_gpt": {
+    "rules": {
+      "n": 100,
+      "fell_back_to_rules": 0,
+      "median_ms": null,
+      "accuracy": 0.69,
+      "majority_baseline": 0.2,
+      "macro_f1": 0.707,
+      "per_class": {
+        "academic": {
+          "precision": 1.0,
+          "recall": 0.85,
+          "f1": 0.919
+        },
+        "stress_relief": {
+          "precision": 1.0,
+          "recall": 0.65,
+          "f1": 0.788
+        },
+        "wellness": {
+          "precision": 0.917,
+          "recall": 0.55,
+          "f1": 0.687
+        },
+        "referral": {
+          "precision": 1.0,
+          "recall": 0.4,
+          "f1": 0.571
+        },
+        "general": {
+          "precision": 0.4,
+          "recall": 1.0,
+          "f1": 0.571
+        }
+      },
+      "confusion": {
+        "academic": {
+          "academic": 17,
+          "stress_relief": 0,
+          "wellness": 0,
+          "referral": 0,
+          "general": 3
+        },
+        "stress_relief": {
+          "academic": 0,
+          "stress_relief": 13,
+          "wellness": 0,
+          "referral": 0,
+          "general": 7
+        },
+        "wellness": {
+          "academic": 0,
+          "stress_relief": 0,
+          "wellness": 11,
+          "referral": 0,
+          "general": 9
+        },
+        "referral": {
+          "academic": 0,
+          "stress_relief": 0,
+          "wellness": 1,
+          "referral": 8,
+          "general": 11
+        },
+        "general": {
+          "academic": 0,
+          "stress_relief": 0,
+          "wellness": 0,
+          "referral": 0,
+          "general": 20
+        }
+      },
+      "misses": [
+        {
+          "text": "I\u2019m three chapters behind in biology.",
+          "gold": "academic",
+          "routed": "general"
+        },
+        {
+          "text": "Why can\u2019t I understand calculus at all?",
+          "gold": "academic",
+          "routed": "general"
+        },
+        {
+          "text": "these discussion posts are wearing me out fr",
+          "gold": "academic",
+          "routed": "general"
+        },
+        {
+          "text": "my shoulders are tight and won\u2019t relax",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "can you help me settle down in this moment",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "I\u2019m pacing around and cannot sit still.",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "Everything feels intense, and my body is stuck on high alert.",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "I cannot get my muscles to loosen up.",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "My pulse feels fast, and I cannot settle down.",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "need something quick to calm these nerves",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "I keep skipping breakfast because my mornings feel rushed.",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "I stay up way too late scrolling.",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "My week is so packed that I never get downtime.",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "how do i stop wasting my whole morning",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "I\u2019m struggling to make time for laundry, movement, and cooking.",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "Eight hours in bed still doesn\u2019t leave me refreshed.",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "My work hours keep throwing off my whole week.",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "I feel worn out from having too much on my plate every day.",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "I\u2019ve been running on empty all week.",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "who can i talk to on campus about personal stuff",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "How do I make an appointment with a counselor?",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "I need food assistance; which campus office should I contact?",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "who do i call if i need professional support",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "How can I connect with an academic adviser?",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "What office handles accessibility support at Morgan State?",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "Can you tell me how to join a support group?",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "I need someone to talk to confidentially. Who is available?",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "How do I request a tutor for math?",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "Could you give me the contact information for campus counseling?",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "What resources can help me pay for meals?",
+          "gold": "referral",
+          "routed": "wellness"
+        },
+        {
+          "text": "Is there a hotline or campus person I can contact for emotional support?",
+          "gold": "referral",
+          "routed": "general"
+        }
+      ]
+    },
+    "model": {
+      "n": 100,
+      "fell_back_to_rules": 0,
+      "median_ms": 791,
+      "accuracy": 1.0,
+      "majority_baseline": 0.2,
+      "macro_f1": 1.0,
+      "per_class": {
+        "academic": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "stress_relief": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "wellness": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "referral": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "general": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      },
+      "confusion": {
+        "academic": {
+          "academic": 20,
+          "stress_relief": 0,
+          "wellness": 0,
+          "referral": 0,
+          "general": 0
+        },
+        "stress_relief": {
+          "academic": 0,
+          "stress_relief": 20,
+          "wellness": 0,
+          "referral": 0,
+          "general": 0
+        },
+        "wellness": {
+          "academic": 0,
+          "stress_relief": 0,
+          "wellness": 20,
+          "referral": 0,
+          "general": 0
+        },
+        "referral": {
+          "academic": 0,
+          "stress_relief": 0,
+          "wellness": 0,
+          "referral": 20,
+          "general": 0
+        },
+        "general": {
+          "academic": 0,
+          "stress_relief": 0,
+          "wellness": 0,
+          "referral": 0,
+          "general": 20
+        }
+      },
+      "misses": []
+    }
+  },
+  "dev_grok": {
+    "rules": {
+      "n": 80,
+      "fell_back_to_rules": 0,
+      "median_ms": null,
+      "accuracy": 0.325,
+      "majority_baseline": 0.2,
+      "macro_f1": 0.317,
+      "per_class": {
+        "academic": {
+          "precision": 0.333,
+          "recall": 0.688,
+          "f1": 0.449
+        },
+        "stress_relief": {
+          "precision": 0.75,
+          "recall": 0.188,
+          "f1": 0.3
+        },
+        "wellness": {
+          "precision": 0.857,
+          "recall": 0.375,
+          "f1": 0.522
+        },
+        "referral": {
+          "precision": 1.0,
+          "recall": 0.062,
+          "f1": 0.118
+        },
+        "general": {
+          "precision": 0.143,
+          "recall": 0.312,
+          "f1": 0.196
+        }
+      },
+      "confusion": {
+        "academic": {
+          "academic": 11,
+          "stress_relief": 0,
+          "wellness": 0,
+          "referral": 0,
+          "general": 5
+        },
+        "stress_relief": {
+          "academic": 2,
+          "stress_relief": 3,
+          "wellness": 0,
+          "referral": 0,
+          "general": 11
+        },
+        "wellness": {
+          "academic": 8,
+          "stress_relief": 0,
+          "wellness": 6,
+          "referral": 0,
+          "general": 2
+        },
+        "referral": {
+          "academic": 2,
+          "stress_relief": 0,
+          "wellness": 1,
+          "referral": 1,
+          "general": 12
+        },
+        "general": {
+          "academic": 10,
+          "stress_relief": 1,
+          "wellness": 0,
+          "referral": 0,
+          "general": 5
+        }
+      },
+      "misses": [
+        {
+          "text": "advisor talking bout improving but idk where to start",
+          "gold": "academic",
+          "routed": "general"
+        },
+        {
+          "text": "group work due soon and nobody replying to messages",
+          "gold": "academic",
+          "routed": "general"
+        },
+        {
+          "text": "cant keep up with the readings no matter how i try",
+          "gold": "academic",
+          "routed": "general"
+        },
+        {
+          "text": "one bad score away from retaking the whole thing",
+          "gold": "academic",
+          "routed": "general"
+        },
+        {
+          "text": "pressure from all sides making it hard to even start",
+          "gold": "academic",
+          "routed": "general"
+        },
+        {
+          "text": "My hands won't stop trembling even though nothing's happening right now",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "Legs bouncing under the table and I can't make them quit",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "This tight feeling across my back showed up outta nowhere",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "Breathing all quick for no reason and it's lowkey annoying",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "Feels like my body's buzzing and won't power down",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "Shoulders creeping up to my ears again during this lecture",
+          "gold": "stress_relief",
+          "routed": "academic"
+        },
+        {
+          "text": "Pulse thumping in my neck and I wish it would ease",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "Can't quit shifting around in my chair no matter how hard I try",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "Everything feels amped up after that long study session",
+          "gold": "stress_relief",
+          "routed": "academic"
+        },
+        {
+          "text": "Muscles in my arms keep twitching on their own",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "Jaw locked so hard my head's starting to ache",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "Senses all heightened like I can't zone out even if I want",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "Random waves of jitter making it tough to stay focused on the screen",
+          "gold": "stress_relief",
+          "routed": "general"
+        },
+        {
+          "text": "barely getting rest these days with assignments piling",
+          "gold": "wellness",
+          "routed": "academic"
+        },
+        {
+          "text": "trying to juggle everything but days feel nonstop morning till night",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "work hours killing study time dont know how to fix",
+          "gold": "wellness",
+          "routed": "academic"
+        },
+        {
+          "text": "routine out the window ever since midterms hitting hard",
+          "gold": "wellness",
+          "routed": "academic"
+        },
+        {
+          "text": "eating whatever quick between lectures aint cutting it anymore",
+          "gold": "wellness",
+          "routed": "academic"
+        },
+        {
+          "text": "rest been off cause up late finishing papers and projects",
+          "gold": "wellness",
+          "routed": "academic"
+        },
+        {
+          "text": "balancing schedule tough with club meetings and lab overlapping",
+          "gold": "wellness",
+          "routed": "academic"
+        },
+        {
+          "text": "cant keep steady routine going with all deadlines",
+          "gold": "wellness",
+          "routed": "academic"
+        },
+        {
+          "text": "rushing between classes means skipping proper food most days",
+          "gold": "wellness",
+          "routed": "academic"
+        },
+        {
+          "text": "from dawn till after dark its go go go no chill time",
+          "gold": "wellness",
+          "routed": "general"
+        },
+        {
+          "text": "who handles mental health appointments here",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "need directions to the tutoring place or whatever",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "can u tell me about housing support options",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "where's the best spot to get help with groceries",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "who should i email about feeling anxious all the time",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "any idea where academic coaches hang out",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "im having issues with my roommate who do i call",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "food bank on campus or similar program details",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "point me to the counseling office location",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "how to sign up for extra test time accommodations",
+          "gold": "referral",
+          "routed": "academic"
+        },
+        {
+          "text": "gotta find someone for math help tutoring wise",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "where can students go when they need a place to stay",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "who runs the program for students without enough to eat",
+          "gold": "referral",
+          "routed": "wellness"
+        },
+        {
+          "text": "need therapist recs or the school equivalent",
+          "gold": "referral",
+          "routed": "general"
+        },
+        {
+          "text": "campus spot for fixing my schedule with professors",
+          "gold": "referral",
+          "routed": "academic"
+        },
+        {
+          "text": "Exams coming up fast and I'm worried about not being prepared enough.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "This class is so boring I can barely stay awake through the lectures.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Just got my schedule for next semester and it's looking rough already.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "The amount of reading for this course is insane and I'm behind already.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "My advisor said I need to declare a major soon and I'm unsure.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Group chats for projects are blowing up and it's too much to handle.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Why do these professors think we have no other classes but theirs?",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Excited to see what the semester brings but also a bit scared.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Can't stand when people talk during the whole lecture it's distracting.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Got invited to speak at an event and now I'm panicking inside.",
+          "gold": "general",
+          "routed": "stress_relief"
+        },
+        {
+          "text": "The workload this semester is no joke I'm swamped with papers.",
+          "gold": "general",
+          "routed": "academic"
+        }
+      ]
+    },
+    "model": {
+      "n": 80,
+      "fell_back_to_rules": 1,
+      "median_ms": 893,
+      "accuracy": 0.85,
+      "majority_baseline": 0.2,
+      "macro_f1": 0.824,
+      "per_class": {
+        "academic": {
+          "precision": 0.682,
+          "recall": 0.938,
+          "f1": 0.789
+        },
+        "stress_relief": {
+          "precision": 0.889,
+          "recall": 1.0,
+          "f1": 0.941
+        },
+        "wellness": {
+          "precision": 0.842,
+          "recall": 1.0,
+          "f1": 0.914
+        },
+        "referral": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "general": {
+          "precision": 1.0,
+          "recall": 0.312,
+          "f1": 0.476
+        }
+      },
+      "confusion": {
+        "academic": {
+          "academic": 15,
+          "stress_relief": 1,
+          "wellness": 0,
+          "referral": 0,
+          "general": 0
+        },
+        "stress_relief": {
+          "academic": 0,
+          "stress_relief": 16,
+          "wellness": 0,
+          "referral": 0,
+          "general": 0
+        },
+        "wellness": {
+          "academic": 0,
+          "stress_relief": 0,
+          "wellness": 16,
+          "referral": 0,
+          "general": 0
+        },
+        "referral": {
+          "academic": 0,
+          "stress_relief": 0,
+          "wellness": 0,
+          "referral": 16,
+          "general": 0
+        },
+        "general": {
+          "academic": 7,
+          "stress_relief": 1,
+          "wellness": 3,
+          "referral": 0,
+          "general": 5
+        }
+      },
+      "misses": [
+        {
+          "text": "this test got me all twisted up inside fr",
+          "gold": "academic",
+          "routed": "stress_relief"
+        },
+        {
+          "text": "Exams coming up fast and I'm worried about not being prepared enough.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "This class is so boring I can barely stay awake through the lectures.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Just got my schedule for next semester and it's looking rough already.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Idk if I'll ever figure out how to manage my time better in college.",
+          "gold": "general",
+          "routed": "wellness"
+        },
+        {
+          "text": "The amount of reading for this course is insane and I'm behind already.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Group chats for projects are blowing up and it's too much to handle.",
+          "gold": "general",
+          "routed": "wellness"
+        },
+        {
+          "text": "Why do these professors think we have no other classes but theirs?",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Balancing everything is harder than I thought it would be this year.",
+          "gold": "general",
+          "routed": "wellness"
+        },
+        {
+          "text": "Got invited to speak at an event and now I'm panicking inside.",
+          "gold": "general",
+          "routed": "stress_relief"
+        },
+        {
+          "text": "The workload this semester is no joke I'm swamped with papers.",
+          "gold": "general",
+          "routed": "academic"
+        },
+        {
+          "text": "Thinking about grad school already and if it's even worth it for me.",
+          "gold": "general",
+          "routed": "academic"
+        }
+      ]
+    }
+  }
+}

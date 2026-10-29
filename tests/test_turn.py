@@ -27,6 +27,7 @@ def fake_llm(monkeypatch):
     # the fake model only writes drafts; the second opinion is tested on its own
     from zenai.config import settings
     monkeypatch.setattr(settings, "SECOND_OPINION", False)
+    monkeypatch.setattr(settings, "ROUTER_LLM", False)
     return fake_chat, calls
 
 

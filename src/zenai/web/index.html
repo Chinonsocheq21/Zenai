@@ -222,7 +222,7 @@
     <div id="tab-trace">
     <div class="kicker">Turn trace</div>
     <h3 id="t-title">Waiting for a message</h3>
-    <p class="lede" id="t-lede">Seven stages, in the order the architecture runs them. Green ran. Red stopped the turn. Gold is designed and not built yet — shown here so nothing looks finished that isn't.</p>
+    <p class="lede" id="t-lede">Eight stages, in the order the architecture runs them. Green ran. Red stopped the turn. Gold is designed and not built yet — shown here so nothing looks finished that isn't.</p>
 
     <div class="rail" id="rail"></div>
     <div class="cards" id="cards"></div>
@@ -261,7 +261,7 @@
 
 <script>
 const STAGES = [
-  ["privacy","Privacy"],["crisis","Crisis"],["mood","Mood"],["memory","Memory"],
+  ["privacy","Privacy"],["crisis","Crisis"],["mood","Mood"],["route","Route"],["memory","Memory"],
   ["conversation","Draft"],["fidelity","Fidelity"],["send","Send"]];
 const LABEL = {anxiety:"Anxiety", low_mood:"Low mood", anger:"Anger", overwhelm:"Overwhelm",
                isolation:"Isolation", neutral_or_positive:"Neutral / positive"};
@@ -318,6 +318,12 @@ function render(d, original) {
                  d.distress_model ? "model: " + d.distress_model : "",
       `<div class="bars">${rows.map(([k, v], i) => `<div class="b ${i === 0 ? "top" : ""}"><span>${LABEL[k] || k}</span>
         <div class="tr"><div class="fl" style="width:${(v * 100).toFixed(1)}%"></div></div><span class="v">${(v * 100).toFixed(0)}%</span></div>`).join("")}</div>`);
+  }
+
+  if (d.specialist) {
+    html += card("04 · Route", d.specialist.name,
+      `<p class="muted">${esc(d.specialist.why)}. Same protocol, same Fidelity Monitor; the specialist only adds focus.</p>` +
+      (d.resources && d.resources.length ? d.resources.map(r => `<div class="att"><span class="v ok">card</span><b>${esc(r.name)}</b> ${esc(r.phone)} <span class="muted">· verified ${esc(r.verified)}</span></div>`).join("") : ""));
   }
 
   if (d.attempts && d.attempts.length) {
@@ -427,7 +433,7 @@ $("reset").onclick = () => {
   $("log").innerHTML = ""; HISTORY.length = 0;
   $("cards").innerHTML = ""; drawRail([]);
   $("t-title").textContent = "Waiting for a message";
-  $("t-lede").textContent = "Seven stages, in the order the architecture runs them. Green ran. Red stopped the turn. Gold is designed and not built yet.";
+  $("t-lede").textContent = "Eight stages, in the order the architecture runs them. Green ran. Red stopped the turn. Gold is designed and not built yet.";
 };
 
 

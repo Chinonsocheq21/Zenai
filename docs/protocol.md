@@ -117,14 +117,29 @@ willing to risk.
 | **Rewrite** | A rejected draft is rewritten with the reason, up to two times. |
 | **Safe fallback** | If every rewrite still drifts, ZenAI sends a reply that is checked to pass: *"Can you tell me more about what's happening for you right now?"* |
 
-## 7. Privacy
+## 7. Specialists
+
+After the crisis check, each message is routed to at most one specialist:
+**Academic Stress**, **Stress-Relief**, **Wellness Schedule** or **Resource &
+Referral**. A specialist is not a separate chatbot. It is the same Conversation
+Agent, on this same protocol, checked by the same Fidelity Monitor, given a
+focus for that kind of message. Nothing in a specialist's focus overrides
+sections 3 and 4.
+
+Resource & Referral is the one exception to "no resources": when a student
+**asks** where to get help, verified Morgan offices are shown as cards beside
+the reply. The cards are curated in `agents/resources.py` and checked against
+morgan.edu; the language model never writes a phone number or an office name.
+The reply itself still gives no advice.
+
+## 8. Privacy
 
 - ZenAI remembers nothing about a student unless the student turns that on, and
   anything it remembers can be deleted.
 - Logs keep only the redacted text, never the original message.
 - Nothing is shared with the university.
 
-## 8. Changing this document
+## 9. Changing this document
 
 Change it here first, then the two places that implement it:
 `PROTOCOL_V0` in `agents/conversation.py` and `RUBRIC` in `models/judge.py`.
