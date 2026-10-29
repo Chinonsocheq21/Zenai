@@ -294,6 +294,36 @@
     *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
     .chart .ln{stroke-dashoffset:0}.chart .ar,.chart .dot{opacity:1}
   }
+  /* ---------- voice ---------- */
+  .mic{width:46px;height:46px;border-radius:23px;flex:0 0 auto;display:grid;place-items:center;color:var(--ink2);background:transparent}
+  .mic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .mic:hover{color:var(--accent)}
+  .voice{position:absolute;inset:0;z-index:15;display:flex;flex-direction:column;align-items:center;padding:max(18px, env(safe-area-inset-top)) 22px max(24px, env(safe-area-inset-bottom));
+         background:radial-gradient(120% 70% at 50% 38%, color-mix(in srgb, var(--orbB) 14%, var(--bg)), var(--bg) 70%);animation:fade .35s ease}
+  .voice .vtop{width:100%;display:flex;align-items:center;justify-content:space-between}
+  .voice .vtop span{font-size:12.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .vbtn{min-height:44px;min-width:44px;border-radius:22px;display:grid;place-items:center;color:var(--ink2);background:var(--surface);border:1px solid var(--line2)}
+  .vbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .vbtn.off{opacity:.55}
+  .vstage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:46px}
+  .vorb{position:relative;width:210px;height:210px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .vorb .orb{width:100%;height:100%;transform:scale(calc(1 + var(--lvl, 0) * .18));transition:transform .08s linear}
+  .vorb .ring{position:absolute;inset:0;border-radius:50%;border:2px solid color-mix(in srgb, var(--orbB) 55%, transparent);opacity:0;pointer-events:none}
+  .voice.listening .vorb .ring{animation:ripple 2.4s ease-out infinite}
+  .voice.listening .vorb .ring:nth-child(3){animation-delay:1.2s}
+  @keyframes ripple{0%{transform:scale(.9);opacity:.7}100%{transform:scale(1.55);opacity:0}}
+  .voice.listening .vorb .orb::after{opacity:calc(.55 + var(--lvl, 0) * 1.2);animation:none;transform:scale(calc(1 + var(--lvl, 0) * .5))}
+  .voice.thinking .vorb .orb::before{animation:breathe 2.4s ease-in-out infinite, morph 4s ease-in-out infinite}
+  .voice.thinking .vorb .orb i{animation:morph 3s ease-in-out infinite reverse, spin 6s linear infinite}
+  .voice.speaking .vorb .orb::before{animation:morph 3.5s ease-in-out infinite}
+  .voice.speaking .vorb .orb::after{animation:glow 1.4s ease-in-out infinite}
+  .vstate{font-family:var(--serif);font-size:24px;color:var(--ink);text-align:center;min-height:32px}
+  .vcap{font-size:16px;line-height:1.55;color:var(--ink2);text-align:center;max-width:330px;min-height:78px}
+  .vcap.zen{font-family:var(--serif);font-size:18.5px;color:var(--ink)}
+  .vhint{font-size:12.5px;color:var(--muted);text-align:center;max-width:300px;line-height:1.5}
+  .vend{min-height:50px;padding:0 26px;border-radius:25px;background:var(--surface);border:1px solid var(--line2);font-weight:600;color:var(--ink);margin-top:10px}
+  @media (prefers-reduced-motion: reduce){.voice.listening .vorb .ring{animation:none}}
+
   /* check-in before talking */
   .before{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line2);border-radius:22px;padding:14px 14px 12px;margin:0 0 18px;text-align:left;box-shadow:var(--shadow, 0 6px 20px rgba(20,30,60,.06))}
   .before .bq{font-size:14px;font-weight:600;color:var(--ink);margin:0 4px 10px}
@@ -351,6 +381,7 @@
       <div class="composer">
         <div class="box">
           <textarea id="msg" placeholder="Say what's on your mind" maxlength="2000" rows="1" aria-label="Message"></textarea>
+          <button class="mic press" id="mic" aria-label="Talk out loud"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
           <button class="send press" id="send" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
         </div>
       </div>
@@ -379,7 +410,7 @@
       <div class="group" id="switches"></div>
       <div id="memlist"></div>
       <button class="erase press" id="erase"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Delete everything ZenAI remembers</button>
-      <p class="fine">What you type is sent to ZenAI to write a reply. Names, emails, phone numbers and student IDs are removed before anything reads it. Conversations aren't saved on this device unless "Keep this conversation" is on.</p>
+      <p class="fine">What you type is sent to ZenAI to write a reply. Names, emails, phone numbers and student IDs are removed before anything reads it. Conversations aren't saved on this device unless "Keep this conversation" is on. If you talk out loud, your browser's speech service (Apple or Google) turns your voice into text; ZenAI only ever receives the text and never keeps audio.</p>
     </section>
   </main>
 
@@ -391,6 +422,21 @@
   </nav>
 
   <!-- CRISIS: covers everything, and there is no text box on it -->
+  <!-- VOICE: the orb listens, thinks and speaks; every word goes through the same checked pipeline -->
+  <section class="voice hidden" id="voice" role="dialog" aria-modal="true" aria-label="Talk out loud with ZenAI">
+    <div class="vtop"><span>Voice</span>
+      <button class="vbtn press" id="vmute" aria-label="Spoken replies on"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path class="wave" d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></button></div>
+    <div class="vstage">
+      <div class="vorb" id="vorb" role="button" aria-label="Tap to talk or to stop">
+        <div class="orb"><i></i></div><span class="ring"></span><span class="ring"></span>
+      </div>
+      <div class="vstate" id="vstate">Tap the orb and talk</div>
+      <div class="vcap" id="vcap"></div>
+    </div>
+    <div class="vhint">Your voice is turned into text by your phone's browser. ZenAI never keeps audio.</div>
+    <button class="vend press" id="vend">Back to typing</button>
+  </section>
+
   <section class="crisis hidden" id="crisis" role="dialog" aria-modal="true" aria-labelledby="c-title">
     <div class="tag"><i></i>Pausing to get you support</div>
     <h2 id="c-title">I'm stopping here, and I want to hand you to a person.</h2>
@@ -399,7 +445,7 @@
     <a class="rescue" id="c-campus-link"><div class="who">At Morgan State</div><div class="what" id="c-campus">Counseling Center</div><div class="how" id="c-phone"></div></a>
     <a class="call press" href="tel:988"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Call 988</a>
     <a class="txt press" href="sms:988"><svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z"/></svg>Text 988 instead</a>
-    <div class="halt">ZenAI has paused this conversation. There's no text box here on purpose. Nothing you wrote has been shared with anyone.</div>
+    <div class="halt">ZenAI has paused this conversation. There's no text box here on purpose. Nothing you said or wrote has been shared with anyone.</div>
     <button class="back" id="leave">I'm safe, take me back</button>
   </section>
 </div>
@@ -437,6 +483,7 @@ $("start").onclick = () => { S.set("welcomed", true); go("talk"); };
 let RES = {hotline: "988", campus: "Morgan State University Counseling Center", phone: ""};
 fetch("/resources").then(r => r.json()).then(d => { RES = d; }).catch(() => {});
 function crisis() {
+  if (typeof V !== "undefined" && V.on) voiceOff();
   $("c-hot").textContent = "Call or text " + RES.hotline;
   $("c-campus").textContent = RES.campus;
   $("c-phone").innerHTML = esc(tidy(RES.phone)).replace(/(\d[\d-]{6,}\d)/g, '<span style="white-space:nowrap">$1</span>');
@@ -520,6 +567,142 @@ function addCards(list) {
        ${r.phone ? `<div class="p">Call ${esc(r.phone)}</div>` : ""}${r.detail ? `<div class="d">${esc(tidy(r.detail))}</div>` : ""}</div></a>`).join("") + `</div>`);
   scrollDown();
 }
+// ---------- voice ----------
+// Listen with the browser's speech recognition, send the words through ask()
+// like any typed message, speak the checked reply with an on-device voice,
+// then listen again. The orb follows the real microphone level while listening.
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const V = {on: false, state: "idle", rec: null, stream: null, ctx: null, raf: 0, speak: S.get("voiceSpeak", true), heard: "",
+           mic: 0, pulse: 0, meterless: false};
+// The orb's motion = the louder of the real mic level and a pulse on every
+// word the recognizer hears. The pulse keeps it alive where a phone won't
+// share the microphone between the meter and speech recognition.
+function orbLoop() {
+  V.pulse *= .9;
+  const lvl = V.state === "listening" ? Math.max(V.mic, V.pulse) : V.state === "speaking" ? .12 + V.pulse * .45 : 0;
+  $("vorb").style.setProperty("--lvl", lvl.toFixed(3));
+  if (V.on) V.raf = requestAnimationFrame(orbLoop);
+}
+function vset(state, line, cap, zen) {
+  V.state = state;
+  $("voice").className = "voice " + state;
+  if (line !== undefined) $("vstate").textContent = line;
+  if (cap !== undefined) { $("vcap").textContent = cap; $("vcap").classList.toggle("zen", !!zen); }
+}
+async function meterOn() {
+  try {
+    V.stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: true, noiseSuppression: true}});
+    V.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const an = V.ctx.createAnalyser(); an.fftSize = 512;
+    V.ctx.createMediaStreamSource(V.stream).connect(an);
+    const buf = new Uint8Array(an.fftSize);
+    const tick = () => {
+      if (!V.ctx) return;
+      an.getByteTimeDomainData(buf);
+      let sum = 0; for (const b of buf) { const x = (b - 128) / 128; sum += x * x; }
+      V.mic = V.mic * .7 + Math.min(1, Math.sqrt(sum / buf.length) * 5) * .3;
+      requestAnimationFrame(tick);
+    };
+    tick();
+  } catch (e) { /* no meter: the orb still ripples */ }
+}
+function meterOff() {
+  V.stream?.getTracks().forEach(t => t.stop()); V.stream = null;
+  V.ctx?.close(); V.ctx = null; V.mic = 0;
+}
+function listen() {
+  if (!V.on) return;
+  try { speechSynthesis.cancel(); } catch (e) {}
+  const rec = new SR();
+  rec.lang = "en-US"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+  V.rec = rec; V.heard = "";
+  vset("listening", "Listening", "");
+  rec.onspeechstart = () => { V.pulse = .7; };
+  rec.onresult = e => {
+    V.pulse = Math.min(1, V.pulse + .55);
+    let t = ""; for (const r of e.results) t += r[0].transcript;
+    V.heard = t.trim(); $("vcap").textContent = V.heard; $("vcap").classList.remove("zen");
+  };
+  rec.onerror = e => {
+    if (e.error === "audio-capture" && V.stream && !V.meterless) {   // this phone won't share the mic: drop the meter, keep listening
+      V.meterless = true; meterOff(); V.rec = null; setTimeout(listen, 150); return;
+    }
+    if (e.error === "no-speech") V.quiet = (V.quiet || 0) + 1;     // a pause: keep listening a little longer
+    if (e.error === "not-allowed" || e.error === "service-not-allowed") {
+      vset("idle", "Microphone is off", "Allow the microphone for this site in your browser settings, or go back to typing.");
+      V.rec = null;
+    }
+  };
+  rec.onend = async () => {
+    V.rec = null;
+    if (!V.on || V.state !== "listening") return;
+    if (!V.heard) {
+      if ((V.quiet || 0) > 0 && V.quiet < 3) { setTimeout(listen, 100); return; }
+      V.quiet = 0; vset("idle", "Tap the orb and talk", ""); return;
+    }
+    V.quiet = 0;
+    vset("thinking", "Taking that in", V.heard);
+    const d = await ask(V.heard);
+    if (!V.on) return;
+    if (!d) { vset("idle", "ZenAI couldn't reply", "If you need someone right away, call or text 988."); return; }
+    if (d.escalate) { voiceOff(); return; }          // the crisis screen has taken over
+    say(d.reply);
+  };
+  try { rec.start(); } catch (e) { vset("idle", "Tap the orb and talk", ""); }
+}
+function pickVoice() {
+  const vs = speechSynthesis.getVoices().filter(v => v.lang && v.lang.startsWith("en"));
+  const pref = ["Ava (Premium)", "Ava (Enhanced)", "Samantha (Enhanced)", "Zoe (Premium)", "Allison (Enhanced)", "Samantha", "Google US English", "Microsoft Aria Online"];
+  for (const n of pref) { const v = vs.find(x => x.name === n); if (v) return v; }
+  return vs.find(v => v.lang === "en-US") || vs[0] || null;
+}
+function say(text) {
+  text = tidy(text);
+  if (!V.speak || !("speechSynthesis" in window)) { vset("idle", "Tap the orb to answer", text, true); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  const v = pickVoice(); if (v) u.voice = v;
+  u.rate = .96; u.pitch = 1;
+  u.onboundary = () => { V.pulse = 1; };
+  u.onstart = () => { clearTimeout(V.guard); vset("speaking", "ZenAI", text, true); };
+  // a phone with speech blocked never fires onstart: show the words instead of waiting forever
+  clearTimeout(V.guard);
+  V.guard = setTimeout(() => { if (V.on && V.state !== "speaking") { speechSynthesis.cancel(); vset("idle", "Tap the orb to answer", text, true); } }, 2500);
+  u.onend = () => { if (V.on && V.state === "speaking") listen(); };
+  u.onerror = () => { if (V.on) vset("idle", "Tap the orb to answer", text, true); };
+  speechSynthesis.speak(u);
+}
+async function voiceOn() {
+  if (!SR) {
+    $("err").textContent = "Voice isn't available in this browser yet. Safari on iPhone and Chrome both support it.";
+    $("err").classList.remove("hidden"); return;
+  }
+  V.on = true;
+  $("voice").classList.remove("hidden");
+  try { speechSynthesis.speak(new SpeechSynthesisUtterance("")); } catch (e) {}   // unlocks speech on iOS
+  if (!V.meterless) await meterOn();
+  cancelAnimationFrame(V.raf); orbLoop();
+  listen();
+}
+function voiceOff() {
+  V.on = false; V.state = "idle";
+  try { V.rec?.abort(); } catch (e) {}
+  try { speechSynthesis.cancel(); } catch (e) {}
+  meterOff(); cancelAnimationFrame(V.raf); V.pulse = 0;
+  $("vorb").style.setProperty("--lvl", 0);
+  $("voice").classList.add("hidden");
+}
+$("mic").onclick = voiceOn;
+$("vend").onclick = voiceOff;
+$("vorb").onclick = () => {
+  if (V.state === "speaking") { speechSynthesis.cancel(); listen(); }       // interrupt and answer
+  else if (V.state === "listening") { try { V.rec?.stop(); } catch (e) {} } // done talking
+  else if (V.state === "idle") listen();
+};
+function drawMute() { $("vmute").classList.toggle("off", !V.speak); $("vmute").querySelector(".wave").style.display = V.speak ? "" : "none";
+  $("vmute").setAttribute("aria-label", V.speak ? "Spoken replies on" : "Spoken replies off"); }
+$("vmute").onclick = () => { V.speak = !V.speak; S.set("voiceSpeak", V.speak); if (!V.speak) speechSynthesis.cancel(); drawMute(); };
+drawMute();
+
 // ---------- closing a conversation ----------
 function showDone() { $("donebar").classList.toggle("hidden", HISTORY.length < 4); }
 $("done").onclick = async () => {
@@ -571,11 +754,9 @@ function todaysCheckin() {
   const saved = m && {level: m.level, at: new Date(m.at).getTime()};
   return fresh(saved) ? LEVELS[saved.level].t : null;
 }
-async function send() {
-  const text = $("msg").value.trim();
-  if (!text || busy) return;
+// one message through the whole pipeline; used by typing and by voice
+async function ask(text) {
   busy = true; $("send").disabled = true; $("err").classList.add("hidden");
-  $("msg").value = ""; $("msg").style.height = "46px";
   addMine(text);
   showThinking();
   try {
@@ -585,7 +766,7 @@ async function send() {
     hideThinking();
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
-    if (d.escalate) { crisis(); return; }
+    if (d.escalate) { crisis(); return d; }
     addZen(d.reply);
     if (d.resources && d.resources.length) addCards(d.resources);
     HISTORY.push({role: "user", content: d.redacted_text}, {role: "assistant", content: d.reply});
@@ -593,13 +774,21 @@ async function send() {
     if (consent().convo) S.set("history", HISTORY);
     S.set("talks", S.get("talks", 0) + 1);
     showDone();
+    return d;
   } catch (e) {
     hideThinking();
     $("err").textContent = "ZenAI couldn't reply just now. If you need someone right away, call or text 988.";
     $("err").classList.remove("hidden");
+    return null;
   } finally {
     busy = false; $("send").disabled = false;
   }
+}
+async function send() {
+  const text = $("msg").value.trim();
+  if (!text || busy) return;
+  $("msg").value = ""; $("msg").style.height = "46px";
+  await ask(text);
 }
 $("send").onclick = send;
 $("msg").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
