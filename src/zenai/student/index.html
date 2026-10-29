@@ -3,160 +3,340 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F8F7F3">
+<meta name="theme-color" content="#F5F1EA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0A1426" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
 <title>ZenAI</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%232F6F5E%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2219%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22Georgia%22%3EZ%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cdefs%3E%3CradialGradient id=%22g%22 cx=%2235%25%22 cy=%2230%25%22 r=%2275%25%22%3E%3Cstop offset=%220%22 stop-color=%22%23FFD9B0%22/%3E%3Cstop offset=%22.45%22 stop-color=%22%23F08A4B%22/%3E%3Cstop offset=%221%22 stop-color=%22%231B3D6F%22/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2215%22 fill=%22url(%23g)%22/%3E%3C/svg%3E">
 <style>
   :root{
-    --paper:#F8F7F3; --ink:#1C2620; --muted:#6B7A72; --line:#E4E0D8;
-    --green:#2F6F5E; --soft:#E3EFE9; --softline:#BFD9CE;
-    --red:#A93E2A; --redsoft:#FBEDE9; --redline:#EBC9BF; --warm:#C97A3E;
-    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+    --bg:#F5F1EA; --bg2:#EFE8DD; --surface:rgba(255,255,255,.78); --solid:#FFFFFF;
+    --ink:#14233D; --ink2:#3C4A61; --muted:#76808F; --line:rgba(20,35,61,.09); --line2:rgba(20,35,61,.14);
+    --blue:#1B3D6F; --blue2:#2E5A99; --orange:#E8792F; --peach:#F6B48A; --cream:#FFE9D2;
+    --accent:var(--blue); --accentInk:#fff;
+    --me1:#1B3D6F; --me2:#2B5592;
+    --zen:rgba(255,255,255,.86);
+    --shadow:0 1px 2px rgba(20,35,61,.04), 0 8px 24px -10px rgba(20,35,61,.16);
+    --shadow2:0 2px 4px rgba(20,35,61,.05), 0 18px 40px -16px rgba(20,35,61,.26);
+    --ok:#2F7A5E;
+    --red:#B3321F; --redInk:#7A2416; --redbg:#FBF3EF; --redcard:#FFFFFF; --redline:rgba(179,50,31,.20);
+    --orbA:#FFD8B4; --orbB:#F08A4B; --orbC:#7FA6E0; --orbD:#1B3D6F;
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:"New York","Iowan Old Style","Apple Garamond",Georgia,"Times New Roman",serif;
+    --r:22px; --ease:cubic-bezier(.2,.8,.2,1); --spring:cubic-bezier(.34,1.56,.64,1);
+    --top:env(safe-area-inset-top,0px); --bot:env(safe-area-inset-bottom,0px);
   }
-  *{box-sizing:border-box;margin:0;padding:0}
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0A1426; --bg2:#0E1B33; --surface:rgba(24,38,66,.72); --solid:#15233F;
+      --ink:#EEF1F7; --ink2:#C3CCDB; --muted:#8E9AB0; --line:rgba(200,214,240,.09); --line2:rgba(200,214,240,.16);
+      --accent:#F2A46E; --accentInk:#1A1208;
+      --me1:#2B5592; --me2:#3B6CB3;
+      --zen:rgba(27,43,74,.85);
+      --shadow:0 1px 2px rgba(0,0,0,.25), 0 10px 28px -12px rgba(0,0,0,.6);
+      --shadow2:0 2px 6px rgba(0,0,0,.3), 0 20px 44px -16px rgba(0,0,0,.7);
+      --ok:#7FD0B0;
+      --red:#FF8A73; --redInk:#FFD4CA; --redbg:#170E14; --redcard:#24161C; --redline:rgba(255,138,115,.28);
+      --orbA:#FFC79A; --orbB:#E8792F; --orbC:#4C7CC4; --orbD:#22477D;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
-  body{background:#EDEAE3;color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+  body{background:var(--bg2);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow:hidden}
   button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
-
-  /* one phone-sized column; on a laptop it sits centred like a phone */
-  .app{max-width:480px;height:100%;margin:0 auto;background:var(--paper);display:flex;flex-direction:column;
-       position:relative;box-shadow:0 0 0 1px var(--line)}
-  header{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);
-         padding-top:max(14px, env(safe-area-inset-top))}
-  .mark{width:30px;height:30px;border-radius:8px;background:var(--green);color:#fff;font-family:var(--serif);
-        display:flex;align-items:center;justify-content:center;font-size:16px}
-  header h1{font-family:var(--serif);font-weight:400;font-size:20px}
-  header .pill{margin-left:auto;font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
-
-  main{flex:1;overflow-y:auto;min-height:0}
-  .screen{display:none;padding:20px 18px 24px}
-  .screen.on{display:block}
-
-  /* tab bar */
-  nav{display:flex;border-top:1px solid var(--line);background:#fff;padding-bottom:env(safe-area-inset-bottom)}
-  nav button{flex:1;padding:10px 4px 9px;font-size:11px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px}
-  nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8}
-  nav button.on{color:var(--green);font-weight:600}
+  a{color:inherit}
   .hidden{display:none !important}
+  .press{transition:transform .18s var(--ease), box-shadow .2s, background .2s, opacity .2s}
+  .press:active{transform:scale(.97)}
 
-  /* welcome */
-  .welcome h2{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.2;margin:18px 0 12px}
-  .welcome p{color:#4A5650;font-size:15.5px;line-height:1.65;margin-bottom:14px}
-  .callout{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px 16px;margin:18px 0;font-size:14px;line-height:1.6}
-  .callout b{display:block;margin-bottom:4px}
-  .cta{display:block;width:100%;height:52px;border-radius:26px;background:var(--green);color:#fff;font-size:16px;font-weight:600;margin-top:10px}
-  .ghost{display:block;width:100%;height:48px;border-radius:24px;border:1px solid var(--line);color:var(--ink);font-size:15px;margin-top:10px;background:#fff}
+  /* phone column with a soft living backdrop */
+  .app{max-width:480px;height:100%;margin:0 auto;display:flex;flex-direction:column;position:relative;overflow:hidden;
+       background:
+         radial-gradient(120% 60% at 100% 0%, color-mix(in srgb, var(--peach) 28%, transparent), transparent 60%),
+         radial-gradient(90% 50% at 0% 100%, color-mix(in srgb, var(--orbC) 18%, transparent), transparent 65%),
+         var(--bg)}
+  @media (min-width:520px){.app{box-shadow:0 0 0 1px var(--line), 0 30px 80px -30px rgba(20,35,61,.35)}}
 
-  /* chat */
+  header{display:flex;align-items:center;gap:10px;padding:10px 18px;padding-top:calc(10px + var(--top));
+         position:relative;z-index:5}
+  header .mini{width:28px;height:28px}
+  header h1{font-family:var(--serif);font-weight:500;font-size:20px;letter-spacing:.2px}
+  header .pill{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);
+               background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 11px;
+               backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  header .pill svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
+  .app.bare header{display:none}
+
+  main{flex:1;overflow-y:auto;min-height:0;position:relative;-webkit-overflow-scrolling:touch}
+  .screen{display:none;padding:12px 20px 32px}
+  .screen.on{display:block;animation:fade .45s var(--ease)}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---------- the orb: ZenAI's presence ---------- */
+  .orb{position:relative;width:160px;height:160px;flex:0 0 auto;isolation:isolate}
+  .orb::before,.orb::after,.orb i{content:"";position:absolute;inset:0;border-radius:46% 54% 52% 48% / 50% 46% 54% 50%}
+  .orb::before{background:radial-gradient(circle at 32% 28%, var(--orbA), var(--orbB) 38%, color-mix(in srgb, var(--orbB) 40%, var(--orbC)) 68%, var(--orbD) 100%);
+               animation:breathe 8s ease-in-out infinite, morph 14s ease-in-out infinite;
+               box-shadow:inset -10px -14px 30px rgba(10,20,40,.18), inset 8px 10px 24px rgba(255,255,255,.4), 0 26px 60px -20px color-mix(in srgb, var(--orbB) 75%, transparent)}
+  .orb::after{inset:-22%;background:radial-gradient(circle, color-mix(in srgb, var(--orbB) 45%, transparent), transparent 65%);
+              filter:blur(14px);z-index:-1;animation:glow 8s ease-in-out infinite}
+  .orb i{inset:10%;background:radial-gradient(circle at 70% 75%, color-mix(in srgb, var(--orbC) 80%, transparent), transparent 60%);filter:blur(4px);
+         mix-blend-mode:screen;opacity:.8;animation:morph 11s ease-in-out infinite reverse, spin 30s linear infinite}
+  .orb.mini::after{filter:blur(4px)}
+  .orb.mini::before{box-shadow:inset -3px -4px 8px rgba(10,20,40,.18), inset 2px 3px 6px rgba(255,255,255,.4)}
+  @keyframes breathe{0%,100%{transform:scale(.94)}50%{transform:scale(1.04)}}
+  @keyframes glow{0%,100%{opacity:.55;transform:scale(.92)}50%{opacity:1;transform:scale(1.06)}}
+  @keyframes morph{0%,100%{border-radius:46% 54% 52% 48% / 50% 46% 54% 50%}33%{border-radius:55% 45% 48% 52% / 44% 56% 44% 56%}66%{border-radius:48% 52% 58% 42% / 56% 48% 52% 44%}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ---------- welcome ---------- */
+  .welcome{min-height:100%;flex-direction:column;padding-top:calc(22px + var(--top)) !important;padding-bottom:0 !important}
+  .welcome.on{display:flex}
+  .welcome .orb{width:128px;height:128px;margin:6px auto 26px}
+  .eyebrow{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .welcome .eyebrow{text-align:center}
+  .welcome h2{font-family:var(--serif);font-weight:400;font-size:31px;line-height:1.15;margin:10px 0 14px;text-align:center;letter-spacing:-.3px}
+  .welcome .lede{color:var(--ink2);font-size:16px;line-height:1.55;text-align:center;margin:0 6px 20px}
+  .callout{display:flex;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;
+           box-shadow:var(--shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .callout .ic{width:38px;height:38px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
+               background:color-mix(in srgb, var(--orbB) 16%, transparent);color:var(--orbB)}
+  .callout .ic.b{background:color-mix(in srgb, var(--orbC) 22%, transparent);color:var(--blue2)}
+  @media (prefers-color-scheme: dark){.callout .ic.b{color:#9BBDF0}}
+  .callout svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .callout b{display:block;font-size:15px;margin-bottom:3px}
+  .callout span{font-size:14px;line-height:1.55;color:var(--ink2)}
+  .spacer{flex:1;min-height:16px}
+  .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;border-radius:28px;
+       background:linear-gradient(135deg, var(--blue), var(--blue2));color:#fff;font-size:16.5px;font-weight:600;letter-spacing:.2px;
+       box-shadow:0 12px 28px -12px rgba(27,61,111,.7)}
+  @media (prefers-color-scheme: dark){.cta{background:linear-gradient(135deg, #F08A4B, #F6B48A);color:#1A1208;box-shadow:0 12px 30px -12px rgba(240,138,75,.6)}}
+  .welcome .cta{margin:12px 0 calc(16px + var(--bot))}
+
+  /* ---------- talk ---------- */
   #talk{display:none;flex-direction:column;height:100%;padding:0}
   #talk.on{display:flex}
-  .log{flex:1;overflow-y:auto;padding:18px 16px 8px}
-  .intro{color:var(--muted);font-size:14px;line-height:1.6;text-align:center;margin:30px 18px}
-  .intro .z{font-family:var(--serif);font-size:22px;color:var(--ink);display:block;margin-bottom:8px}
-  .me{background:var(--ink);color:#F6F4F0;padding:11px 14px;border-radius:18px;border-bottom-right-radius:6px;
-      max-width:84%;margin:0 0 4px auto;width:fit-content;font-size:15.5px;line-height:1.5}
-  .keep{display:block;text-align:right;font-size:11.5px;color:var(--muted);margin:0 4px 12px;text-decoration:none}
-  .keep.done{color:var(--green)}
-  .zen{background:var(--soft);border:1px solid var(--softline);padding:12px 15px;border-radius:18px;border-bottom-left-radius:6px;
-       max-width:88%;margin:0 0 16px;font-family:var(--serif);font-size:16.5px;line-height:1.55}
-  .ref{display:block;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:-6px 0 10px;max-width:88%;text-decoration:none;color:inherit}
-  .ref .n{font-weight:600;font-size:14.5px}
-  .ref .w{font-size:13px;color:#4A5650;margin:3px 0 6px;line-height:1.45}
-  .ref .p{font-size:13px;color:var(--green);font-weight:600}
-  .ref .d{font-size:11.5px;color:var(--muted);margin-top:2px}
-  .reflabel{font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);margin:0 0 6px 2px}
-  .typing{display:flex;gap:5px;padding:14px 16px;background:var(--soft);border:1px solid var(--softline);border-radius:18px;
-          border-bottom-left-radius:6px;width:fit-content;margin:0 0 16px}
-  .typing i{width:7px;height:7px;border-radius:50%;background:var(--green);opacity:.35;animation:blink 1.2s infinite}
-  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
-  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:.9}}
-  .composer{display:flex;gap:9px;padding:10px 12px 12px;border-top:1px solid var(--line);background:#fff}
-  .composer textarea{flex:1;resize:none;height:46px;max-height:120px;border:1px solid var(--line);border-radius:23px;
-        padding:12px 16px;font:16px var(--sans);outline:none;background:var(--paper)}
-  .send{width:46px;height:46px;border-radius:23px;background:var(--green);color:#fff;font-size:19px;flex:0 0 auto}
-  .send:disabled{opacity:.4}
-  .err{color:var(--red);font-size:13px;text-align:center;margin:6px 0 12px}
+  .log{flex:1;overflow-y:auto;padding:8px 16px 12px;scrollbar-width:none;-webkit-mask-image:linear-gradient(transparent,#000 16px,#000 calc(100% - 10px),transparent);mask-image:linear-gradient(transparent,#000 16px,#000 calc(100% - 10px),transparent)}
+  .log::-webkit-scrollbar,main::-webkit-scrollbar{display:none}
+  main{scrollbar-width:none}
+  .hello{display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 8px 10px}
+  .hello .orb{width:132px;height:132px;margin-bottom:26px}
+  .hello .eyebrow{margin-bottom:8px}
+  .hello h2{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.2;letter-spacing:-.2px}
+  .hello p{color:var(--ink2);font-size:15.5px;line-height:1.6;margin:10px 12px 22px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .chip{min-height:44px;padding:0 16px;border-radius:22px;background:var(--surface);border:1px solid var(--line2);font-size:14.5px;color:var(--ink);
+        box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 
-  /* crisis */
-  .crisis{position:absolute;inset:0;background:var(--redsoft);z-index:20;overflow-y:auto;padding:24px 20px;
-          padding-top:max(24px, env(safe-area-inset-top))}
-  .crisis h2{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.25;margin:10px 0 12px}
-  .crisis p{font-size:15.5px;line-height:1.65;color:#5A3A32;margin-bottom:18px}
-  .rescue{display:block;background:#fff;border:1px solid var(--redline);border-radius:16px;padding:15px 16px;margin-bottom:11px;text-decoration:none;color:inherit}
-  .rescue .who{font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:5px}
-  .rescue .what{font-size:19px;font-weight:600}
-  .rescue .how{font-size:13.5px;color:var(--muted);margin-top:2px}
-  .call{display:flex;align-items:center;justify-content:center;height:54px;border-radius:27px;background:var(--red);color:#fff;
-        font-size:17px;font-weight:600;text-decoration:none;margin:16px 0 10px}
-  .halt{border-top:1px solid var(--redline);padding-top:14px;margin-top:14px;font-size:13px;color:#7A5449;line-height:1.6}
-  .back{margin-top:14px;font-size:13.5px;color:var(--red);text-decoration:underline}
+  .msg{animation:rise .5s var(--ease) both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+  .me{background:linear-gradient(135deg, var(--me1), var(--me2));color:#F4F7FC;padding:12px 16px;border-radius:22px 22px 6px 22px;
+      max-width:82%;margin:14px 0 4px auto;width:fit-content;font-size:16px;line-height:1.5;box-shadow:0 10px 24px -14px rgba(27,61,111,.8);
+      white-space:pre-wrap;word-wrap:break-word}
+  .keep{display:flex;align-items:center;justify-content:flex-end;gap:5px;min-height:32px;font-size:12.5px;color:var(--muted);margin:0 6px 6px auto;
+        text-decoration:none;width:fit-content}
+  .keep svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2}
+  .keep.done{color:var(--ok)}
+  .zenrow{display:flex;gap:10px;align-items:flex-start;margin:14px 0 6px}
+  .zenrow .orb{width:26px;height:26px;margin-top:4px}
+  .zen{background:var(--zen);border:1px solid var(--line);padding:13px 16px;border-radius:6px 22px 22px 22px;max-width:86%;
+       font-family:var(--serif);font-size:17px;line-height:1.55;box-shadow:var(--shadow);
+       backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);white-space:pre-wrap;word-wrap:break-word}
+  .refs{margin:10px 0 8px 36px;display:flex;flex-direction:column;gap:9px}
+  .reflabel{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-left:2px}
+  .ref{display:flex;gap:13px;align-items:flex-start;background:var(--solid);border:1px solid var(--line);border-radius:18px;padding:14px;
+       text-decoration:none;color:inherit;box-shadow:var(--shadow)}
+  .ref .ph{width:40px;height:40px;border-radius:13px;flex:0 0 auto;display:grid;place-items:center;
+           background:linear-gradient(135deg, color-mix(in srgb, var(--orbB) 22%, transparent), color-mix(in srgb, var(--orbC) 22%, transparent));color:var(--orbB)}
+  .ref .ph svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .ref .n{font-weight:600;font-size:15px;line-height:1.3}
+  .ref .w{font-size:13.5px;color:var(--ink2);margin:4px 0 8px;line-height:1.45}
+  .ref .p{display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:15px;font-size:13px;font-weight:600;
+          background:color-mix(in srgb, var(--accent) 12%, transparent);color:var(--accent)}
+  .ref .d{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.4}
 
-  /* check-in */
-  .q{font-family:var(--serif);font-weight:400;font-size:27px;line-height:1.25;margin:8px 0 6px}
-  .help{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px}
-  .scale{display:flex;flex-direction:column;gap:10px}
-  .opt{display:flex;align-items:center;gap:13px;border:1px solid var(--line);background:#fff;border-radius:15px;padding:15px 16px;font-size:16px;text-align:left}
-  .opt .d{width:12px;height:12px;border-radius:50%;flex:0 0 auto}
-  .opt.on{border-color:var(--green);background:var(--soft)}
-  .thanks{background:var(--soft);border:1px solid var(--softline);border-radius:15px;padding:14px 16px;font-size:14.5px;line-height:1.55;margin-top:16px}
+  .thinking{display:flex;align-items:center;gap:12px;margin:16px 0 8px}
+  .thinking .orb{width:34px;height:34px}
+  .thinking .orb::before{animation:breathe 2.6s ease-in-out infinite, morph 6s ease-in-out infinite}
+  .thinking .orb::after{animation:glow 2.6s ease-in-out infinite}
+  .thinking span{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--muted);transition:opacity .5s}
+  .thinking span.fade{opacity:0}
 
-  /* progress */
-  .stats{display:flex;gap:10px;margin:6px 0 18px}
-  .card{flex:1;background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px}
-  .card .n{font-family:var(--serif);font-size:30px;line-height:1}
-  .card .k{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.35}
-  .chart{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
-  .chart h3{font-size:14px;margin-bottom:2px}
-  .chart .sub{font-size:12px;color:var(--muted);margin-bottom:14px}
-  .bars{display:flex;align-items:flex-end;gap:6px;height:110px}
-  .bars div{flex:1;background:var(--green);border-radius:4px 4px 2px 2px;opacity:.85;min-height:3px}
-  .axis{display:flex;gap:6px;margin-top:6px}
-  .axis span{flex:1;text-align:center;font-size:10px;color:var(--muted)}
-  .empty{color:var(--muted);font-size:14px;line-height:1.6;background:#fff;border:1px dashed var(--line);border-radius:15px;padding:16px}
-  .notes h3{font-size:14px;margin:4px 0 8px}
-  .note{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start}
-  .note button{margin-left:auto;font-size:12px;color:var(--red);flex:0 0 auto}
+  .composer{padding:10px 14px 12px;position:relative}
+  .composer .box{display:flex;align-items:flex-end;gap:8px;background:var(--surface);border:1px solid var(--line2);border-radius:28px;padding:5px 5px 5px 18px;
+                 box-shadow:var(--shadow2);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transition:border-color .2s, box-shadow .2s}
+  .composer .box:focus-within{border-color:color-mix(in srgb, var(--accent) 45%, transparent)}
+  .composer textarea{flex:1;resize:none;height:46px;max-height:120px;border:0;padding:12px 0;font:16px/1.4 var(--sans);outline:none;background:transparent;color:var(--ink)}
+  .composer textarea::placeholder{color:var(--muted)}
+  .send{width:46px;height:46px;border-radius:23px;background:linear-gradient(135deg, var(--blue), var(--blue2));color:#fff;flex:0 0 auto;display:grid;place-items:center}
+  @media (prefers-color-scheme: dark){.send{background:linear-gradient(135deg, #F08A4B, #F6B48A);color:#1A1208}}
+  .send svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .send:disabled{opacity:.35}
+  .err{color:var(--red);font-size:13.5px;line-height:1.5;text-align:center;margin:4px 24px 0}
 
-  /* privacy */
-  .row{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--line)}
-  .row .t{font-size:15.5px;font-weight:600;margin-bottom:3px}
-  .row .s{font-size:13px;color:var(--muted);line-height:1.55}
-  .sw{width:50px;height:30px;border-radius:15px;background:#D8D3C9;position:relative;flex:0 0 auto;margin-top:2px;transition:background .2s}
-  .sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .2s}
-  .sw.on{background:var(--green)} .sw.on i{left:23px}
-  .erase{display:block;width:100%;margin-top:22px;border:1px solid var(--redline);background:#fff;color:var(--red);border-radius:15px;padding:15px;font-weight:600}
-  .fine{font-size:12.5px;color:var(--muted);line-height:1.6;margin-top:14px}
+  /* ---------- crisis: legibility first ---------- */
+  .crisis{position:absolute;inset:0;background:var(--redbg);z-index:40;overflow-y:auto;padding:24px 22px;
+          padding-top:calc(22px + var(--top));padding-bottom:calc(20px + var(--bot));animation:fade .3s var(--ease)}
+  .crisis .tag{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;color:var(--red)}
+  .crisis .tag i{width:8px;height:8px;border-radius:50%;background:var(--red)}
+  .crisis h2{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.2;margin:12px 0 10px;color:var(--ink)}
+  .crisis p{font-size:16px;line-height:1.55;color:var(--ink2);margin-bottom:18px}
+  .rescue{display:block;background:var(--redcard);border:1px solid var(--redline);border-radius:20px;padding:16px 18px;margin-bottom:12px;text-decoration:none;color:inherit}
+  .rescue .who{font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:6px}
+  .rescue .what{font-size:20px;font-weight:650;line-height:1.3;color:var(--ink)}
+  .rescue .how{font-size:14px;color:var(--ink2);margin-top:4px;line-height:1.5}
+  .call{display:flex;align-items:center;justify-content:center;gap:10px;height:58px;border-radius:29px;background:#B3321F;color:#fff;
+        font-size:17.5px;font-weight:650;text-decoration:none;margin:20px 0 10px;box-shadow:0 14px 30px -14px rgba(179,50,31,.8)}
+  .call svg,.txt svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .txt{display:flex;align-items:center;justify-content:center;gap:10px;height:54px;border-radius:27px;border:1.5px solid var(--redline);
+       background:var(--redcard);color:var(--ink);font-size:16.5px;font-weight:600;text-decoration:none}
+  .halt{border-top:1px solid var(--redline);padding-top:14px;margin-top:18px;font-size:14px;color:var(--ink2);line-height:1.6}
+  .back{display:block;margin:6px auto 0;min-height:44px;padding:0 18px;font-size:15px;font-weight:600;color:var(--red);text-decoration:underline;text-underline-offset:3px}
+
+  /* ---------- shared headings ---------- */
+  .q{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.2;margin:10px 0 8px;letter-spacing:-.2px}
+  .help{font-size:15px;color:var(--ink2);line-height:1.6;margin-bottom:22px}
+  .sec{font-size:12px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);font-weight:600;margin:26px 2px 10px}
+
+  /* ---------- check-in tiles ---------- */
+  .scale{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .tile{position:relative;overflow:hidden;min-height:136px;border-radius:24px;padding:16px;text-align:left;display:flex;flex-direction:column;
+        justify-content:flex-end;color:#1E1A16;box-shadow:var(--shadow);border:2px solid transparent;
+        transition:transform .25s var(--ease), box-shadow .25s, border-color .2s, opacity .3s}
+  .tile:active{transform:scale(.96)}
+  .tile .blob{position:absolute;right:-18px;top:-18px;width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.45);filter:blur(1px);
+              transition:transform .6s var(--spring)}
+  .tile .blob2{position:absolute;right:30px;top:22px;width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.55)}
+  .tile b{font-family:var(--serif);font-weight:500;font-size:21px;line-height:1.15;position:relative}
+  .tile small{font-size:12.5px;line-height:1.35;opacity:.78;margin-top:4px;position:relative}
+  .tile.on{border-color:var(--ink);box-shadow:var(--shadow2);transform:translateY(-2px)}
+  .tile.on .blob{transform:scale(1.35)}
+  .scale.picked .tile:not(.on){opacity:.55}
+  .tile.wide{grid-column:1 / -1;min-height:84px;flex-direction:row;align-items:center;justify-content:space-between;color:#fff}
+  .tile.wide .t{display:flex;flex-direction:column}
+  .tile.wide .go{position:relative;width:40px;height:40px;border-radius:20px;background:rgba(255,255,255,.16);display:grid;place-items:center}
+  .tile.wide .go svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .tile.wide .blob{background:rgba(255,255,255,.08)}
+  .tile.wide .blob2{display:none}
+  .thanks{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;
+          font-size:15px;line-height:1.55;margin-top:16px;box-shadow:var(--shadow);animation:rise .45s var(--ease)}
+  .thanks .orb{width:28px;height:28px;margin-top:1px}
+  .thanks a{color:var(--accent);font-weight:600;text-underline-offset:3px}
+
+  /* ---------- progress ---------- */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:4px 0 14px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:var(--shadow);
+        backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .card .n{font-family:var(--serif);font-size:32px;line-height:1}
+  .card .k{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.35}
+  .chart{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:18px 16px 14px;box-shadow:var(--shadow);
+         backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .chart h3{font-family:var(--serif);font-weight:500;font-size:19px}
+  .chart .sub{font-size:13px;color:var(--muted);margin:3px 0 12px}
+  .chart svg{display:block;width:100%;height:auto;overflow:visible}
+  .chart .lbl{font:11px var(--sans);fill:var(--muted)}
+  .chart .grid{stroke:var(--line2);stroke-width:1;stroke-dasharray:2 5}
+  .chart .ln{fill:none;stroke:url(#lineg);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+             stroke-dasharray:1000;stroke-dashoffset:1000;animation:draw 1.4s var(--ease) .1s forwards}
+  .chart .ar{opacity:0;animation:show .8s ease .6s forwards}
+  .chart .dot{stroke:var(--solid);stroke-width:2.5;opacity:0;animation:show .4s ease forwards}
+  .chart .ghost{fill:var(--line2)}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes show{to{opacity:1}}
+  .chartmsg{text-align:center;font-size:14px;color:var(--ink2);line-height:1.55;margin:4px 10px 4px}
+  .empty{display:flex;flex-direction:column;align-items:center;text-align:center;background:var(--surface);border:1px solid var(--line);
+         border-radius:24px;padding:28px 22px 22px;box-shadow:var(--shadow)}
+  .empty svg.sk{width:100%;max-width:260px;height:auto;margin-bottom:18px}
+  .empty h3{font-family:var(--serif);font-weight:400;font-size:21px;margin-bottom:6px}
+  .empty p{font-size:14.5px;color:var(--ink2);line-height:1.6;margin-bottom:18px}
+  .soft{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:22px;font-size:15px;font-weight:600;
+        background:color-mix(in srgb, var(--accent) 12%, transparent);color:var(--accent)}
+  .note{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 8px 12px 14px;
+        font-size:14.5px;line-height:1.5;margin-bottom:8px;box-shadow:var(--shadow);animation:rise .4s var(--ease) both}
+  .note::before{content:"";width:6px;align-self:stretch;border-radius:3px;background:linear-gradient(var(--orbB), var(--orbC));flex:0 0 auto}
+  .note span{flex:1;word-break:break-word}
+  .note button{min-width:44px;min-height:44px;border-radius:14px;display:grid;place-items:center;color:var(--muted);flex:0 0 auto}
+  .note button:active{background:var(--line)}
+  .note button svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ---------- privacy ---------- */
+  .group{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:0 16px;box-shadow:var(--shadow);
+         backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .row{display:flex;gap:14px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+  .row:last-child{border-bottom:0}
+  .row .t{font-size:16px;font-weight:600;margin-bottom:3px}
+  .row .s{font-size:13.5px;color:var(--muted);line-height:1.5}
+  .sw{width:52px;height:32px;border-radius:16px;background:var(--line2);position:relative;flex:0 0 auto;transition:background .3s var(--ease)}
+  .sw::after{content:"";position:absolute;inset:-6px}
+  .sw i{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.22);
+        transition:transform .38s var(--spring), width .2s}
+  .sw:active i{width:30px}
+  .sw.on{background:linear-gradient(135deg, var(--blue), var(--blue2))}
+  @media (prefers-color-scheme: dark){.sw.on{background:linear-gradient(135deg, #E8792F, #F6B48A)}}
+  .sw.on i{transform:translateX(20px)}
+  .sw.on:active i{transform:translateX(16px)}
+  .erase{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;margin-top:26px;border:1px solid var(--redline);
+         background:var(--surface);color:var(--red);border-radius:18px;font-weight:600;font-size:15.5px}
+  .erase svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .fine{font-size:13px;color:var(--muted);line-height:1.6;margin-top:16px;padding:0 4px}
+
+  /* ---------- frosted tab bar ---------- */
+  nav{display:flex;margin:0 12px calc(8px + var(--bot));padding:6px;border-radius:26px;position:relative;z-index:6;
+      background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow2);
+      backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4)}
+  nav button{flex:1;min-height:52px;font-size:11px;font-weight:500;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+             border-radius:20px;transition:color .25s, background .3s var(--ease)}
+  nav button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .35s var(--spring)}
+  nav button.on{color:var(--accent);font-weight:650;background:color-mix(in srgb, var(--accent) 10%, transparent)}
+  nav button.on svg{transform:translateY(-1px) scale(1.06)}
+
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
+    .chart .ln{stroke-dashoffset:0}.chart .ar,.chart .dot{opacity:1}
+  }
 </style>
 </head>
 <body>
-<div class="app">
-  <header><div class="mark">Z</div><h1>ZenAI</h1><span class="pill">Private</span></header>
+<div class="app" id="app">
+  <header>
+    <div class="orb mini" aria-hidden="true"><i></i></div><h1>ZenAI</h1>
+    <span class="pill"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Private</span>
+  </header>
 
   <main>
     <!-- WELCOME: shown until the student has read it once -->
     <section class="screen welcome" id="welcome">
+      <div class="orb" aria-hidden="true"><i></i></div>
+      <div class="eyebrow">ZenAI for Morgan State students</div>
       <h2>A place to slow down for a minute.</h2>
-      <p>ZenAI helps you notice what you're carrying, without judging it and without telling you what to do.</p>
-      <div class="callout"><b>ZenAI is not a counselor.</b>It won't diagnose you or give you advice. If something serious comes up, it stops and connects you with people who can help, any time of day.</div>
-      <div class="callout"><b>Your privacy</b>ZenAI doesn't remember anything unless you turn that on in Privacy, and you can delete everything in one tap. Nothing is shared with the university.</div>
-      <button class="cta" id="start">Start talking</button>
+      <p class="lede">ZenAI helps you notice what you're carrying, without judging it and without telling you what to do.</p>
+      <div class="callout">
+        <div class="ic"><svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 7 3.5C19 16.5 12 21 12 21z"/></svg></div>
+        <div><b>ZenAI is not a counselor.</b><span>It won't diagnose you or give you advice. If something serious comes up, it stops and connects you with people who can help, any time of day.</span></div>
+      </div>
+      <div class="callout">
+        <div class="ic b"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+        <div><b>Your privacy</b><span>ZenAI doesn't remember anything unless you turn that on in Privacy, and you can delete everything in one tap. Nothing is shared with the university.</span></div>
+      </div>
+      <div class="spacer"></div>
+      <button class="cta press" id="start">Start talking</button>
     </section>
 
     <!-- TALK -->
     <section class="screen" id="talk">
-      <div class="log" id="log">
-        <div class="intro"><span class="z">What's on your mind?</span>Say it however it comes out. There's no wrong way to start.</div>
-      </div>
+      <div class="log" id="log" aria-live="polite"></div>
       <div class="err hidden" id="err"></div>
       <div class="composer">
-        <textarea id="msg" placeholder="Type here…" maxlength="2000" rows="1"></textarea>
-        <button class="send" id="send" aria-label="Send">↑</button>
+        <div class="box">
+          <textarea id="msg" placeholder="Say what's on your mind" maxlength="2000" rows="1" aria-label="Message"></textarea>
+          <button class="send press" id="send" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+        </div>
       </div>
     </section>
 
     <!-- CHECK IN -->
     <section class="screen" id="checkin">
+      <div class="eyebrow" id="ciDate"></div>
       <h2 class="q">How heavy is today?</h2>
       <p class="help">No streaks, no score. This is only so you can see the shape of a few weeks.</p>
       <div class="scale" id="scale"></div>
@@ -174,28 +354,29 @@
     <section class="screen" id="privacy">
       <h2 class="q">What ZenAI keeps</h2>
       <p class="help">Everything is off until you turn it on. It's stored on this device only, never shared with the university.</p>
-      <div id="switches"></div>
-      <div class="notes" id="memlist"></div>
-      <button class="erase" id="erase">Delete everything ZenAI remembers</button>
+      <div class="group" id="switches"></div>
+      <div id="memlist"></div>
+      <button class="erase press" id="erase"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Delete everything ZenAI remembers</button>
       <p class="fine">What you type is sent to ZenAI to write a reply. Names, emails, phone numbers and student IDs are removed before anything reads it. Conversations aren't saved on this device unless "Keep this conversation" is on.</p>
     </section>
   </main>
 
   <nav id="nav">
-    <button data-go="talk" class="on"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>Talk</button>
-    <button data-go="checkin"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M8 13s1.5 2 4 2 4-2 4-2"/></svg>Check in</button>
-    <button data-go="progress"><svg viewBox="0 0 24 24"><path d="M5 19V11M12 19V5M19 19v-6"/></svg>Progress</button>
-    <button data-go="privacy"><svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Privacy</button>
+    <button data-go="talk" class="on press"><svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z"/></svg>Talk</button>
+    <button data-go="checkin" class="press"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 13.5s1.3 2 3.5 2 3.5-2 3.5-2"/><path d="M9.5 9.5h.01M14.5 9.5h.01"/></svg>Check in</button>
+    <button data-go="progress" class="press"><svg viewBox="0 0 24 24"><path d="M3 17c3 0 4-7 7-7s3 5 6 5 3-6 5-8"/></svg>Progress</button>
+    <button data-go="privacy" class="press"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/></svg>Privacy</button>
   </nav>
 
   <!-- CRISIS: covers everything, and there is no text box on it -->
-  <section class="crisis hidden" id="crisis">
-    <h2>I'm stopping here, and I want to hand you to a person.</h2>
+  <section class="crisis hidden" id="crisis" role="dialog" aria-modal="true" aria-labelledby="c-title">
+    <div class="tag"><i></i>Pausing to get you support</div>
+    <h2 id="c-title">I'm stopping here, and I want to hand you to a person.</h2>
     <p>What you said is more than I should carry on my own. I'm not a counselor, and this is the moment that matters most to get right.</p>
-    <a class="rescue" href="tel:988"><div class="who">Right now · 24 hours</div><div class="what" id="c-hot">Call or text 988</div><div class="how">Suicide &amp; Crisis Lifeline · free · confidential</div></a>
-    <div class="rescue"><div class="who">At Morgan State</div><div class="what" id="c-campus">Counseling Center</div><div class="how" id="c-phone"></div></div>
-    <a class="call" href="tel:988">Call 988</a>
-    <a class="ghost" href="sms:988" style="display:flex;align-items:center;justify-content:center;text-decoration:none">Text 988 instead</a>
+    <a class="rescue" href="tel:988"><div class="who">Right now, 24 hours</div><div class="what" id="c-hot">Call or text 988</div><div class="how">Suicide and Crisis Lifeline. Free and confidential.</div></a>
+    <a class="rescue" id="c-campus-link"><div class="who">At Morgan State</div><div class="what" id="c-campus">Counseling Center</div><div class="how" id="c-phone"></div></a>
+    <a class="call press" href="tel:988"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Call 988</a>
+    <a class="txt press" href="sms:988"><svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z"/></svg>Text 988 instead</a>
     <div class="halt">ZenAI has paused this conversation. There's no text box here on purpose. Nothing you wrote has been shared with anyone.</div>
     <button class="back" id="leave">I'm safe, take me back</button>
   </section>
@@ -203,7 +384,10 @@
 
 <script>
 const $ = id => document.getElementById(id);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+// visible text never shows long dashes: ranges read as "to", asides as commas
+const tidy = s => String(s ?? "").replace(/(\d)\s*[–—]\s*(\d)/g, "$1 to $2").replace(/\s*[–—]\s*/g, ", ").replace(/\s·\s/g, ", ");
+const ORB = cls => `<div class="orb ${cls || ""}" aria-hidden="true"><i></i></div>`;
 
 // ---------- storage: this device only ----------
 const S = {
@@ -212,18 +396,20 @@ const S = {
 };
 const consent = () => S.get("consent", {moods: false, helps: false, convo: false});
 let HISTORY = S.get("consent", {}).convo ? S.get("history", []) : [];
+const dayKey = d => { d = new Date(d); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
 
 // ---------- navigation ----------
 function go(name) {
   document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === name));
   document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.go === name));
   $("nav").classList.toggle("hidden", name === "welcome");
+  $("app").classList.toggle("bare", name === "welcome");
   if (name === "progress") drawProgress();
   if (name === "privacy") drawPrivacy();
+  if (name !== "talk") document.querySelector("main").scrollTop = 0;
 }
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => go(b.dataset.go));
 $("start").onclick = () => { S.set("welcomed", true); go("talk"); };
-go(S.get("welcomed", false) ? "talk" : "welcome");
 
 // ---------- crisis ----------
 let RES = {hotline: "988", campus: "Morgan State University Counseling Center", phone: ""};
@@ -231,37 +417,81 @@ fetch("/resources").then(r => r.json()).then(d => { RES = d; }).catch(() => {});
 function crisis() {
   $("c-hot").textContent = "Call or text " + RES.hotline;
   $("c-campus").textContent = RES.campus;
-  $("c-phone").textContent = RES.phone;
+  $("c-phone").innerHTML = esc(tidy(RES.phone)).replace(/(\d[\d-]{6,}\d)/g, '<span style="white-space:nowrap">$1</span>');
+  const num = (String(RES.phone).match(/\d{3}[-. ]?\d{3}[-. ]?\d{4}/) || [""])[0].replace(/\D/g, "");
+  num ? $("c-campus-link").setAttribute("href", "tel:" + num) : $("c-campus-link").removeAttribute("href");
   $("crisis").classList.remove("hidden");
+  $("crisis").scrollTop = 0;
 }
-$("leave").onclick = () => $("crisis").classList.add("hidden");
+$("leave").onclick = () => {
+  $("crisis").classList.add("hidden");
+  document.querySelectorAll(".tile").forEach(x => x.classList.remove("on")); $("scale").classList.remove("picked");
+};
 
 // ---------- talk ----------
+function greeting() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) return ["Good morning", "How are you starting the day?"];
+  if (h >= 12 && h < 17) return ["Good afternoon", "How's the day sitting with you so far?"];
+  if (h >= 17 && h < 22) return ["Good evening", "What are you carrying out of today?"];
+  return ["Still up?", "Late nights can get loud in your head. What's going on?"];
+}
+const STARTERS = ["I'm stressed about school", "I can't focus", "I just need to vent"];
+function drawHello() {
+  const [g, sub] = greeting();
+  $("log").innerHTML = `<div class="hello">${ORB()}<div class="eyebrow">${g}</div>
+    <h2>What's on your mind?</h2><p>${sub} Say it however it comes out. There's no wrong way to start.</p>
+    <div class="chips">${STARTERS.map(s => `<button class="chip press">${s}</button>`).join("")}</div></div>`;
+  $("log").querySelectorAll(".chip").forEach(c => c.onclick = () => { $("msg").value = c.textContent; $("msg").focus(); });
+}
+const scrollDown = () => { const l = $("log"); l.scrollTop = l.scrollHeight; stick = true; };
+// keep the newest message in view when the screen resizes (keyboard opening, rotation)
+let stick = true;
+$("log").addEventListener("scroll", () => { const l = $("log"); stick = l.scrollHeight - l.scrollTop - l.clientHeight < 40; });
+new ResizeObserver(() => { if (stick) { const l = $("log"); l.scrollTop = l.scrollHeight; } }).observe($("log"));
 function addMine(text) {
   const log = $("log");
-  log.querySelector(".intro")?.remove();
-  const id = "m" + Date.now();
-  log.insertAdjacentHTML("beforeend", `<div class="me">${esc(text)}</div>` +
-    (consent().helps ? `<a href="#" class="keep" id="${id}">Remember this for next time</a>` : ""));
+  log.querySelector(".hello")?.remove();
+  const id = "m" + Date.now() + Math.random().toString(36).slice(2, 6);
+  log.insertAdjacentHTML("beforeend", `<div class="me msg">${esc(text)}</div>` +
+    (consent().helps ? `<a href="#" class="keep msg" id="${id}"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg><span>Remember this for next time</span></a>` : ""));
   const k = $(id);
-  if (k) k.onclick = e => { e.preventDefault(); remember(text); k.textContent = "Saved. You can delete it in Privacy."; k.classList.add("done"); k.onclick = null; };
-  log.scrollTop = log.scrollHeight;
+  if (k) k.onclick = e => { e.preventDefault(); remember(text); k.querySelector("span").textContent = "Saved. You can delete it in Privacy."; k.classList.add("done"); k.onclick = e2 => e2.preventDefault(); };
+  scrollDown();
 }
 function addZen(text) {
-  $("log").insertAdjacentHTML("beforeend", `<div class="zen">${esc(text)}</div>`);
-  $("log").scrollTop = $("log").scrollHeight;
+  $("log").querySelector(".hello")?.remove();
+  $("log").insertAdjacentHTML("beforeend", `<div class="zenrow msg">${ORB()}<div class="zen">${esc(tidy(text))}</div></div>`);
+  scrollDown();
 }
+const PHONE_IC = `<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>`;
 function addCards(list) {
-  $("log").insertAdjacentHTML("beforeend", `<div class="reflabel">At Morgan State</div>` + list.map(r =>
-    `<a class="ref" href="tel:${esc(r.phone.replace(/[^0-9]/g, ""))}"><div class="n">${esc(r.name)}</div><div class="w">${esc(r.what)}</div>
-     <div class="p">Call ${esc(r.phone)}</div><div class="d">${esc(r.detail)}</div></a>`).join("") + `<div style="height:8px"></div>`);
-  $("log").scrollTop = $("log").scrollHeight;
+  $("log").insertAdjacentHTML("beforeend", `<div class="refs msg"><div class="reflabel">At Morgan State</div>` + list.map(r =>
+    `<a class="ref press" href="tel:${esc(String(r.phone || "").replace(/[^0-9]/g, ""))}"><div class="ph">${PHONE_IC}</div><div>
+       <div class="n">${esc(tidy(r.name))}</div><div class="w">${esc(tidy(r.what))}</div>
+       ${r.phone ? `<div class="p">Call ${esc(r.phone)}</div>` : ""}${r.detail ? `<div class="d">${esc(tidy(r.detail))}</div>` : ""}</div></a>`).join("") + `</div>`);
+  scrollDown();
 }
 function remember(text) {
   const mem = S.get("memory", []);
   mem.unshift(text.slice(0, 200));
   S.set("memory", mem.slice(0, 10));
 }
+
+// a calm, alive wait: the orb breathes and the line changes slowly
+const WAITS = ["Taking that in", "Sitting with what you said", "Finding the right words", "Still here, no rush"];
+let waitTimer = null;
+function showThinking() {
+  $("log").insertAdjacentHTML("beforeend", `<div class="thinking msg" id="typing" aria-label="ZenAI is writing">${ORB()}<span id="waitline">${WAITS[0]}</span></div>`);
+  scrollDown();
+  let n = 0;
+  waitTimer = setInterval(() => {
+    const el = $("waitline"); if (!el) return;
+    el.classList.add("fade");
+    setTimeout(() => { n = Math.min(n + 1, WAITS.length - 1); el.textContent = WAITS[n]; el.classList.remove("fade"); }, 500);
+  }, 3500);
+}
+function hideThinking() { clearInterval(waitTimer); $("typing")?.remove(); }
 
 let busy = false;
 async function send() {
@@ -270,12 +500,11 @@ async function send() {
   busy = true; $("send").disabled = true; $("err").classList.add("hidden");
   $("msg").value = ""; $("msg").style.height = "46px";
   addMine(text);
-  $("log").insertAdjacentHTML("beforeend", `<div class="typing" id="typing"><i></i><i></i><i></i></div>`);
-  $("log").scrollTop = $("log").scrollHeight;
+  showThinking();
   try {
     const r = await fetch("/chat", {method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({text, history: HISTORY, memory: consent().helps ? S.get("memory", []) : []})});
-    $("typing")?.remove();
+      body: JSON.stringify({text, history: HISTORY, memory: consent().helps ? S.get("memory", []) : [], client: "student"})});
+    hideThinking();
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
     if (d.escalate) { crisis(); return; }
@@ -286,7 +515,7 @@ async function send() {
     if (consent().convo) S.set("history", HISTORY);
     S.set("talks", S.get("talks", 0) + 1);
   } catch (e) {
-    $("typing")?.remove();
+    hideThinking();
     $("err").textContent = "ZenAI couldn't reply just now. If you need someone right away, call or text 988.";
     $("err").classList.remove("hidden");
   } finally {
@@ -296,49 +525,92 @@ async function send() {
 $("send").onclick = send;
 $("msg").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
 $("msg").addEventListener("input", e => { e.target.style.height = "46px"; e.target.style.height = Math.min(120, e.target.scrollHeight) + "px"; });
-// restore a kept conversation
-if (HISTORY.length) {
-  for (const h of HISTORY) h.role === "user" ? addMine(h.content) : addZen(h.content);
-}
+// restore a kept conversation, or greet
+if (HISTORY.length) { for (const h of HISTORY) h.role === "user" ? addMine(h.content) : addZen(h.content); }
+else drawHello();
 
 // ---------- check in ----------
 const LEVELS = [
-  {t: "Light", c: "#7FA88F"}, {t: "A bit much", c: "#A8B57F"}, {t: "Heavy", c: "#C97A3E"},
-  {t: "Very heavy", c: "#B4633E"}, {t: "I'm not okay", c: "#A93E2A"},
+  {t: "Light", s: "Things feel manageable", g: "linear-gradient(150deg,#D4EFE4,#9FD3C1)", c: "#5FB59A"},
+  {t: "A bit much", s: "Some weight, still okay", g: "linear-gradient(150deg,#FBEBB8,#F3CF74)", c: "#E2B23F"},
+  {t: "Heavy", s: "Hard to carry today", g: "linear-gradient(150deg,#FBD0B0,#F29A62)", c: "#EC8546"},
+  {t: "Very heavy", s: "Really struggling", g: "linear-gradient(150deg,#F2C1C9,#D98597)", c: "#C9617A"},
+  {t: "I'm not okay", s: "Get support right now", g: "linear-gradient(135deg,#1B3D6F,#3A2D5E)", c: "#3A2D5E"},
 ];
-$("scale").innerHTML = LEVELS.map((l, i) =>
-  `<button class="opt" data-i="${i}"><span class="d" style="background:${l.c}"></span>${l.t}</button>`).join("");
-document.querySelectorAll(".opt").forEach(b => b.onclick = () => {
+const ARROW = `<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>`;
+$("ciDate").textContent = new Date().toLocaleDateString(undefined, {weekday: "long", month: "long", day: "numeric"});
+$("scale").innerHTML = LEVELS.map((l, i) => i === 4
+  ? `<button class="tile wide" data-i="${i}" style="background:${l.g}"><span class="blob"></span><span class="t"><b>${l.t}</b><small>${l.s}</small></span><span class="go">${ARROW}</span></button>`
+  : `<button class="tile" data-i="${i}" style="background:${l.g}"><span class="blob"></span><span class="blob2"></span><b>${l.t}</b><small>${l.s}</small></button>`).join("");
+document.querySelectorAll(".tile").forEach(b => b.onclick = () => {
   const i = +b.dataset.i;
-  document.querySelectorAll(".opt").forEach(x => x.classList.toggle("on", x === b));
+  document.querySelectorAll(".tile").forEach(x => x.classList.toggle("on", x === b));
+  $("scale").classList.add("picked");
   if (i === 4) { crisis(); return; }
   if (consent().moods) {
     const m = S.get("moods", []); m.push({at: new Date().toISOString(), level: i}); S.set("moods", m.slice(-200));
   }
-  $("thanks").innerHTML = consent().moods
-    ? `Noted. <a href="#" id="talknow">Want to talk about it?</a>`
-    : `Thanks for checking in. To see this over time, turn on "Remember my check-ins" in Privacy. <a href="#" id="talknow">Want to talk about it?</a>`;
+  $("thanks").innerHTML = ORB() + "<div>" + (consent().moods
+    ? `Noted. Thanks for checking in with yourself. <a href="#" id="talknow">Want to talk about it?</a>`
+    : `Thanks for checking in. To see this over time, turn on "Remember my check-ins" in Privacy. <a href="#" id="talknow">Want to talk about it?</a>`) + "</div>";
   $("thanks").classList.remove("hidden");
   $("talknow").onclick = e => { e.preventDefault(); go("talk"); };
 });
 
 // ---------- progress ----------
+function smooth(pts, lo, hi) {
+  if (pts.length < 2) return "";
+  const cy = v => Math.max(lo, Math.min(hi, v)).toFixed(1);
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2, t = 0.18;
+    d += ` C${(p1[0] + (p2[0] - p0[0]) * t).toFixed(1)},${cy(p1[1] + (p2[1] - p0[1]) * t)} ${(p2[0] - (p3[0] - p1[0]) * t).toFixed(1)},${cy(p2[1] - (p3[1] - p1[1]) * t)} ${p2[0]},${p2[1]}`;
+  }
+  return d;
+}
 function drawProgress() {
   const moods = S.get("moods", []), mem = S.get("memory", []);
+  const recent = moods.filter(m => Date.now() - new Date(m.at) < 7 * 864e5).length;
+  const stats = `<div class="stats"><div class="card"><div class="n">${S.get("talks", 0)}</div><div class="k">replies from ZenAI</div></div>
+       <div class="card"><div class="n">${recent}</div><div class="k">check-ins this week</div></div>
+       <div class="card"><div class="n">${mem.length}</div><div class="k">notes saved</div></div></div>`;
+  const notes = mem.length ? `<div class="sec">What you asked ZenAI to remember</div>${mem.map(m => `<div class="note"><span>${esc(m)}</span></div>`).join("")}` : "";
   if (!consent().moods && !moods.length) {
-    $("prog").innerHTML = `<div class="empty">Nothing to show yet. Turn on "Remember my check-ins" in Privacy, then check in from time to time, and the shape of your weeks shows up here.</div>`;
+    $("prog").innerHTML = stats + `<div class="empty">
+      <svg class="sk" viewBox="0 0 260 90" aria-hidden="true"><defs><linearGradient id="skg" x1="0" x2="1"><stop offset="0" stop-color="#5FB59A"/><stop offset=".5" stop-color="#F3CF74"/><stop offset="1" stop-color="#EC8546"/></linearGradient></defs>
+        <path d="M8 60 C40 30 70 70 104 48 S170 20 200 44 S240 52 252 30" fill="none" stroke="url(#skg)" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 9" opacity=".9"/>
+        ${[8, 56, 104, 152, 200, 252].map((x, k) => `<circle cx="${x}" cy="${[60, 52, 48, 30, 44, 30][k]}" r="4" class="ghost" style="fill:var(--line2)"/>`).join("")}</svg>
+      <h3>Your weeks will show up here</h3>
+      <p>Turn on "Remember my check-ins" in Privacy, then check in now and then. Over time you'll see the shape of things.</p>
+      <button class="soft press" id="toPriv">Open Privacy</button></div>` + notes;
+    $("toPriv").onclick = () => go("privacy");
     return;
   }
-  const days = [...Array(14)].map((_, k) => { const d = new Date(); d.setDate(d.getDate() - (13 - k)); return d.toISOString().slice(0, 10); });
-  const byDay = days.map(day => { const xs = moods.filter(m => m.at.slice(0, 10) === day); return xs.length ? xs.reduce((a, b) => a + b.level, 0) / xs.length : null; });
-  const recent = moods.filter(m => Date.now() - new Date(m.at) < 7 * 864e5).length;
-  $("prog").innerHTML =
-    `<div class="stats"><div class="card"><div class="n">${S.get("talks", 0)}</div><div class="k">replies from ZenAI</div></div>
-       <div class="card"><div class="n">${recent}</div><div class="k">check-ins this week</div></div></div>
-     <div class="chart"><h3>How heavy things felt</h3><div class="sub">Last 14 days. Taller is heavier.</div>
-       <div class="bars">${byDay.map(v => `<div style="height:${v === null ? 3 : 18 + v * 22}%;${v === null ? "opacity:.15" : ""}"></div>`).join("")}</div>
-       <div class="axis">${days.map((d, k) => `<span>${k % 3 === 0 ? d.slice(5).replace("-", "/") : ""}</span>`).join("")}</div></div>` +
-    (mem.length ? `<div class="notes"><h3>What you asked ZenAI to remember</h3>${mem.map(m => `<div class="note">${esc(m)}</div>`).join("")}</div>` : "");
+  const days = [...Array(14)].map((_, k) => { const d = new Date(); d.setDate(d.getDate() - (13 - k)); return d; });
+  const keys = days.map(dayKey);
+  const byDay = keys.map(day => { const xs = moods.filter(m => dayKey(m.at) === day); return xs.length ? xs.reduce((a, b) => a + b.level, 0) / xs.length : null; });
+  const W = 340, H = 176, L = 70, R = 330, T = 16, B = 128;
+  const x = k => L + (R - L) * k / 13, y = v => T + (B - T) * v / 3;
+  const pts = byDay.map((v, k) => v === null ? null : [+x(k).toFixed(1), +y(v).toFixed(1), v]).filter(Boolean);
+  const line = smooth(pts, T, B);
+  const area = line ? `${line} L${pts[pts.length - 1][0]},${B} L${pts[0][0]},${B} Z` : "";
+  const col = v => LEVELS[Math.round(v)].c;
+  const svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Check-ins over the last 14 days">
+    <defs>
+      <linearGradient id="lineg" gradientUnits="userSpaceOnUse" x1="0" y1="${T}" x2="0" y2="${B}">
+        <stop offset="0" stop-color="${LEVELS[0].c}"/><stop offset=".35" stop-color="${LEVELS[1].c}"/><stop offset=".7" stop-color="${LEVELS[2].c}"/><stop offset="1" stop-color="${LEVELS[3].c}"/></linearGradient>
+      <linearGradient id="areag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${LEVELS[0].c}" stop-opacity=".32"/><stop offset="1" stop-color="${LEVELS[2].c}" stop-opacity="0"/></linearGradient>
+    </defs>
+    ${LEVELS.slice(0, 4).map((l, i) => `<line class="grid" x1="${L}" x2="${R}" y1="${y(i)}" y2="${y(i)}"/><circle cx="8" cy="${y(i)}" r="4" fill="${l.c}"/><text class="lbl" x="18" y="${y(i) + 4}">${l.t}</text>`).join("")}
+    ${area ? `<path class="ar" d="${area}" fill="url(#areag)"/>` : ""}
+    ${line ? `<path class="ln" d="${line}" pathLength="1000"/>` : ""}
+    ${byDay.map((v, k) => v === null ? `<circle cx="${x(k)}" cy="${B + 18}" r="2" class="ghost" style="fill:var(--line2)"/>` : `<circle cx="${x(k)}" cy="${B + 18}" r="2.5" fill="${col(v)}"/>`).join("")}
+    ${pts.map((p, k) => `<circle class="dot" cx="${p[0]}" cy="${p[1]}" r="6" fill="${col(p[2])}" style="animation-delay:${.4 + k * .06}s"/>`).join("")}
+    ${days.map((d, k) => (k % 4 === 1 || k === 13) ? `<text class="lbl" x="${x(k)}" y="${H - 4}" text-anchor="middle">${k === 13 ? "Today" : d.toLocaleDateString(undefined, {month: "short", day: "numeric"})}</text>` : "").join("")}
+  </svg>`;
+  $("prog").innerHTML = stats + `<div class="chart"><h3>How heavy things felt</h3><div class="sub">Last 14 days. Lighter days sit higher.</div>${svg}
+    ${pts.length ? "" : `<p class="chartmsg">No check-ins in the last two weeks yet. <a href="#" id="toCi" style="color:var(--accent);font-weight:600">Check in now</a></p>`}</div>` + notes;
+  $("toCi") && ($("toCi").onclick = e => { e.preventDefault(); go("checkin"); });
 }
 
 // ---------- privacy ----------
@@ -347,27 +619,34 @@ const SW = [
   {k: "helps", t: "Remember what I choose", s: "Adds a \"Remember this\" link under your messages. ZenAI uses those notes as context next time."},
   {k: "convo", t: "Keep this conversation", s: "Off by default. When off, the chat is gone when you close the page."},
 ];
+const TRASH = `<svg viewBox="0 0 24 24"><path d="M4 7h16M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>`;
 function drawPrivacy() {
   const c = consent();
   $("switches").innerHTML = SW.map(x =>
-    `<div class="row"><div><div class="t">${x.t}</div><div class="s">${x.s}</div></div><button class="sw ${c[x.k] ? "on" : ""}" data-k="${x.k}" aria-pressed="${!!c[x.k]}" aria-label="${x.t}"><i></i></button></div>`).join("");
+    `<div class="row"><div style="flex:1"><div class="t">${x.t}</div><div class="s">${x.s}</div></div><button class="sw ${c[x.k] ? "on" : ""}" data-k="${x.k}" role="switch" aria-checked="${!!c[x.k]}" aria-label="${x.t}"><i></i></button></div>`).join("");
   document.querySelectorAll(".sw").forEach(b => b.onclick = () => {
     const c2 = consent(); c2[b.dataset.k] = !c2[b.dataset.k]; S.set("consent", c2);
     if (b.dataset.k === "convo") S.set("history", c2.convo ? HISTORY : []);
-    drawPrivacy();
+    b.classList.toggle("on", !!c2[b.dataset.k]); b.setAttribute("aria-checked", !!c2[b.dataset.k]);
   });
+  drawNotes();
+}
+function drawNotes() {
   const mem = S.get("memory", []);
-  $("memlist").innerHTML = mem.length ? `<h3 style="font-size:14px;margin:18px 0 8px">Saved notes</h3>` +
-    mem.map((m, i) => `<div class="note"><span>${esc(m)}</span><button data-i="${i}">Delete</button></div>`).join("") : "";
+  $("memlist").innerHTML = mem.length ? `<div class="sec">Saved notes</div>` +
+    mem.map((m, i) => `<div class="note"><span>${esc(m)}</span><button data-i="${i}" aria-label="Delete note">${TRASH}</button></div>`).join("") : "";
   $("memlist").querySelectorAll("button").forEach(b => b.onclick = () => {
-    const m = S.get("memory", []); m.splice(+b.dataset.i, 1); S.set("memory", m); drawPrivacy();
+    const m = S.get("memory", []); m.splice(+b.dataset.i, 1); S.set("memory", m); drawNotes();
   });
 }
 $("erase").onclick = () => {
   if (!confirm("Delete everything ZenAI has saved on this device? This can't be undone.")) return;
+  Object.keys(localStorage).filter(k => k.startsWith("zenai.")).forEach(k => localStorage.removeItem(k));
   ["consent", "moods", "memory", "history", "talks", "welcomed"].forEach(k => localStorage.removeItem("zenai." + k));
   HISTORY = []; location.reload();
 };
+
+go(S.get("welcomed", false) ? "talk" : "welcome");
 </script>
 </body>
 </html>
