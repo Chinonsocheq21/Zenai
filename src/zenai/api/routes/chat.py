@@ -20,6 +20,8 @@ class ChatIn(BaseModel):
     # Notes the student explicitly chose to let ZenAI remember. Kept on the
     # student's own device and sent with each message; never stored here.
     memory: list[str] = Field(default_factory=list, max_length=10)
+    # which screen sent it, so the workflow viewer can label the turn
+    client: str = Field("api", max_length=20)
 
 
 @router.post("/chat")
@@ -31,7 +33,7 @@ def chat(body: ChatIn) -> dict:
         raise HTTPException(503, "No language model configured (XAI_API_KEY in .env).")
     try:
         return turn.run(body.text, [m.model_dump() for m in body.history], body.monitor,
-                        memory=[m[:200] for m in body.memory])
+                        memory=[m[:200] for m in body.memory], client=body.client)
     except llm.LLMError as e:
         raise HTTPException(502, str(e)) from e
 

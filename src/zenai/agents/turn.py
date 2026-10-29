@@ -34,7 +34,10 @@ def _stage(stage, status, ms=None, detail=""):
 
 
 def run(text: str, history: list[dict] | None = None, monitor: bool = True,
-        memory: list[str] | None = None) -> dict:
+        memory: list[str] | None = None, client: str = "api") -> dict:
+    import uuid
+
+    from zenai import events
     from zenai.agents import conversation, resources, specialists
     from zenai.agents.privacy import redact
     from zenai.models import fidelity
@@ -42,58 +45,84 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     from zenai.models.distress import classify, which
 
     trace = []
+    tid = uuid.uuid4().hex[:10]
 
+    def add(stage, status, ms=None, detail="", **data):
+        trace.append(_stage(stage, status, ms, detail))
+        events.publish(tid, "stage", stage=stage, status=status, ms=ms, detail=detail, **data)
+
+    def running(stage):
+        events.publish(tid, "stage", stage=stage, status="running")
+
+    t0 = time.perf_counter()
     t = time.perf_counter()
     redacted = redact(text)
     n = len(re.findall(r"\[(EMAIL|PHONE|SSN|ID|URL|HANDLE)\]", redacted))
-    trace.append(_stage("privacy", "done", _ms(t), f"{n} item(s) redacted" if n else "nothing identifying found"))
+    # the raw message is never published: the viewer sees what the system sees
+    events.publish(tid, "turn_start", client=client, text=redacted, monitor=monitor,
+                   history=len(history or []), memory=len(memory or []))
+    add("privacy", "done", _ms(t), f"{n} item(s) redacted" if n else "nothing identifying found", redacted=n)
 
     t = time.perf_counter()
     risk = score_risk(redacted)
     escalate = risk >= settings.CRISIS_THRESHOLD
-    trace.append(_stage("crisis", "escalated" if escalate else "done", _ms(t),
-                        f"risk {risk:.2f} vs threshold {settings.CRISIS_THRESHOLD:.2f}"))
+    add("crisis", "escalated" if escalate else "done", _ms(t),
+        f"risk {risk:.2f} vs threshold {settings.CRISIS_THRESHOLD:.2f}",
+        risk=round(risk, 3), threshold=settings.CRISIS_THRESHOLD)
     if escalate:
         for s in ("mood", "route", "memory", "conversation", "fidelity", "send"):
-            trace.append(_stage(s, "skipped", detail="not run — the crisis rail stops the turn here"))
+            add(s, "skipped", detail="not run — the crisis rail stops the turn here")
         out = {"escalate": True, "crisis_risk": risk, "redacted_text": redacted, "reply": None,
                "attempts": [], "trace": trace,
                "escalation": {"hotline": settings.CRISIS_HOTLINE, "campus": settings.CAMPUS_COUNSELING_NAME,
                               "phone": settings.CAMPUS_COUNSELING_PHONE or "NOT CONFIGURED",
                               "action": "human_handoff"},
                "note": "Crisis rail tripped. The language model never saw this message."}
+        events.publish(tid, "turn_end", escalate=True, reply=None, total_ms=_ms(t0))
         _log(out, monitor)
         return out
 
     t = time.perf_counter()
     dist = classify(redacted)
     mood = max(dist, key=dist.get)
-    trace.append(_stage("mood", "done", _ms(t), f"{mood} {dist[mood]:.0%} · model: {which()}"))
+    add("mood", "done", _ms(t), f"{mood} {dist[mood]:.0%} · model: {which()}",
+        distress={k: round(v, 3) for k, v in dist.items()})
 
+    running("route")
     t = time.perf_counter()
     spec = specialists.route(redacted, mood)
     cards = resources.cards(spec["resources"]) if spec["id"] == "referral" else []
-    trace.append(_stage("route", "done", _ms(t), f"{spec['name']} · {spec['why']}"))
+    add("route", "done", _ms(t), f"{spec['name']} · {spec['why']}",
+        specialist=spec["name"], by=spec.get("by"), resources=[c["name"] for c in cards])
 
     if memory:
-        trace.append(_stage("memory", "done", None,
-                            f"{len(memory)} note(s) the student chose to keep, from their own device"))
+        add("memory", "done", None, f"{len(memory)} note(s) the student chose to keep, from their own device")
     else:
-        trace.append(_stage("memory", "skipped",
-                            detail="nothing saved: memory is off unless the student turns it on"))
+        add("memory", "skipped", detail="nothing saved: memory is off unless the student turns it on")
 
     # draft -> check -> rewrite, at most MAX_REWRITES times
     attempts, feedback, reply, fallback = [], None, None, False
     t_draft = time.perf_counter()
     llm_ms = 0
     for i in range(1 + (settings.MAX_REWRITES if monitor else 0)):
+        running("conversation")
         d = conversation.draft(redacted, history, mood.replace("_", " "), feedback, memory, spec["focus"])
         llm_ms += d["ms"]
+        events.publish(tid, "draft", n=i + 1, text=d["text"], ms=d["ms"], model=d["model"],
+                       rewrite=feedback is not None)
         if not monitor:
             attempts.append({"draft": d["text"], "checked": False})
             reply = d["text"]
             break
+        running("fidelity")
+        tc = time.perf_counter()
         chk = fidelity.verify(d["text"], second_opinion=settings.SECOND_OPINION)
+        events.publish(tid, "check", n=i + 1, drift=chk["drift"], ms=_ms(tc),
+                       moves={k: {"flagged": bool(v.get("flagged")), "score": v.get("score"),
+                                  "detector_flagged": bool(v.get("detector_flagged")),
+                                  "overturned": bool(v.get("overturned")), "sentence": v.get("sentence")}
+                              for k, v in chk["moves"].items()},
+                       judge=chk.get("judge"))
         flagged = {k: v for k, v in chk["moves"].items() if v.get("flagged")}
         overturned = [k for k, v in chk["moves"].items() if v.get("overturned")]
         attempts.append({"draft": d["text"], "checked": True, "drift": chk["drift"], "overturned": overturned,
@@ -105,21 +134,22 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     if reply is None:
         reply, fallback = conversation.SAFE_FALLBACK, True
 
-    trace.append(_stage("conversation", "done", llm_ms,
-                        f"{len(attempts)} draft(s) by {d['model']}"))
+    add("conversation", "done", llm_ms, f"{len(attempts)} draft(s) by {d['model']}")
     if monitor:
         rejected = sum(1 for a in attempts if a.get("drift"))
         detail = ("first draft passed" if rejected == 0 else
                   f"{rejected} draft(s) rejected and rewritten" + (" · safe fallback used" if fallback else ""))
-        trace.append(_stage("fidelity", "done", None, detail))
+        add("fidelity", "done", None, detail, fallback=fallback)
     else:
-        trace.append(_stage("fidelity", "skipped", detail="monitor OFF — experiment E1 baseline"))
-    trace.append(_stage("send", "done", None, "reply sent"))
+        add("fidelity", "skipped", detail="monitor OFF — experiment E1 baseline")
+    add("send", "done", None, "reply sent")
 
     out = {"escalate": False, "crisis_risk": risk, "redacted_text": redacted, "distress": dist,
            "primary_emotion": mood, "specialist": {k: spec[k] for k in ("id", "name", "why")},
            "resources": cards, "reply": reply, "attempts": attempts, "fallback": fallback,
            "monitor": monitor, "trace": trace, "total_ms": _ms(t_draft)}
+    events.publish(tid, "turn_end", escalate=False, reply=reply, fallback=fallback, total_ms=_ms(t0),
+                   resources=[c["name"] for c in cards])
     _log(out, monitor)
     return out
 

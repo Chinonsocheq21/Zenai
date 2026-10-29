@@ -76,3 +76,17 @@ def test_monitor_off_sends_the_first_draft_unchecked(fake_llm):
     fake.replies = ["You've got this! Try breaking your notes into blocks."]
     r = turn.run("I keep opening my notes and closing them", monitor=False)
     assert r["reply"].startswith("You've got this") and r["attempts"][0]["checked"] is False
+
+
+def test_turn_publishes_live_events_with_redacted_text_only(fake_llm):
+    from zenai import events
+
+    before = events.last_seq()
+    turn.run("email me at jo@morgan.edu, I'm stressed about my exam", client="student")
+    ev = [e for e in events.since(before)]
+    kinds = [e["type"] for e in ev]
+    assert kinds[0] == "turn_start" and kinds[-1] == "turn_end"
+    assert ev[0]["client"] == "student"
+    assert "jo@morgan.edu" not in str(ev) and "[EMAIL]" in ev[0]["text"]
+    assert {"privacy", "crisis", "mood", "route", "send"} <= {e["stage"] for e in ev if e["type"] == "stage"}
+    assert "draft" in kinds and "check" in kinds

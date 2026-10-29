@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from zenai.api.routes import analyze, chat, fidelity, health
+from zenai.api.routes import analyze, chat, fidelity, health, workflow
 
 
 @asynccontextmanager
@@ -39,6 +39,7 @@ app.include_router(health.router)
 app.include_router(analyze.router)
 app.include_router(fidelity.router)
 app.include_router(chat.router)
+app.include_router(workflow.router)
 
 # The console is served by the API itself: one process, no CORS, nothing to
 # configure on demo day. Open http://127.0.0.1:8000/ .
@@ -46,6 +47,8 @@ WEB = Path(__file__).resolve().parent.parent / "web"
 app.mount("/app", StaticFiles(directory=WEB, html=True), name="web")
 STUDENT = Path(__file__).resolve().parent.parent / "student"
 app.mount("/student", StaticFiles(directory=STUDENT, html=True), name="student")
+WORKFLOW = Path(__file__).resolve().parent.parent / "workflow"
+app.mount("/workflow", StaticFiles(directory=WORKFLOW, html=True), name="workflow")
 
 
 @app.get("/", include_in_schema=False)

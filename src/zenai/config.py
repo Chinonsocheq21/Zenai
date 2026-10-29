@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     # specialist routing: a fast non-reasoning model, rules if it is off or down
     ROUTER_LLM: bool = True
     ROUTER_MODEL: str = "grok-4.20-0309-non-reasoning"
+    # live pipeline events for /workflow/ (testing phase; redacted text only, memory only)
+    WORKFLOW_EVENTS: bool = True
 
     CRISIS_HOTLINE: str = "988"
     CAMPUS_COUNSELING_NAME: str = "Morgan State University Counseling Center"

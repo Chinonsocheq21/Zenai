@@ -45,3 +45,9 @@ def test_student_app_and_resources():
     assert r.status_code == 200 and "ZenAI" in r.text
     res = client.get("/resources").json()
     assert res["hotline"] == "988" and res["phone"]
+
+
+def test_workflow_viewer_and_recent_events():
+    assert client.get("/workflow/").status_code == 200
+    r = client.get("/workflow/recent").json()
+    assert "events" in r and "last" in r

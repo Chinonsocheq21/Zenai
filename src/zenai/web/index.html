@@ -366,7 +366,7 @@ async function send(text) {
     log.scrollTop = log.scrollHeight;
     const monitor = $("monitor").checked;
     let r = await fetch("/chat", {method: "POST", headers: {"Content-Type": "application/json"},
-                                  body: JSON.stringify({text, history: HISTORY, monitor})});
+                                  body: JSON.stringify({text, history: HISTORY, monitor, client: "console"})});
     if (r.status === 503) {   // no language model configured: show the pipeline without a reply
       r = await fetch("/analyze", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({text})});
     }
