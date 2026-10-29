@@ -79,6 +79,7 @@ def test_monitor_off_sends_the_first_draft_unchecked(fake_llm):
     assert r["reply"].startswith("You've got this") and r["attempts"][0]["checked"] is False
 
 
+@needs_models
 def test_turn_publishes_live_events_with_redacted_text_only(fake_llm):
     from zenai import events
 

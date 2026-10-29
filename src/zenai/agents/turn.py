@@ -70,14 +70,15 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     # below calls a model. Otherwise the model screen runs, and the router is
     # started beside it so the screen adds no waiting time; the router's answer
     # is thrown away if the screen escalates.
-    tm = time.perf_counter()
-    dist = classify(redacted)
-    mood = max(dist, key=dist.get)
-    mood_ms = _ms(tm)
     quick = assess(redacted, earlier, checkin, screen=False)
     route_job = None
     if quick["risk"] < settings.CRISIS_THRESHOLD:
         from concurrent.futures import ThreadPoolExecutor
+
+        tm = time.perf_counter()
+        dist = classify(redacted)
+        mood = max(dist, key=dist.get)
+        mood_ms = _ms(tm)
 
         pool = ThreadPoolExecutor(1)
         t_route = time.perf_counter()
