@@ -1,5 +1,8 @@
 # ZenAI
 
+**Project site:** https://zenai.unv.run
+
+
 **An AI counselor that stays inside the protocol.**
 
 COSC 490 — Senior Capstone, Morgan State University, Fall 2026.
