@@ -59,3 +59,16 @@ def test_close_falls_back_when_no_model(monkeypatch):
     monkeypatch.setattr(llm, "available", lambda: False)
     r = client.post("/chat/close", json={"history": []}).json()
     assert r["fallback"] is True and "come back" in r["reply"]
+
+
+def test_audit_page_never_reveals_the_condition():
+    import csv
+    from pathlib import Path
+
+    tags = [p.parent.name for p in Path("results/e1").glob("*/audit_replies.csv")]
+    if not tags:
+        return
+    r = client.get(f"/audit/items?tag={tags[0]}").json()
+    assert r["items"] and "monitor" not in str(r["items"][0]).lower()
+    assert set(r["items"][0]) == {"id", "message", "reply"}
+    assert csv  # the key lives in data/e1-keys, never served

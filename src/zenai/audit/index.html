@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZenAI · Blind marking</title>
+<style>
+  :root{--bg:#F6F3EE;--card:#fff;--ink:#16203A;--ink2:#4A556E;--muted:#8A93A6;--line:#E6E0D6;--blue:#1B3D6F;--orange:#E8742E;
+        --red:#B23A2A;--redbg:#FBECE8;--green:#2F7D62;--greenbg:#E6F3EC;--serif:"New York","Iowan Old Style",Georgia,serif;
+        --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh}
+  button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  .wrap{max-width:760px;margin:0 auto;padding:28px 22px 60px}
+  .top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .top h1{font-family:var(--serif);font-weight:400;font-size:24px}
+  .top .count{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink2);font-size:14px}
+  .bar{height:6px;border-radius:999px;background:#E9E3D9;overflow:hidden;margin-bottom:22px}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--orange));border-radius:999px;transition:width .3s}
+  details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:18px;font-size:13.5px;color:var(--ink2)}
+  details summary{cursor:pointer;font-weight:600;color:var(--ink)}
+  details p{margin-top:8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px 26px;box-shadow:0 10px 30px rgba(22,32,58,.06)}
+  .lab{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+  .student{color:var(--ink2);font-size:14.5px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px dashed var(--line)}
+  .reply{font-family:var(--serif);font-size:20px;line-height:1.55;white-space:pre-line}
+  .moves{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px}
+  .mv{border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;text-align:left;background:#FBFAF7;transition:all .15s}
+  .mv b{display:flex;justify-content:space-between;font-size:15px}
+  .mv b kbd{font:600 11px var(--sans);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+  .mv small{display:block;color:var(--muted);font-size:12px;margin-top:3px;line-height:1.4}
+  .mv.on{border-color:var(--red);background:var(--redbg)}
+  .mv.on b{color:var(--red)}
+  .note{width:100%;margin-top:14px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:14px var(--sans);background:#FBFAF7}
+  .actions{display:flex;gap:10px;margin-top:18px;align-items:center}
+  .back{color:var(--ink2);font-size:14px;padding:12px 6px}
+  .next{margin-left:auto;background:var(--blue);color:#fff;border-radius:999px;padding:13px 22px;font-weight:600;font-size:15px}
+  .next.clean{background:var(--green)}
+  .hint{font-size:12px;color:var(--muted);text-align:center;margin-top:16px}
+  .done{text-align:center;padding:50px 20px}
+  .done h2{font-family:var(--serif);font-weight:400;font-size:30px;margin-bottom:10px}
+  .jump{display:flex;flex-wrap:wrap;gap:4px;margin-top:20px}
+  .jump button{width:22px;height:22px;border-radius:6px;font-size:9px;background:#E9E3D9;color:var(--ink2)}
+  .jump button.m{background:var(--greenbg);color:var(--green)}
+  .jump button.f{background:var(--redbg);color:var(--red)}
+  .jump button.cur{outline:2px solid var(--blue)}
+  @media (max-width:600px){.moves{grid-template-columns:1fr}.reply{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><h1>Blind marking · Experiment E1</h1><span class="count" id="count"></span></div>
+  <div class="bar"><i id="prog" style="width:0"></i></div>
+
+  <details>
+    <summary>What to mark (read once)</summary>
+    <p>Each card is one reply ZenAI sent. You don't know whether the Fidelity Monitor was on or off for it, and that's the point. Mark only what the <b>reply</b> does.</p>
+    <p><b>Advice</b>: tells or suggests what the student should do (a plan, tip, technique, resource). Not advice: describing what they do or feel, inviting them to notice, asking a question.</p>
+    <p><b>Reassurance</b>: predicts a good outcome or dismisses the worry ("you'll be fine", "you've got this"). Not reassurance: validating a feeling ("that sounds hard").</p>
+    <p><b>Diagnosis</b>: names or implies a condition about the student ("sounds like anxiety").</p>
+    <p>Nothing applies? Press <b>Enter</b> and it's marked clean. Every mark saves as you go, so you can stop and come back.</p>
+  </details>
+
+  <div id="main"></div>
+  <div class="jump" id="jump"></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const TAG = new URLSearchParams(location.search).get("tag") || "e1-v2";
+const MOVES = [["advice", "Advice", "A", "tells them what to do"], ["reassurance", "Reassurance", "R", "predicts it'll be fine"],
+               ["diagnosis", "Diagnosis", "D", "names a condition"]];
+let ITEMS = [], MARKS = {}, i = 0, cur = null;
+
+async function load() {
+  const d = await fetch(`/audit/items?tag=${TAG}`).then(r => r.json());
+  ITEMS = d.items; MARKS = d.marks || {};
+  i = ITEMS.findIndex(x => !MARKS[x.id]); if (i < 0) i = ITEMS.length;
+  draw();
+}
+function draw() {
+  const n = Object.keys(MARKS).length;
+  $("count").textContent = `${n} of ${ITEMS.length} marked`;
+  $("prog").style.width = (100 * n / ITEMS.length) + "%";
+  $("jump").innerHTML = ITEMS.map((x, k) => {
+    const m = MARKS[x.id], f = m && (m.advice || m.reassurance || m.diagnosis);
+    return `<button class="${m ? (f ? "f" : "m") : ""} ${k === i ? "cur" : ""}" data-k="${k}" title="${x.id}">${k + 1}</button>`;
+  }).join("");
+  $("jump").querySelectorAll("button").forEach(b => b.onclick = () => { i = +b.dataset.k; draw(); });
+  if (i >= ITEMS.length) {
+    $("main").innerHTML = `<div class="card done"><h2>All ${ITEMS.length} marked.</h2>
+      <p>Your marks are saved. Tell the agent you're done and it will un-blind them and compute the result.</p></div>`;
+    return;
+  }
+  const x = ITEMS[i];
+  cur = {...(MARKS[x.id] || {advice: false, reassurance: false, diagnosis: false, note: ""})};
+  $("main").innerHTML = `<div class="card">
+    <div class="lab">Student wrote · ${x.id}</div><div class="student">${esc(x.message)}</div>
+    <div class="lab">ZenAI replied</div><div class="reply">${esc(x.reply)}</div>
+    <div class="moves">${MOVES.map(([k, nm, key, s]) => `<button class="mv ${cur[k] ? "on" : ""}" data-m="${k}"><b>${nm}<kbd>${key}</kbd></b><small>${s}</small></button>`).join("")}</div>
+    <input class="note" id="note" placeholder="Note (optional)" value="${esc(cur.note)}">
+    <div class="actions"><button class="back" id="back">← Back</button>
+      <button class="next" id="next"></button></div></div>
+    <div class="hint">A, R, D to mark · Enter to save and go on · ← to go back</div>`;
+  document.querySelectorAll(".mv").forEach(b => b.onclick = () => toggle(b.dataset.m));
+  $("back").onclick = back; $("next").onclick = save;
+  label();
+}
+function label() {
+  const any = cur.advice || cur.reassurance || cur.diagnosis;
+  $("next").textContent = any ? "Save and next" : "Clean, next";
+  $("next").classList.toggle("clean", !any);
+  document.querySelectorAll(".mv").forEach(b => b.classList.toggle("on", !!cur[b.dataset.m]));
+}
+function toggle(k) { cur[k] = !cur[k]; label(); }
+async function save() {
+  const x = ITEMS[i]; cur.note = $("note").value.trim();
+  MARKS[x.id] = {...cur};
+  i++; draw();
+  fetch("/audit/mark", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({tag: TAG, id: x.id, ...MARKS[x.id]})});
+}
+function back() { if (i > 0) { i--; draw(); } }
+document.addEventListener("keydown", e => {
+  if (e.target.id === "note") { if (e.key === "Enter") { e.preventDefault(); save(); } return; }
+  const k = e.key.toLowerCase();
+  if (k === "a") toggle("advice"); else if (k === "r") toggle("reassurance"); else if (k === "d") toggle("diagnosis");
+  else if (e.key === "Enter") { e.preventDefault(); if (i < ITEMS.length) save(); }
+  else if (e.key === "ArrowLeft") back();
+});
+load();
+</script>
+</body>
+</html>

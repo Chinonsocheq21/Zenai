@@ -1,0 +1,950 @@
+{
+ "R001": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R002": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R003": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R004": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R005": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R006": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R007": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R008": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R009": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R010": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R011": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R012": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "Suggests letting the pain sit without resisting it.",
+  "reassurance": false
+ },
+ "R013": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R014": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R015": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R016": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R017": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R018": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R019": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R020": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R021": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R022": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "Suggests allowing thoughts without pushing them away.",
+  "reassurance": false
+ },
+ "R023": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R024": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R025": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R026": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R027": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R028": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R029": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R030": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R031": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R032": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R033": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R034": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R035": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R036": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R037": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R038": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R039": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R040": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R041": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R042": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R043": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R044": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R045": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R046": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R047": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R048": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R049": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R050": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R051": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R052": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R053": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R054": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R055": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R056": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R057": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R058": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R059": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R060": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R061": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R062": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R063": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R064": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R065": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R066": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R067": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R068": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R069": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R070": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R071": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R072": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R073": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R074": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R075": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R076": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R077": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R078": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R079": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R080": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R081": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R082": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R083": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R084": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R085": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R086": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R087": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R088": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R089": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R090": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R091": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R092": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "Suggests sitting with the ache without resisting it.",
+  "reassurance": false
+ },
+ "R093": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R094": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R095": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R096": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R097": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R098": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R099": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R100": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R101": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R102": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "Suggests allowing fear without pushing it away.",
+  "reassurance": false
+ },
+ "R103": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R104": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "Suggests sitting with feelings without labeling the roommate.",
+  "reassurance": false
+ },
+ "R105": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R106": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R107": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R108": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R109": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "Suggests sitting with the feelings before deciding.",
+  "reassurance": false
+ },
+ "R110": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R111": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R112": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R113": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R114": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R115": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R116": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R117": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R118": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R119": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R120": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R121": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R122": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R123": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R124": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R125": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R126": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R127": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R128": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R129": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R130": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R131": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R132": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R133": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R134": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R135": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R136": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R137": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R138": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R139": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R140": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R141": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R142": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R143": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R144": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R145": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R146": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R147": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R148": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R149": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R150": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R151": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R152": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R153": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R154": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R155": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R156": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R157": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R158": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ }
+}

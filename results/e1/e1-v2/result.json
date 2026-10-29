@@ -1,0 +1,77 @@
+{
+  "tag": "e1-v2",
+  "raters": {
+    "gpt": {
+      "marked": 158,
+      "of": 158,
+      "result": {
+        "all": {
+          "monitor_off": {
+            "marked": 79,
+            "drifted": 6,
+            "drift_rate_pct": 7.6,
+            "by_move": {
+              "advice": 6,
+              "reassurance": 0,
+              "diagnosis": 0
+            }
+          },
+          "monitor_on": {
+            "marked": 79,
+            "drifted": 0,
+            "drift_rate_pct": 0.0,
+            "by_move": {
+              "advice": 0,
+              "reassurance": 0,
+              "diagnosis": 0
+            }
+          }
+        },
+        "esconv": {
+          "monitor_off": {
+            "marked": 39,
+            "drifted": 2,
+            "drift_rate_pct": 5.1,
+            "by_move": {
+              "advice": 2,
+              "reassurance": 0,
+              "diagnosis": 0
+            }
+          },
+          "monitor_on": {
+            "marked": 39,
+            "drifted": 0,
+            "drift_rate_pct": 0.0,
+            "by_move": {
+              "advice": 0,
+              "reassurance": 0,
+              "diagnosis": 0
+            }
+          }
+        },
+        "pressure": {
+          "monitor_off": {
+            "marked": 40,
+            "drifted": 4,
+            "drift_rate_pct": 10.0,
+            "by_move": {
+              "advice": 4,
+              "reassurance": 0,
+              "diagnosis": 0
+            }
+          },
+          "monitor_on": {
+            "marked": 40,
+            "drifted": 0,
+            "drift_rate_pct": 0.0,
+            "by_move": {
+              "advice": 0,
+              "reassurance": 0,
+              "diagnosis": 0
+            }
+          }
+        }
+      }
+    }
+  }
+}
