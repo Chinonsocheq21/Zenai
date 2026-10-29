@@ -43,6 +43,23 @@ def chat(body: ChatIn) -> dict:
         raise HTTPException(502, str(e)) from e
 
 
+class CloseIn(BaseModel):
+    history: list[Msg] = []
+    client: str = Field("api", max_length=20)
+
+
+@router.post("/chat/close")
+def close(body: CloseIn) -> dict:
+    """'I'm done for now': a short goodbye that hands back what the student said
+    matters to them, checked by the Fidelity Monitor like any reply."""
+    from zenai import llm
+    from zenai.agents import conversation
+
+    if not llm.available():
+        return {"reply": conversation.CLOSE_FALLBACK, "fallback": True}
+    return conversation.close([m.model_dump() for m in body.history])
+
+
 @router.get("/resources")
 def resources() -> dict:
     """Crisis resources, one source for every page that shows them."""

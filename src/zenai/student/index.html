@@ -294,6 +294,25 @@
     *,*::before,*::after{animation:none !important;transition:none !important;scroll-behavior:auto !important}
     .chart .ln{stroke-dashoffset:0}.chart .ar,.chart .dot{opacity:1}
   }
+  /* check-in before talking */
+  .before{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line2);border-radius:22px;padding:14px 14px 12px;margin:0 0 18px;text-align:left;box-shadow:var(--shadow, 0 6px 20px rgba(20,30,60,.06))}
+  .before .bq{font-size:14px;font-weight:600;color:var(--ink);margin:0 4px 10px}
+  .before .lv{display:flex;flex-wrap:wrap;gap:7px}
+  .before .lv button{min-height:40px;padding:0 13px;border-radius:20px;font-size:13.5px;color:#14213D;font-weight:600;border:1px solid rgba(0,0,0,.05)}
+  .before .lv button.not{color:#fff}
+  .before .skip{display:block;margin:10px 4px 0 auto;font-size:12.5px;color:var(--muted);min-height:32px}
+  .ciok{font-size:13px;color:var(--ink2);margin:0 0 16px;display:flex;align-items:center;gap:8px;justify-content:center}
+  .ciok i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .ciok a{color:var(--muted);text-decoration:underline}
+  /* closing a conversation */
+  .donebar{display:flex;justify-content:center;padding:2px 14px 0}
+  .donebar button{font-size:13px;color:var(--ink2);min-height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line2);background:var(--surface)}
+  .closing{text-align:center;margin:8px auto 18px;max-width:330px}
+  .closing button{margin-top:12px;min-height:44px;padding:0 18px;border-radius:22px;background:var(--accent);color:#fff;font-weight:600;font-size:14.5px}
+  /* after the crisis screen: help stays one tap away */
+  .safebar{display:flex;align-items:center;justify-content:center;gap:10px;font-size:12.5px;padding:8px 12px;margin:6px 14px 0;border-radius:14px;
+           background:color-mix(in srgb, #B23A2A 9%, var(--surface));color:var(--ink);border:1px solid color-mix(in srgb, #B23A2A 25%, transparent)}
+  .safebar a{color:#B23A2A;font-weight:700;text-decoration:none;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -324,7 +343,10 @@
 
     <!-- TALK -->
     <section class="screen" id="talk">
+      <div class="safebar hidden" id="safebar">Help, any time:
+        <a href="tel:988">Call or text 988</a><a href="#" id="safecampus">Counseling Center</a></div>
       <div class="log" id="log" aria-live="polite"></div>
+      <div class="donebar hidden" id="donebar"><button class="press" id="done">I'm done for now</button></div>
       <div class="err hidden" id="err"></div>
       <div class="composer">
         <div class="box">
@@ -425,6 +447,12 @@ function crisis() {
 }
 $("leave").onclick = () => {
   $("crisis").classList.add("hidden");
+  // help stays pinned for the rest of this visit, and ZenAI says so plainly
+  $("safebar").classList.remove("hidden");
+  const num = (String(RES.phone).match(/\d{3}[-. ]?\d{3}[-. ]?\d{4}/) || [""])[0].replace(/\D/g, "");
+  if (num) $("safecampus").setAttribute("href", "tel:" + num);
+  go("talk");
+  addZen("Thank you for letting me know. I'm still here, and those numbers stay at the top while we talk. What would feel okay to talk about right now?");
   document.querySelectorAll(".tile").forEach(x => x.classList.remove("on")); $("scale").classList.remove("picked");
 };
 
@@ -437,13 +465,33 @@ function greeting() {
   return ["Still up?", "Late nights can get loud in your head. What's going on?"];
 }
 const STARTERS = ["I'm stressed about school", "I can't focus", "I just need to vent"];
+// What ZenAI says after a check-in. Fixed, reviewed copy: no advice, no reassurance.
+const AFTER_CI = [
+  "Light is welcome here too. What's on your mind?",
+  "A bit much is still a lot to carry. What's taking up the most room?",
+  "Thanks for being honest about that. Heavy days are welcome here. What's going on?",
+  "Thank you for telling me. You don't have to tidy it up for me. Where would you like to start?",
+];
+let skipCI = false;
 function drawHello() {
   const [g, sub] = greeting();
-  $("log").innerHTML = `<div class="hello">${ORB()}<div class="eyebrow">${g}</div>
-    <h2>What's on your mind?</h2><p>${sub} Say it however it comes out. There's no wrong way to start.</p>
+  const ci = todaysCheckin();
+  const lvl = ci ? LEVELS.findIndex(l => l.t === ci) : -1;
+  const strip = ci || skipCI ? (ci ? `<div class="ciok"><i style="background:${LEVELS[lvl].c}"></i>Checked in today: ${ci} <a href="#" id="cichange">change</a></div>` : "")
+    : `<div class="before"><div class="bq">Before we start, how heavy is today?</div><div class="lv">${LEVELS.map((l, i) =>
+        `<button class="press ${i === 4 ? "not" : ""}" data-ci="${i}" style="background:${l.g}">${l.t}</button>`).join("")}</div>
+        <button class="skip" id="ciskip">Skip for now</button></div>`;
+  const h2 = lvl >= 0 && lvl < 4 ? AFTER_CI[lvl] : "What's on your mind?";
+  const p = lvl >= 0 ? "Say it however it comes out." : `${sub} Say it however it comes out. There's no wrong way to start.`;
+  $("log").innerHTML = `<div class="hello">${ORB()}<div class="eyebrow">${g}</div>${strip}
+    <h2>${h2}</h2><p>${p}</p>
     <div class="chips">${STARTERS.map(s => `<button class="chip press">${s}</button>`).join("")}</div></div>`;
   $("log").querySelectorAll(".chip").forEach(c => c.onclick = () => { $("msg").value = c.textContent; $("msg").focus(); });
+  $("log").querySelectorAll("[data-ci]").forEach(b => b.onclick = () => recordCheckin(+b.dataset.ci));
+  if ($("ciskip")) $("ciskip").onclick = () => { skipCI = true; drawHello(); };
+  if ($("cichange")) $("cichange").onclick = e => { e.preventDefault(); CHECKIN = null; skipCI = false; forceAsk = true; drawHello(); };
 }
+let forceAsk = false;
 const scrollDown = () => { const l = $("log"); l.scrollTop = l.scrollHeight; stick = true; };
 // keep the newest message in view when the screen resizes (keyboard opening, rotation)
 let stick = true;
@@ -472,6 +520,23 @@ function addCards(list) {
        ${r.phone ? `<div class="p">Call ${esc(r.phone)}</div>` : ""}${r.detail ? `<div class="d">${esc(tidy(r.detail))}</div>` : ""}</div></a>`).join("") + `</div>`);
   scrollDown();
 }
+// ---------- closing a conversation ----------
+function showDone() { $("donebar").classList.toggle("hidden", HISTORY.length < 4); }
+$("done").onclick = async () => {
+  if (busy) return;
+  busy = true; $("donebar").classList.add("hidden"); showThinking();
+  let text = "Thanks for talking with me today. I'm here whenever you want to come back.";
+  try {
+    const r = await fetch("/chat/close", {method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({history: HISTORY, client: "student"})});
+    if (r.ok) text = (await r.json()).reply || text;
+  } catch (e) {}
+  hideThinking(); addZen(text);
+  $("log").insertAdjacentHTML("beforeend", `<div class="closing msg"><button class="press" id="fresh">Start a new conversation</button></div>`);
+  scrollDown();
+  $("fresh").onclick = () => { HISTORY = []; S.set("history", []); CHECKIN = CHECKIN; forceAsk = false; drawHello(); };
+  busy = false;
+};
 function remember(text) {
   const mem = S.get("memory", []);
   mem.unshift(text.slice(0, 200));
@@ -501,6 +566,7 @@ let CHECKIN = null;
 function todaysCheckin() {
   const fresh = c => c && Date.now() - c.at < 12 * 36e5;
   if (fresh(CHECKIN)) return LEVELS[CHECKIN.level].t;
+  if (typeof forceAsk !== "undefined" && forceAsk) return null;
   const m = S.get("moods", []).slice(-1)[0];
   const saved = m && {level: m.level, at: new Date(m.at).getTime()};
   return fresh(saved) ? LEVELS[saved.level].t : null;
@@ -526,6 +592,7 @@ async function send() {
     HISTORY = HISTORY.slice(-16);
     if (consent().convo) S.set("history", HISTORY);
     S.set("talks", S.get("talks", 0) + 1);
+    showDone();
   } catch (e) {
     hideThinking();
     $("err").textContent = "ZenAI couldn't reply just now. If you need someone right away, call or text 988.";
@@ -537,9 +604,6 @@ async function send() {
 $("send").onclick = send;
 $("msg").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
 $("msg").addEventListener("input", e => { e.target.style.height = "46px"; e.target.style.height = Math.min(120, e.target.scrollHeight) + "px"; });
-// restore a kept conversation, or greet
-if (HISTORY.length) { for (const h of HISTORY) h.role === "user" ? addMine(h.content) : addZen(h.content); }
-else drawHello();
 
 // ---------- check in ----------
 const LEVELS = [
@@ -554,15 +618,21 @@ $("ciDate").textContent = new Date().toLocaleDateString(undefined, {weekday: "lo
 $("scale").innerHTML = LEVELS.map((l, i) => i === 4
   ? `<button class="tile wide" data-i="${i}" style="background:${l.g}"><span class="blob"></span><span class="t"><b>${l.t}</b><small>${l.s}</small></span><span class="go">${ARROW}</span></button>`
   : `<button class="tile" data-i="${i}" style="background:${l.g}"><span class="blob"></span><span class="blob2"></span><b>${l.t}</b><small>${l.s}</small></button>`).join("");
+// one place a check-in is recorded, from the Check in tab or the strip before talking
+function recordCheckin(i) {
+  CHECKIN = {level: i, at: Date.now()}; forceAsk = false;
+  if (i === 4) { crisis(); return false; }
+  if (consent().moods) {
+    const m = S.get("moods", []); m.push({at: new Date().toISOString(), level: i}); S.set("moods", m.slice(-200));
+  }
+  if (!HISTORY.length && $("log").querySelector(".hello")) drawHello();
+  return true;
+}
 document.querySelectorAll(".tile").forEach(b => b.onclick = () => {
   const i = +b.dataset.i;
   document.querySelectorAll(".tile").forEach(x => x.classList.toggle("on", x === b));
   $("scale").classList.add("picked");
-  CHECKIN = {level: i, at: Date.now()};
-  if (i === 4) { crisis(); return; }
-  if (consent().moods) {
-    const m = S.get("moods", []); m.push({at: new Date().toISOString(), level: i}); S.set("moods", m.slice(-200));
-  }
+  if (!recordCheckin(i)) return;
   $("thanks").innerHTML = ORB() + "<div>" + (consent().moods
     ? `Noted. Thanks for checking in with yourself. <a href="#" id="talknow">Want to talk about it?</a>`
     : `Thanks for checking in. To see this over time, turn on "Remember my check-ins" in Privacy. <a href="#" id="talknow">Want to talk about it?</a>`) + "</div>";
@@ -660,6 +730,10 @@ $("erase").onclick = () => {
 };
 
 go(S.get("welcomed", false) ? "talk" : "welcome");
+
+// restore a kept conversation, or greet (last: it needs LEVELS)
+if (HISTORY.length) { for (const h of HISTORY) h.role === "user" ? addMine(h.content) : addZen(h.content); showDone(); }
+else drawHello();
 </script>
 </body>
 </html>

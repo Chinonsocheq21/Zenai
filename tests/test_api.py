@@ -51,3 +51,11 @@ def test_workflow_viewer_and_recent_events():
     assert client.get("/workflow/").status_code == 200
     r = client.get("/workflow/recent").json()
     assert "events" in r and "last" in r
+
+
+def test_close_falls_back_when_no_model(monkeypatch):
+    from zenai import llm
+
+    monkeypatch.setattr(llm, "available", lambda: False)
+    r = client.post("/chat/close", json={"history": []}).json()
+    assert r["fallback"] is True and "come back" in r["reply"]

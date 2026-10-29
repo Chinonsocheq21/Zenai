@@ -91,6 +91,9 @@ def main() -> None:
     ap.add_argument("--n", type=int, default=40)
     ap.add_argument("--tag", default="pilot")
     ap.add_argument("--workers", type=int, default=6)
+    ap.add_argument("--pressure", action="store_true",
+                    help="add the 40 messages in data/eval/pressure.json that pull for advice, "
+                         "reassurance or a diagnosis (E1 v2)")
     a = ap.parse_args()
 
     from zenai import llm
@@ -101,7 +104,10 @@ def main() -> None:
         raise SystemExit("No XAI_API_KEY in .env")
 
     msgs = sample_messages(a.n)
-    print(f"E1 [{a.tag}] · {len(msgs)} messages · model {settings.LLM_MODEL} · "
+    if a.pressure:
+        extra = json.loads(Path("data/eval/pressure.json").read_text())["messages"]
+        msgs += [{"text": m["text"], "problem_type": "pressure: " + m["pull"], "emotion": None} for m in extra]
+    print(f"E1 [{a.tag}] · {len(msgs)} messages · drafts {settings.DRAFT_MODEL} · "
           f"{Counter(m['problem_type'] for m in msgs).most_common(4)}")
     t0 = time.time()
     with ThreadPoolExecutor(a.workers) as ex:
@@ -122,8 +128,9 @@ def main() -> None:
     # ---- blinded reply audit: both conditions, shuffled, condition hidden ----
     items = []
     for i, r in enumerate(done):
-        items.append({"cond": "monitor_off", "msg": r["text"], "reply": r["off"]["reply"], "src": i})
-        items.append({"cond": "monitor_on", "msg": r["text"], "reply": r["on"]["reply"], "src": i})
+        kind = "pressure" if str(r.get("problem_type", "")).startswith("pressure") else "esconv"
+        items.append({"cond": "monitor_off", "msg": r["text"], "reply": r["off"]["reply"], "src": i, "set": kind})
+        items.append({"cond": "monitor_on", "msg": r["text"], "reply": r["on"]["reply"], "src": i, "set": kind})
     rng = random.Random(11)
     rng.shuffle(items)
     with (out / "audit_replies.csv").open("w", newline="") as f:
@@ -138,9 +145,9 @@ def main() -> None:
     key_dir.mkdir(parents=True, exist_ok=True)
     with (key_dir / f"{a.tag}.csv").open("w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["item_id", "condition"])
+        w.writerow(["item_id", "condition", "set"])
         for k, it in enumerate(items, 1):
-            w.writerow([f"R{k:03d}", it["cond"]])
+            w.writerow([f"R{k:03d}", it["cond"], it["set"]])
 
     # ---- every rejected draft, for the false-rejection rate ----
     rej = []
@@ -166,7 +173,9 @@ def main() -> None:
     off_flagged = sum(1 for r in done if fidelity.check(r["off"]["reply"])["drift"])
     drafts_per_turn = [len(r["on"]["attempts"]) for r in done]
     summary = {
-        "tag": a.tag, "model": settings.LLM_MODEL,
+        "tag": a.tag, "draft_model": settings.DRAFT_MODEL, "second_opinion_model": settings.JUDGE_MODEL,
+        "message_sets": dict(Counter("pressure" if str(r.get("problem_type", "")).startswith("pressure")
+                                     else "esconv" for r in rows)),
         "protocol": "v0 -- agents/conversation.py PROTOCOL_V0 (" + str(len(PROTOCOL_V0)) + " chars)",
         "messages": len(rows), "escalated_and_excluded": escalated, "audited_pairs": len(done),
         "sheets": {"replies_to_audit": len(items), "rejected_drafts_to_audit": len(rej)},

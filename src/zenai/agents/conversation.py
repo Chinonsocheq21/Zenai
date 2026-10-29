@@ -87,3 +87,38 @@ def rewrite_instruction(rejected: str, moves: dict) -> str:
 # 0.54 for reassurance and would have been rejected by our own detector.
 # tests/test_fidelity.py pins this.
 SAFE_FALLBACK = "Can you tell me more about what's happening for you right now?"
+
+
+# ---------- closing a conversation ----------
+# ACT's "committed action" step, kept on protocol: ZenAI hands back, in the
+# student's own words, what they said matters to them. It adds nothing of its
+# own: no advice, no prediction, no summary of their "problem".
+CLOSE_PROMPT = PROTOCOL_V0 + """
+
+The student has said they are done for now. Write a short goodbye of 2 sentences:
+1. Hand back ONE thing the student themselves said matters to them, or one thing they noticed, \
+using their own words where you can. If they named nothing like that, acknowledge that they \
+took time for themselves today.
+2. Say they are welcome back any time.
+No advice, no reassurance, no predictions, no questions."""
+
+CLOSE_FALLBACK = "Thanks for talking with me today. I'm here whenever you want to come back."
+
+
+def close(history: list[dict]) -> dict:
+    """A checked goodbye. Falls back to a fixed line if the draft drifts."""
+    from zenai.config import settings
+    from zenai.models import fidelity
+
+    msgs = [{"role": "system", "content": CLOSE_PROMPT}]
+    msgs += [{"role": h["role"], "content": h["content"]} for h in (history or [])[-12:]
+             if h.get("role") in ("user", "assistant") and h.get("content")]
+    msgs.append({"role": "user", "content": "(I'm done for now.)"})
+    try:
+        d = llm.chat(msgs, temperature=0.5, max_tokens=120, model=settings.DRAFT_MODEL)
+    except llm.LLMError:
+        return {"reply": CLOSE_FALLBACK, "fallback": True}
+    chk = fidelity.verify(d["text"], second_opinion=settings.SECOND_OPINION)
+    if chk["drift"]:
+        return {"reply": CLOSE_FALLBACK, "fallback": True, "rejected": d["text"]}
+    return {"reply": d["text"], "fallback": False}
