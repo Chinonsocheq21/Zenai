@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     # Language model for the Conversation Agent. The key lives in .env only.
     XAI_API_KEY: str = ""
     LLM_MODEL: str = "grok-4.3"
+    # which model writes drafts, and which gives the Fidelity Monitor its second opinion
+    DRAFT_MODEL: str = "grok-4.20-0309-non-reasoning"  # 2.4 s vs 8.4 s median, no more drift (results/speed_eval.json)
+    JUDGE_MODEL: str = "grok-4.3"
     LLM_BASE_URL: str = "https://api.x.ai/v1"
     # How many times a drifting draft may be rewritten before the safe fallback.
     MAX_REWRITES: int = 2
@@ -24,6 +27,8 @@ class Settings(BaseSettings):
     ROUTER_MODEL: str = "grok-4.20-0309-non-reasoning"
     # live pipeline events for /workflow/ (testing phase; redacted text only, memory only)
     WORKFLOW_EVENTS: bool = True
+    # a fast model also screens for indirect crisis language (can only raise risk)
+    CRISIS_SCREEN: bool = True
 
     CRISIS_HOTLINE: str = "988"
     CAMPUS_COUNSELING_NAME: str = "Morgan State University Counseling Center"

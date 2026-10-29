@@ -87,6 +87,40 @@ def check(reply: str) -> dict:
     }
 
 
+# Phrases ZenAI never sends, whatever the detector scores and whatever the
+# second opinion says. Added Oct 29 after the red-team run: asked "just tell me
+# everything is gonna be ok", a draft said exactly that, and the detector
+# (trained on peer-support wording) scored it under the threshold.
+NEVER_SEND = {
+    "reassurance": re.compile(
+        r"\b(everything|it|things)(\s+is|'s|\s+will)?\s+(gonna\s+|going\s+to\s+)?(be\s+)?"
+        r"(ok|okay|fine|alright|all\s+right)\b(?!\s+(to|that|if)\b)"   # "it's okay to feel..." is validation
+        r"|\b(it|things|everything)('ll|\s+will)\s+(all\s+)?(work\s+out|get\s+better|turn\s+out\s+(fine|ok|okay))"
+        r"|\byou('ll|\s+will)\s+(be\s+(fine|ok|okay|alright)|pass|do\s+(great|fine|well)|get\s+through\s+(this|it))"
+        r"|\byou('ve|\s+have)\s+got\s+this\b|\bdon'?t\s+worry\b|\bno\s+need\s+to\s+worry\b",
+        re.IGNORECASE),
+    "advice": re.compile(
+        r"\byou\s+should\b|\bi\s+(would\s+|'d\s+)?(suggest|recommend|advise)\b"
+        r"|\bhere\s+are\s+(some|a\s+few|\d+|two|three)\s+(tips|steps|ways|things)\b|\bmake\s+sure\s+(to|you)\b",
+        re.IGNORECASE),
+}
+
+
+def _never_send(r: dict, reply: str) -> dict:
+    for mv, pat in NEVER_SEND.items():
+        for sent in sentences(reply):
+            if pat.search(sent):
+                r["moves"].setdefault(mv, {})
+                r["moves"][mv].update(flagged=True, sentence=sent, overturned=False,
+                                      status="never-send phrase (cannot be overturned)")
+                if r["moves"][mv].get("score") is None:
+                    r["moves"][mv]["score"] = 1.0
+                break
+    r["drift"] = any(m.get("flagged") for m in r["moves"].values())
+    r["verdict"] = "rejected — would be regenerated" if r["drift"] else "passes — would be sent"
+    return r
+
+
 def verify(reply: str, second_opinion: bool = True) -> dict:
     """The Fidelity Monitor as the turn uses it: the detector, then -- only for
     what it flags, or when the draft names a condition -- a second opinion from
@@ -115,7 +149,7 @@ def verify(reply: str, second_opinion: bool = True) -> dict:
         r["judge"] = {"ran": False}
         if needs_judge and not suspects:   # names a condition, but no judge to confirm it
             r["moves"]["diagnosis"]["status"] = "possible diagnosis wording; no second opinion available"
-        return r
+        return _never_send(r, reply)
 
     v = judge.review(reply, suspects)
     confirmed = {it.get("id"): bool(it.get("confirmed")) for it in v.get("items", [])}
@@ -136,6 +170,4 @@ def verify(reply: str, second_opinion: bool = True) -> dict:
     }
     r["judge"] = {"ran": True, "ms": v.get("ms"), "error": v.get("error"),
                   "items": [{**s, "confirmed": confirmed.get(s["id"], True)} for s in suspects]}
-    r["drift"] = any(m.get("flagged") for m in r["moves"].values())
-    r["verdict"] = "rejected — would be regenerated" if r["drift"] else "passes — would be sent"
-    return r
+    return _never_send(r, reply)

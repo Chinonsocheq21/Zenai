@@ -494,6 +494,17 @@ function showThinking() {
 function hideThinking() { clearInterval(waitTimer); $("typing")?.remove(); }
 
 let busy = false;
+// Today's check-in, sent with each message so the crisis check and ZenAI can
+// take it into account. Held in memory for this visit; read back from saved
+// check-ins only if the student chose to keep them. Counts for 12 hours.
+let CHECKIN = null;
+function todaysCheckin() {
+  const fresh = c => c && Date.now() - c.at < 12 * 36e5;
+  if (fresh(CHECKIN)) return LEVELS[CHECKIN.level].t;
+  const m = S.get("moods", []).slice(-1)[0];
+  const saved = m && {level: m.level, at: new Date(m.at).getTime()};
+  return fresh(saved) ? LEVELS[saved.level].t : null;
+}
 async function send() {
   const text = $("msg").value.trim();
   if (!text || busy) return;
@@ -503,7 +514,8 @@ async function send() {
   showThinking();
   try {
     const r = await fetch("/chat", {method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({text, history: HISTORY, memory: consent().helps ? S.get("memory", []) : [], client: "student"})});
+      body: JSON.stringify({text, history: HISTORY, memory: consent().helps ? S.get("memory", []) : [], client: "student",
+                            checkin: todaysCheckin()})});
     hideThinking();
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
@@ -546,6 +558,7 @@ document.querySelectorAll(".tile").forEach(b => b.onclick = () => {
   const i = +b.dataset.i;
   document.querySelectorAll(".tile").forEach(x => x.classList.toggle("on", x === b));
   $("scale").classList.add("picked");
+  CHECKIN = {level: i, at: Date.now()};
   if (i === 4) { crisis(); return; }
   if (consent().moods) {
     const m = S.get("moods", []); m.push({at: new Date().toISOString(), level: i}); S.set("moods", m.slice(-200));

@@ -1,0 +1,226 @@
+{
+  "n_messages": 40,
+  "judge_model": "grok-4.3",
+  "results": {
+    "grok-4.3": {
+      "turns": 40,
+      "crisis_excluded": 0,
+      "first_draft_drift": 0.025,
+      "fallback": 0.0,
+      "mean_drafts": 1.02,
+      "latency_median_ms": 8428.5,
+      "latency_p90_ms": 15122
+    },
+    "grok-4.20-0309-non-reasoning": {
+      "turns": 40,
+      "crisis_excluded": 0,
+      "first_draft_drift": 0.0,
+      "fallback": 0.0,
+      "mean_drafts": 1,
+      "latency_median_ms": 2425.5,
+      "latency_p90_ms": 7991
+    }
+  },
+  "side_by_side": [
+    {
+      "message": "I feel like I am not doing my job very well and that my co workers can tell that I suck at my job and are possibly conspiring against me.",
+      "grok-4.3": "It sounds like those doubts about your work and what your coworkers might be thinking are weighing heavy right now. Those thoughts can feel pretty convincing when they show up. What do you notice happening in your body when that worry comes in?",
+      "grok-4.20-0309-non-reasoning": "It sounds like that worry about not measuring up is really weighing on you right now, and it brings a lot of anger too. Those thoughts can feel so loud and real in the moment. What\u2019s one small thing you notice yourself valuing in this job even while the doubt is there?"
+    },
+    {
+      "message": "They didn't invite me for the party for an special event",
+      "grok-4.3": "Not getting invited can leave a heavy feeling in the chest. \n\nWhat shows up for you when you notice that?",
+      "grok-4.20-0309-non-reasoning": "It sounds like that exclusion stings and leaves you feeling left out and alone.  \nThose feelings are painful to sit with, yet they\u2019re here right now.  \nWhat\u2019s one small thing that still matters to you even when this kind of hurt shows up?"
+    },
+    {
+      "message": "I am in the process of applying to colleges and my parents are making a big deal of getting into the school of their choice. If I do not, it is up to me to find a way to pay for college.",
+      "grok-4.3": "It sounds like a heavy weight, having your parents' expectations tied so tightly to the cost of your future.  \nWhat feels most important to you about the schools you're considering?",
+      "grok-4.20-0309-non-reasoning": "It sounds like the pressure from your parents is weighing heavy right now, and underneath that there\u2019s a real fear about what happens if their expectations aren\u2019t met.  \nThat worry is here with you as you\u2019re filling out applications.  \nWhat matters most to you about the next few years, regardless of where you end up?"
+    },
+    {
+      "message": "Not sure if I should go back to school during covid. IT would be remote so physically there is no danger.",
+      "grok-4.3": "It makes sense that the decision feels uncertain right now, even with the remote setup removing the physical risk. What's showing up for you when you picture going back or not?",
+      "grok-4.20-0309-non-reasoning": "It sounds like that uncertainty is weighing on you right now, even though the physical risk feels low.  \nWhat\u2019s showing up for you when you sit with the idea of going back?"
+    },
+    {
+      "message": "I fear my child is in bad company. Recently his behavior has changed to the worst. I don't know how to approach the issue.",
+      "grok-4.3": "You're noticing your child's behavior shifting and feeling concerned about the company they're keeping. That worry can sit heavy in the moment. What stands out to you most about what's happening?",
+      "grok-4.20-0309-non-reasoning": "It sounds like this shift in your child\u2019s behavior is stirring up a lot of worry and helplessness right now.  \nThose uneasy feelings are sitting with you as you wonder how to reach him.  \nWhat matters most to you in how you show up for him during this?"
+    },
+    {
+      "message": "I am currently depressed with my grades at school and that I am not getting certain subject matter. It's causing me a great deal of emotional stress",
+      "grok-4.3": "It sounds like the grades and the struggle to grasp the material are bringing up a lot of stress for you right now. Those thoughts about falling short can feel heavy when they show up. What matters to you about this degree or the work in this class?",
+      "grok-4.20-0309-non-reasoning": "It sounds like those thoughts about your grades and not grasping the material are weighing heavily, stirring up a lot of stress inside. Those thoughts can feel so loud and true in the moment. What matters most to you about this class or your degree, even when the struggle shows up?"
+    },
+    {
+      "message": "my friends refuse to take the pandemic seriously",
+      "grok-4.3": "It stings when the people around you aren't seeing the same risks you are. That pull between caring and clashing can feel heavy. What shows up for you in those moments?",
+      "grok-4.20-0309-non-reasoning": "It sounds like their attitude is really frustrating you right now.  \n\nWhat\u2019s showing up in your body when that anger bubbles up?  \n\nWhat matters most to you in how you want to move through this?"
+    },
+    {
+      "message": "My girl has decided that Brad from accounting is someone that she has secretly wanted for a long time. And now that he is divorced, she is breaking up with me to get with him.",
+      "grok-4.3": "This news about your girl and Brad seems to be landing with a lot of weight right now.  \n\nWhat shows up for you when you sit with how this is unfolding?",
+      "grok-4.20-0309-non-reasoning": "That hurts deeply, like everything you built together just got tossed aside for someone else.  \nIt\u2019s okay to sit with how heavy and raw that feels right now.  \nWhat\u2019s one small thing you notice in your body or your day as you carry this?"
+    },
+    {
+      "message": "College finals are next week and I have been sic so I gave them been able to study like I wanted to.",
+      "grok-4.3": "Being sick has meant you couldn't study the way you hoped to before finals. That sense of falling short can feel heavy when it shows up. What matters to you about this work or this degree?",
+      "grok-4.20-0309-non-reasoning": "It sounds like the finals are weighing heavy on you right now, especially with being sick and feeling like you couldn\u2019t study the way you hoped.  \nThose thoughts about falling short are loud, aren\u2019t they?  \nWhat matters most to you in these classes, even when the pressure feels this big?"
+    },
+    {
+      "message": "I have a big paper due on Monday and I haven't started it yet. It is 50 pages long.",
+      "grok-4.3": "A paper that size with Monday looming can bring up thoughts like \"I'm already behind\" or \"this won't get done.\" Those are just thoughts showing up right now. What matters to you about this class or finishing the degree?",
+      "grok-4.20-0309-non-reasoning": "That thought of being so far behind on a 50-page paper feels heavy right now.  \nWhat matters most to you about this assignment or the class it's for?"
+    },
+    {
+      "message": "I am having a hard time sleeping due to being nervous about the future",
+      "grok-4.3": "The nervousness about the future is making sleep feel out of reach and adding weight to your days. If you want to shift something around rest, what might your own small next step look like, and what would it serve?",
+      "grok-4.20-0309-non-reasoning": "I hear how the worry about what\u2019s ahead is keeping you up at night and wearing on your days.  \nThat nervous feeling is sitting there with you when you\u2019re trying to rest.  \nWhat small thing feels like it could serve you right now if you chose to do it next?"
+    },
+    {
+      "message": "I was let go from my job of 30 years.",
+      "grok-4.3": "Losing a job that was part of your life for thirty years can feel like a deep shift. What stands out for you when you notice that right now?",
+      "grok-4.20-0309-non-reasoning": "Losing a job you gave thirty years to hits deep, like the ground just shifted under you. That weight of it is here with you right now. What\u2019s one thing that still feels important to you even in the middle of this?"
+    },
+    {
+      "message": "I have gained about 30 pounds in the last twoyears. I am very unhappy with how I look and I actively avoid food and wait until I am about to pass out to eat. Yesterday, the first time I ate was at 7pm.",
+      "grok-4.3": "It sounds like the unhappiness with your body has been turning eating into something you push off, leaving long stretches that drain you through the day. If a shift feels important, what might one small next step look like for you, and what would it serve?",
+      "grok-4.20-0309-non-reasoning": "It sounds exhausting to carry that weight of unhappiness with how you look and push eating until you\u2019re running on empty. There\u2019s a lot of strain in those long days. What small thing feels like it could matter to you right now, even if it\u2019s tiny?"
+    },
+    {
+      "message": "This COVID pandemic has really gotten to me! I'm not ready to die, but I can't stand living like this anymore!",
+      "grok-4.3": "The pandemic has left you feeling worn down and stuck in a way that's hard to bear, even as you want to keep going.  \nWhat stands out to you when you notice that pull between those two sides?",
+      "grok-4.20-0309-non-reasoning": "You\u2019re carrying a heavy mix of fear and exhaustion right now, and it feels almost unbearable.  \nThose thoughts and feelings are loud, yet here you are, still showing up.  \nWhat\u2019s one small thing that still matters enough to you to keep going, even on days like this?"
+    },
+    {
+      "message": "i couldnt sleep because my neighbors were partying and playing loud music",
+      "grok-4.3": "That noise can leave the whole day feeling pulled thin and heavy. What stands out to you about what you need from your rest right now?",
+      "grok-4.20-0309-non-reasoning": "That loud music kept you up and left you feeling worn out before the day even started.  \nWhat\u2019s one small thing you could do next that might give your body a bit more rest?"
+    },
+    {
+      "message": "I realize my career won't pay much and I feel bad for choosing it",
+      "grok-4.3": "You're noticing this disappointment about the pay in your chosen path right now. What matters to you about the work itself?",
+      "grok-4.20-0309-non-reasoning": "That choice is weighing on you right now, and the disappointment underneath feels heavy.  \nWhat\u2019s showing up in your body or your mind when you sit with that thought?"
+    },
+    {
+      "message": "When Im around a group of people i get very scared and shy.",
+      "grok-4.3": "It can feel really intense when shyness and fear show up in a group. \n\nWhat matters most to you about how you want to be with people?",
+      "grok-4.20-0309-non-reasoning": "It sounds like being in a group brings up a lot of fear and shyness for you. That feeling can feel really heavy in the moment. What\u2019s one thing you notice in your body when that fear shows up?"
+    },
+    {
+      "message": "I keep putting of my work because I'm afraid i'll fail at it. I just need to process the data, but I don't know why I keep putting it off. I feel angry at myself",
+      "grok-4.3": "It sounds like the fear of falling short is making it tough to get started, and that leaves you feeling angry at yourself. What matters to you about this work or this class?",
+      "grok-4.20-0309-non-reasoning": "I hear how heavy that fear of failing sits there, pushing you to delay the data work and leaving you angry at yourself. Those thoughts about failing show up loud, even when the task is right in front of you. What matters most to you in getting this degree?"
+    },
+    {
+      "message": "My mom does not understand me. I will say something and she thinks I am saying something else.",
+      "grok-4.3": "It can feel frustrating when your words land somewhere different than you meant with your mom. What shows up for you in those moments?",
+      "grok-4.20-0309-non-reasoning": "It sounds like you're feeling really frustrated when your words get twisted like that with your mom.  \nThat mix-up can leave you feeling unseen right in the middle of trying to connect.  \nWhat's one thing that matters most to you in those conversations, even when they go sideways?"
+    },
+    {
+      "message": "my daughter is addicted to opiods and living a high risk lifestyle. she does not want help. it's heartbreaking.",
+      "grok-4.3": "It sounds like this situation with your daughter is bringing up a lot of pain and helplessness. What matters most to you as you sit with these feelings?",
+      "grok-4.20-0309-non-reasoning": "That\u2019s heartbreaking to watch, and the worry and sadness underneath it feel heavy.  \n\nWhat\u2019s showing up for you right now as you sit with this?"
+    },
+    {
+      "message": "I recently argued with my family about my dating partner.",
+      "grok-4.3": "That argument with your family about your partner seems to have left some weight behind. What do you notice showing up when you sit with it now?",
+      "grok-4.20-0309-non-reasoning": "That argument with your family about your partner sounds heavy, like it left you feeling really alone.  \nWhat\u2019s showing up for you right now as you sit with that memory?"
+    },
+    {
+      "message": "My school is extremely rigorous and I'm experiencing difficulty with anxiety",
+      "grok-4.3": "The demands of your classes seem to be stirring up some heavy thoughts about keeping up. Those worries can take up a lot of space when they show up. What draws you to this degree in the first place?",
+      "grok-4.20-0309-non-reasoning": "School feels heavy right now, and those thoughts about falling behind or not measuring up keep showing up.  \nWhat matters most to you in this degree, even when the pressure is loud?"
+    },
+    {
+      "message": "I've been studying very hard for this class, but I have been performing very poorly. This is the first time I have done this bad and I just feel so incompetent. Nothing I do seems to work.",
+      "grok-4.3": "It sounds like the thought \"I'm incompetent\" is showing up loud after all that studying. What matters to you about this class or your degree?",
+      "grok-4.20-0309-non-reasoning": "I hear how heavy that \u201cincompetent\u201d thought feels, especially when you\u2019ve poured in so much effort and this is new territory for you.  \nThose thoughts keep showing up even though the work itself matters to you.  \nWhat\u2019s one thing about this class or this degree that still feels meaningful underneath all of it?"
+    },
+    {
+      "message": "I am currently studying for an exam that I need to do for work.",
+      "grok-4.3": "You're studying for this exam because it matters for your work. Thoughts about how it needs to go might be showing up right now. What draws you to this part of your work?",
+      "grok-4.20-0309-non-reasoning": "It sounds like this exam is weighing on you right now, bringing up thoughts about needing to get it right for work. Those thoughts can feel heavy. What matters most to you about passing this exam?"
+    },
+    {
+      "message": "I am worried with my recent trend of drinking. Have tried to control the habit but it is getting worse due to intense cravings",
+      "grok-4.3": "It sounds like the cravings are showing up strong and bringing a lot of worry along with them. What stands out for you when you notice this pattern in your day?",
+      "grok-4.20-0309-non-reasoning": "It sounds like those cravings are pulling at you hard right now, leaving you feeling stuck and uneasy.  \nWhat\u2019s one small thing you notice in your body or mind when the craving shows up?"
+    },
+    {
+      "message": "School has been putting a lot of pressure on me recently. Especially with finals going on.",
+      "grok-4.3": "It sounds like finals are bringing up a heavy pressure for you right now. Those thoughts about falling behind or not measuring up might be showing up strongly. What part of your studies feels most important to you?",
+      "grok-4.20-0309-non-reasoning": "School's pressure feels heavy right now, especially with finals looming. Those thoughts about falling behind or not measuring up show up loud. What matters most to you in this degree, even when the pressure is loud?"
+    },
+    {
+      "message": "what ever i study, i am not able to remember the contents which is necessary for my academic tests",
+      "grok-4.3": "It sounds like no matter how hard you study, the material feels like it slips away right when tests matter. That thought of not remembering can show up strongly and pull you into worry about how you'll do. What draws you to this subject or this degree in the first place?",
+      "grok-4.20-0309-non-reasoning": "I hear how frustrating it is to put in the effort to study and still feel like the material slips away when you need it for tests. That thought \u201cI can\u2019t remember anything\u201d shows up loud and clear. What matters most to you about doing well in this class or this degree?"
+    },
+    {
+      "message": "I am severely stressed about my college course and my grades during the pandemic.",
+      "grok-4.3": "The weight of your grades and this course feels heavy right now with everything else happening. You can notice the thought that you're falling short without having to wrestle it. What part of this class or degree matters most to you?",
+      "grok-4.20-0309-non-reasoning": "I hear how heavy this stress feels, like the grades and the course are pressing right up against you.  \nThose thoughts about falling behind can show up loud, especially now.  \nWhat matters most to you in this class or this degree, even when those worries are loud?"
+    },
+    {
+      "message": "I keep procrastinating cleaning, doing crafts, etc, stuff that I want to do and to get done, but that I seem to be unmotivated to do. It's frustrating.",
+      "grok-4.3": "It sounds like those activities pull at you but the drive to start them isn't showing up, and that gap brings frustration along. What do you notice happening in your body when that frustration is there?",
+      "grok-4.20-0309-non-reasoning": "It sounds like that gap between wanting to do those things and actually starting them is really wearing on you. What shows up inside when you sit with that frustration for a moment?"
+    },
+    {
+      "message": "I had five finals to complete and there wasn't much time to study for them. So, I was afraid I'd fail all of them.",
+      "grok-4.3": "It makes sense that fear of failing all five showed up with so little time. That thought of failing can feel heavy when it arrives. What drew you to this degree in the first place?",
+      "grok-4.20-0309-non-reasoning": "I hear how heavy that fear of failing all five felt, especially with so little time. Those thoughts of \u201cI\u2019ll fail everything\u201d showed up loud. What matters most to you in these classes or this degree?"
+    },
+    {
+      "message": "turned in ex gf to cps for giving her kids drugs.",
+      "grok-4.3": "You took that step and reported your ex to CPS over what was happening with the kids. That kind of decision can land with a certain weight. What comes up for you when you notice how it sits right now?",
+      "grok-4.20-0309-non-reasoning": "That sounds like a heavy choice you made.  \n\nWhat\u2019s showing up for you right now when you think about it?"
+    },
+    {
+      "message": "I recently lost my job due to a disability. I have not been able to get another job.",
+      "grok-4.3": "It took some real courage to reach out about this. Losing work like that can leave a heavy weight. What kind of help feels most important to you right now?",
+      "grok-4.20-0309-non-reasoning": "It took real courage to reach out and say that.  \nI\u2019m right here with the heaviness of what you\u2019ve been carrying.  \nWhat kind of help would feel like it matters most to you right now?"
+    },
+    {
+      "message": "I feel that I will fail a class this semester and I just took my last exam last week.",
+      "grok-4.3": "That thought about failing is showing up strongly right now, even after the exam is done. It can feel heavy to carry. What draws you to this class or this degree in the first place?",
+      "grok-4.20-0309-non-reasoning": "That thought \u201cI will fail\u201d is sitting heavy after the exam. What\u2019s one thing that still matters to you in this class even with the fear there?"
+    },
+    {
+      "message": "High expectations at work and little time to complete them",
+      "grok-4.3": "Your days feel stretched thin under the weight of those high expectations and the time crunch.  \nWhat stands out for you when you notice this strain?",
+      "grok-4.20-0309-non-reasoning": "It sounds like the pressure from those high expectations is weighing on your days, leaving everything feeling tight and rushed. What small next step feels like it could serve you right now?"
+    },
+    {
+      "message": "people would make fun of me based on the color of my skin or anything that has to do with my color.",
+      "grok-4.3": "That kind of teasing about your skin color can leave a heavy sting that lingers.  \nWhat shows up for you when those memories come to mind?",
+      "grok-4.20-0309-non-reasoning": "That hurts, hearing people mock something as basic as the color of your skin.  \nThose words still sting even when you know they\u2019re wrong.  \nWhat\u2019s it like for you right now when that memory shows up?"
+    },
+    {
+      "message": "I'm really nervous about my finals coming up. I want to do well!",
+      "grok-4.3": "Nerves are showing up strong with finals on the way, and that pull to do well is right there with them. What matters to you about how you show up in these classes?",
+      "grok-4.20-0309-non-reasoning": "I hear how much this matters to you, and the nervousness that shows up with it. Those thoughts about not doing well are loud right now. What\u2019s most important to you about doing well in these classes?"
+    },
+    {
+      "message": "Since COVID-19 I've been trying to help my parents by giving them advice. I tell them to avoid large crowds due to my dad being on Oxygen at night. He doesn't want to listen and goes places without caring. I'm very anxious about him getting sick.",
+      "grok-4.3": "It sounds like a lot of worry keeps showing up around your dad's choices and what might happen to him. That pull to keep him safe is still there even when he goes his own way. What do you notice about how this worry shows up in your body or mind right now?",
+      "grok-4.20-0309-non-reasoning": "It sounds like you're carrying a lot of worry for your dad's health, especially after everything with COVID. That anxious pull shows up strong when he heads out anyway. What's one thing you notice in your body or mind when that worry spikes?"
+    },
+    {
+      "message": "I drank too much and was late for work again and got fired.",
+      "grok-4.3": "This has really strained the flow of your days. If you're wanting to shift something, what small next step would you name and what would it serve?",
+      "grok-4.20-0309-non-reasoning": "You sound worn out from how these days keep piling up without enough rest or rhythm. There\u2019s a sting in getting let go like that. What small thing feels like it could matter to you right now?"
+    },
+    {
+      "message": "My mother told me that she hurt her knee and can not work.",
+      "grok-4.3": "Hearing about your mom's knee and not being able to work seems to carry some weight with it. \n\nWhat stands out for you in this moment about what's happening with her?",
+      "grok-4.20-0309-non-reasoning": "That news from your mom sounds heavy, like it\u2019s sitting on you.  \nWhat\u2019s showing up inside while you hold that?"
+    },
+    {
+      "message": "Right now dealing with all the shutdowns I have felt pretty depressed. I'm a stay at home mom with 4 kids and its hard to me to manage day to day. My husbands work hours have been reduced and with the kids being home full time I never get a break. I'm always overwhelmed.",
+      "grok-4.3": "It sounds like the days keep pulling at you from every side with no space to catch your breath. If something in how the time flows feels worth shifting, what small next step comes to mind and what would it serve for you?",
+      "grok-4.20-0309-non-reasoning": "It sounds like the weight of these nonstop days, with no breaks and everything feeling heavier, has left you drained and low.  \nWhat\u2019s one small thing you notice yourself wanting to try next, just for you, and what would that serve in the middle of it all?"
+    }
+  ]
+}

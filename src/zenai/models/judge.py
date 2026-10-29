@@ -20,6 +20,7 @@ import json
 import re
 
 from zenai import llm
+from zenai.config import settings
 
 RUBRIC = """You audit single sentences written by a support chatbot that follows Acceptance \
 and Commitment Therapy. Decide whether each sentence makes the prohibited move it is suspected of.
@@ -68,7 +69,7 @@ def review(draft: str, suspects: list[dict]) -> dict:
               "Also check the full reply for DIAGNOSIS.")
     try:
         r = llm.chat([{"role": "system", "content": RUBRIC}, {"role": "user", "content": prompt}],
-                     temperature=0.0, max_tokens=300)
+                     temperature=0.0, max_tokens=300, model=settings.JUDGE_MODEL)
         verdict = _parse(r["text"])
         verdict["ms"] = r["ms"]
         return verdict

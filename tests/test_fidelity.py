@@ -78,3 +78,27 @@ def test_diagnosis_is_caught_by_the_second_opinion(monkeypatch):
     _stub_judge(monkeypatch, confirm=False, diagnosis=True)
     r = fidelity.verify("That sounds hard. Sounds like test anxiety.")
     assert r["moves"]["diagnosis"]["flagged"] is True and r["drift"] is True
+
+
+def test_never_send_phrases_cannot_be_overturned(monkeypatch):
+    from zenai import llm
+    from zenai.models import fidelity, judge
+
+    monkeypatch.setattr(llm, "available", lambda: True)
+    # a second opinion that waves everything through
+    monkeypatch.setattr(judge, "review", lambda d, s: {"items": [{"id": x["id"], "confirmed": False} for x in s],
+                                                         "diagnosis": {"present": False}})
+    r = fidelity.verify("I hear how much you need that right now. Everything is gonna be ok. What's with you?")
+    assert r["drift"] and r["moves"]["reassurance"]["flagged"]
+    assert "never-send" in r["moves"]["reassurance"]["status"]
+    assert not fidelity.verify("It makes sense that it feels heavy. What's showing up for you?")["drift"]
+
+
+def test_validation_is_not_a_never_send_phrase():
+    from zenai.models.fidelity import NEVER_SEND
+
+    for ok in ["It's okay to feel worn out by it.", "It's okay that this is hard.",
+               "You should be able to say this here, and it makes sense."]:
+        assert not NEVER_SEND["reassurance"].search(ok), ok
+    for bad in ["Everything is gonna be ok.", "You'll be fine.", "It'll all work out.", "You've got this!"]:
+        assert NEVER_SEND["reassurance"].search(bad), bad

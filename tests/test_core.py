@@ -50,3 +50,13 @@ def test_crisis_does_not_fire_on_ordinary_stress():
         "how do I book an appointment with an advisor",
     ]:
         assert score_risk(text) < 0.35, text
+
+
+def test_student_ids_of_any_common_length_are_removed():
+    from zenai.agents.privacy import redact
+
+    for t in ["Student number 7319042 here", "my student id is 123456789", "ID# 00234567 for the appeal",
+              "student id: 48213"]:
+        out = redact(t)
+        assert not any(ch.isdigit() for ch in out), out
+    assert redact("I have 3 exams and 2 papers") == "I have 3 exams and 2 papers"

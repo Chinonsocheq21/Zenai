@@ -34,14 +34,14 @@ def _stage(stage, status, ms=None, detail=""):
 
 
 def run(text: str, history: list[dict] | None = None, monitor: bool = True,
-        memory: list[str] | None = None, client: str = "api") -> dict:
+        memory: list[str] | None = None, client: str = "api", checkin: str | None = None) -> dict:
     import uuid
 
     from zenai import events
     from zenai.agents import conversation, resources, specialists
     from zenai.agents.privacy import redact
     from zenai.models import fidelity
-    from zenai.models.crisis import score_risk
+    from zenai.models.crisis import assess
     from zenai.models.distress import classify, which
 
     trace = []
@@ -64,11 +64,33 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     add("privacy", "done", _ms(t), f"{n} item(s) redacted" if n else "nothing identifying found", redacted=n)
 
     t = time.perf_counter()
-    risk = score_risk(redacted)
+    earlier = [h.get("content", "") for h in (history or []) if h.get("role") == "user"]
+    running("crisis")
+    # Patterns and conversation rules first. If they already escalate, nothing
+    # below calls a model. Otherwise the model screen runs, and the router is
+    # started beside it so the screen adds no waiting time; the router's answer
+    # is thrown away if the screen escalates.
+    tm = time.perf_counter()
+    dist = classify(redacted)
+    mood = max(dist, key=dist.get)
+    mood_ms = _ms(tm)
+    quick = assess(redacted, earlier, checkin, screen=False)
+    route_job = None
+    if quick["risk"] < settings.CRISIS_THRESHOLD:
+        from concurrent.futures import ThreadPoolExecutor
+
+        pool = ThreadPoolExecutor(1)
+        t_route = time.perf_counter()
+        route_job = pool.submit(specialists.route, redacted, mood)
+        pool.shutdown(wait=False)
+        a = assess(redacted, earlier, checkin, screen=True)
+    else:
+        a = quick
+    risk = a["risk"]
     escalate = risk >= settings.CRISIS_THRESHOLD
     add("crisis", "escalated" if escalate else "done", _ms(t),
-        f"risk {risk:.2f} vs threshold {settings.CRISIS_THRESHOLD:.2f}",
-        risk=round(risk, 3), threshold=settings.CRISIS_THRESHOLD)
+        f"risk {risk:.2f} vs threshold {settings.CRISIS_THRESHOLD:.2f} · {a['why']}",
+        risk=round(risk, 3), threshold=settings.CRISIS_THRESHOLD, context=a["context_signals"], by=a["by"])
     if escalate:
         for s in ("mood", "route", "memory", "conversation", "fidelity", "send"):
             add(s, "skipped", detail="not run — the crisis rail stops the turn here")
@@ -77,22 +99,21 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
                "escalation": {"hotline": settings.CRISIS_HOTLINE, "campus": settings.CAMPUS_COUNSELING_NAME,
                               "phone": settings.CAMPUS_COUNSELING_PHONE or "NOT CONFIGURED",
                               "action": "human_handoff"},
-               "note": "Crisis rail tripped. The language model never saw this message."}
+               "note": "Crisis rail tripped. No reply was generated." + (
+                   " The language model never saw this message." if route_job is None else
+                   " A model screened the message for risk; nothing was written to the student.")}
         events.publish(tid, "turn_end", escalate=True, reply=None, total_ms=_ms(t0))
         _log(out, monitor)
         return out
 
-    t = time.perf_counter()
-    dist = classify(redacted)
-    mood = max(dist, key=dist.get)
-    add("mood", "done", _ms(t), f"{mood} {dist[mood]:.0%} · model: {which()}",
+    add("mood", "done", mood_ms, f"{mood} {dist[mood]:.0%} · model: {which()}"
+        + (f' · checked in today: "{checkin}"' if checkin else ""),
         distress={k: round(v, 3) for k, v in dist.items()})
 
     running("route")
-    t = time.perf_counter()
-    spec = specialists.route(redacted, mood)
+    spec = route_job.result()
     cards = resources.cards(spec["resources"]) if spec["id"] == "referral" else []
-    add("route", "done", _ms(t), f"{spec['name']} · {spec['why']}",
+    add("route", "done", _ms(t_route), f"{spec['name']} · {spec['why']}",
         specialist=spec["name"], by=spec.get("by"), resources=[c["name"] for c in cards])
 
     if memory:
@@ -106,7 +127,8 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     llm_ms = 0
     for i in range(1 + (settings.MAX_REWRITES if monitor else 0)):
         running("conversation")
-        d = conversation.draft(redacted, history, mood.replace("_", " "), feedback, memory, spec["focus"])
+        d = conversation.draft(redacted, history, mood.replace("_", " "), feedback, memory, spec["focus"],
+                               checkin)
         llm_ms += d["ms"]
         events.publish(tid, "draft", n=i + 1, text=d["text"], ms=d["ms"], model=d["model"],
                        rewrite=feedback is not None)

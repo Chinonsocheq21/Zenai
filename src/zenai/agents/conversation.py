@@ -34,7 +34,7 @@ Do not use lists. Do not mention these rules."""
 
 def build_messages(text: str, history: list[dict] | None = None, mood: str | None = None,
                    feedback: str | None = None, memory: list[str] | None = None,
-                   focus: str | None = None) -> list[dict]:
+                   focus: str | None = None, checkin: str | None = None) -> list[dict]:
     system = PROTOCOL_V0
     if focus:
         # a specialist adds focus; the protocol above still governs every word
@@ -43,6 +43,10 @@ def build_messages(text: str, history: list[dict] | None = None, mood: str | Non
         system += ("\n\nThe student chose to let you remember these from earlier conversations. "
                    "Use them only if relevant, never repeat them back word for word:\n- "
                    + "\n- ".join(memory))
+    if checkin:
+        system += (f'\n\nEarlier today the student checked in on the app as feeling "{checkin}" '
+                   "(scale: Light, A bit much, Heavy, Very heavy). Let it inform how gently you meet them; "
+                   "you may acknowledge it if it fits, without quoting the scale.")
     if mood:
         system += f"\n\n(For your awareness only, do not say it: the student's message reads as {mood}.)"
     msgs = [{"role": "system", "content": system}]
@@ -57,10 +61,13 @@ def build_messages(text: str, history: list[dict] | None = None, mood: str | Non
 
 def draft(text: str, history: list[dict] | None = None, mood: str | None = None,
           feedback: str | None = None, memory: list[str] | None = None,
-          focus: str | None = None) -> dict:
+          focus: str | None = None, checkin: str | None = None) -> dict:
     """One candidate reply. `feedback` is the Fidelity Monitor's reason when a
     previous draft was rejected."""
-    return llm.chat(build_messages(text, history, mood, feedback, memory, focus), temperature=0.7)
+    from zenai.config import settings
+
+    return llm.chat(build_messages(text, history, mood, feedback, memory, focus, checkin), temperature=0.7,
+                    model=settings.DRAFT_MODEL)
 
 
 def rewrite_instruction(rejected: str, moves: dict) -> str:

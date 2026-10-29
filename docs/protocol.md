@@ -6,7 +6,7 @@ This document is the source of truth: the Conversation Agent's prompt
 (`src/zenai/models/judge.py`) both implement it, and a change here should be
 made there too.
 
-Version 1 · October 29, 2026 · COSC 490 Project 5, Group 3
+Version 1.1 · October 29, 2026 · COSC 490 Project 5, Group 3
 
 ---
 
@@ -94,15 +94,34 @@ Before any reply is drafted, every message goes through two checks, in order:
 
 1. **Privacy.** Email addresses, phone numbers, student IDs and similar are
    removed. Nothing after this step ever sees them.
-2. **Crisis.** If the message suggests a risk of self-harm, the conversation
-   **stops**. No reply is generated, and the language model never sees the
-   message. The student sees a hand-off:
+2. **Crisis.** If the conversation suggests a risk of self-harm, it **stops**.
+   No reply is generated. The student sees a hand-off:
 
    - **988 Suicide & Crisis Lifeline**: call or text 988, 24 hours
    - **Morgan State University Counseling Center**: 443-885-3130, weekdays 8:30 to 5
    - **Morgan's 24/7 crisis line**: 1-800-422-0009
 
    (Numbers verified on morgan.edu on October 15, 2026.)
+
+   The check reads the **conversation**, not just the last message, in four
+   layers, each of which can only raise the risk, never lower it:
+
+   1. **Patterns** for explicit language. A message these catch never reaches
+      a language model at all.
+   2. **The conversation stays in crisis**: if one of the student's last three
+      messages was a crisis sign, a calm "anyway, how's your day" does not end it.
+   3. **Context**: indirect language ("what's the point", "I want it all to
+      stop") escalates when an earlier message or today's check-in ("Very
+      heavy", "I'm not okay") carries a warning sign too.
+   4. **A model screen**: anything not already caught is read, with the last
+      three messages, by a fast language model that looks for indirect signs
+      (means, plans, goodbyes, giving things away). It only screens; it never
+      writes to a student in crisis. If it can't be reached, the patterns stand.
+
+   Measured Oct 29 on red-team messages written by other models: patterns alone
+   caught 1 of 12 hidden crises; all four layers caught 12 of 12, and 10 of 10
+   on a held-out set written afterwards, with no false alarms on 11 hyperbole
+   messages ("this exam is killing me") or 100 everyday student messages.
 
 The crisis check is tuned to catch too much rather than too little: a false
 alarm costs the student one awkward message; a miss costs something we are not
@@ -114,6 +133,7 @@ willing to risk.
 |---|---|
 | **Drift detector** | A trained classifier scores each sentence of a draft for advice and reassurance. Fast, and errs toward flagging. |
 | **Second opinion** | Only the sentences the detector flags, and drafts that name a condition, go to the language model with the definitions in section 4. It confirms or overturns each flag, and checks for diagnosis. If it cannot be reached, every flag stands. |
+| **Never-send phrases** | A short fixed list ("everything will be ok", "you'll be fine", "you've got this", "you should", "here are some tips") is rejected outright, whatever the detector scores and whatever the second opinion says. Validation ("it's okay to feel this way") is not on it. |
 | **Rewrite** | A rejected draft is rewritten with the reason, up to two times. |
 | **Safe fallback** | If every rewrite still drifts, ZenAI sends a reply that is checked to pass: *"Can you tell me more about what's happening for you right now?"* |
 

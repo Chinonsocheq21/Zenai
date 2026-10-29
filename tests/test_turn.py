@@ -28,6 +28,7 @@ def fake_llm(monkeypatch):
     from zenai.config import settings
     monkeypatch.setattr(settings, "SECOND_OPINION", False)
     monkeypatch.setattr(settings, "ROUTER_LLM", False)
+    monkeypatch.setattr(settings, "CRISIS_SCREEN", False)
     return fake_chat, calls
 
 
@@ -90,3 +91,12 @@ def test_turn_publishes_live_events_with_redacted_text_only(fake_llm):
     assert "jo@morgan.edu" not in str(ev) and "[EMAIL]" in ev[0]["text"]
     assert {"privacy", "crisis", "mood", "route", "send"} <= {e["stage"] for e in ev if e["type"] == "stage"}
     assert "draft" in kinds and "check" in kinds
+
+
+def test_checkin_reaches_the_prompt_and_the_crisis_check(fake_llm):
+    from zenai.agents import conversation
+
+    msgs = conversation.build_messages("hi", checkin="Heavy")
+    assert '"Heavy"' in msgs[0]["content"]
+    r = turn.run("I just want it all to stop", checkin="I'm not okay")
+    assert r["escalate"] is True
