@@ -44,6 +44,8 @@ app.include_router(chat.router)
 # configure on demo day. Open http://127.0.0.1:8000/ .
 WEB = Path(__file__).resolve().parent.parent / "web"
 app.mount("/app", StaticFiles(directory=WEB, html=True), name="web")
+STUDENT = Path(__file__).resolve().parent.parent / "student"
+app.mount("/student", StaticFiles(directory=STUDENT, html=True), name="student")
 
 
 @app.get("/", include_in_schema=False)

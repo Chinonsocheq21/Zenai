@@ -38,3 +38,10 @@ def test_console_is_served():
     r = client.get("/app/")
     assert r.status_code == 200
     assert "ZenAI" in r.text
+
+
+def test_student_app_and_resources():
+    r = client.get("/student/")
+    assert r.status_code == 200 and "ZenAI" in r.text
+    res = client.get("/resources").json()
+    assert res["hotline"] == "988" and res["phone"]

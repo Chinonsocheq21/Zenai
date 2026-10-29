@@ -85,3 +85,57 @@ def check(reply: str) -> dict:
         "verdict": "rejected — would be regenerated" if any(v["flagged"] for v in moves.values())
                    else "passes — would be sent",
     }
+
+
+def verify(reply: str, second_opinion: bool = True) -> dict:
+    """The Fidelity Monitor as the turn uses it: the detector, then -- only for
+    what it flags, or when the draft names a condition -- a second opinion from
+    the language model (see zenai.models.judge).
+
+    Same shape as check(), plus per move `detector_flagged` and `overturned`, and
+    a `judge` record. Every sentence over a move's threshold is judged, not only
+    the strongest one, so a confirmed second instance still counts.
+    """
+    r = check(reply)
+    from zenai import llm
+    from zenai.models import judge
+
+    suspects, sid = [], 1
+    for s in r["sentences"]:
+        for mv, th in THRESHOLDS.items():
+            if s[mv] >= th:
+                suspects.append({"id": sid, "sentence": s["text"], "move": mv, "score": s[mv]})
+                sid += 1
+    needs_judge = bool(suspects) or judge.mentions_condition(reply)
+    for mv in THRESHOLDS:
+        r["moves"][mv]["detector_flagged"] = r["moves"][mv]["flagged"]
+        r["moves"][mv]["overturned"] = False
+
+    if not (second_opinion and needs_judge and llm.available()):
+        r["judge"] = {"ran": False}
+        if needs_judge and not suspects:   # names a condition, but no judge to confirm it
+            r["moves"]["diagnosis"]["status"] = "possible diagnosis wording; no second opinion available"
+        return r
+
+    v = judge.review(reply, suspects)
+    confirmed = {it.get("id"): bool(it.get("confirmed")) for it in v.get("items", [])}
+    for mv in THRESHOLDS:
+        mine = [s for s in suspects if s["move"] == mv]
+        if not mine:
+            continue
+        kept = [s for s in mine if confirmed.get(s["id"], True)]   # missing verdict = keep (fail closed)
+        if kept:
+            best = max(kept, key=lambda s: s["score"])
+            r["moves"][mv].update(flagged=True, sentence=best["sentence"], score=round(best["score"], 3))
+        else:
+            r["moves"][mv].update(flagged=False, overturned=True)
+    dx = v.get("diagnosis") or {}
+    r["moves"]["diagnosis"] = {
+        "score": None, "threshold": None, "flagged": bool(dx.get("present")),
+        "sentence": dx.get("sentence"), "status": "checked by second opinion",
+    }
+    r["judge"] = {"ran": True, "ms": v.get("ms"), "error": v.get("error"),
+                  "items": [{**s, "confirmed": confirmed.get(s["id"], True)} for s in suspects]}
+    r["drift"] = any(m.get("flagged") for m in r["moves"].values())
+    r["verdict"] = "rejected — would be regenerated" if r["drift"] else "passes — would be sent"
+    return r

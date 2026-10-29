@@ -43,3 +43,38 @@ def test_the_safe_fallback_passes_the_monitor_with_margin():
     assert r["drift"] is False
     for move in ("advice", "reassurance"):
         assert r["moves"][move]["score"] < r["moves"][move]["threshold"] - 0.15
+
+
+# ---- the second opinion, with a stubbed judge (no model call) ----
+
+def _stub_judge(monkeypatch, confirm: bool, diagnosis: bool = False, fail: bool = False):
+    from zenai import llm
+    from zenai.models import judge
+
+    monkeypatch.setattr(llm, "available", lambda: True)
+
+    def review(draft, suspects):
+        if fail:   # the real review() fails closed; mimic its output
+            return {"items": [{"id": s["id"], "confirmed": True} for s in suspects],
+                    "diagnosis": {"present": False, "sentence": None}, "error": "down"}
+        return {"items": [{"id": s["id"], "confirmed": confirm} for s in suspects],
+                "diagnosis": {"present": diagnosis, "sentence": "Sounds like test anxiety." if diagnosis else None}}
+
+    monkeypatch.setattr(judge, "review", review)
+
+
+def test_second_opinion_can_overturn_a_false_flag(monkeypatch):
+    _stub_judge(monkeypatch, confirm=False)
+    r = fidelity.verify("You keep reaching for those notes and then shutting them right away.")
+    assert r["drift"] is False and r["moves"]["advice"]["overturned"] is True
+
+
+def test_second_opinion_failing_never_lets_drift_through(monkeypatch):
+    _stub_judge(monkeypatch, confirm=False, fail=True)
+    assert fidelity.verify("You've got this! Try breaking your notes into blocks.")["drift"] is True
+
+
+def test_diagnosis_is_caught_by_the_second_opinion(monkeypatch):
+    _stub_judge(monkeypatch, confirm=False, diagnosis=True)
+    r = fidelity.verify("That sounds hard. Sounds like test anxiety.")
+    assert r["moves"]["diagnosis"]["flagged"] is True and r["drift"] is True

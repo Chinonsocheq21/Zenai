@@ -33,7 +33,8 @@ def _stage(stage, status, ms=None, detail=""):
     return {"stage": stage, "status": status, "ms": ms, "detail": detail}
 
 
-def run(text: str, history: list[dict] | None = None, monitor: bool = True) -> dict:
+def run(text: str, history: list[dict] | None = None, monitor: bool = True,
+        memory: list[str] | None = None) -> dict:
     from zenai.agents import conversation
     from zenai.agents.privacy import redact
     from zenai.models import fidelity
@@ -69,23 +70,28 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True) -> d
     mood = max(dist, key=dist.get)
     trace.append(_stage("mood", "done", _ms(t), f"{mood} {dist[mood]:.0%} · model: {which()}"))
 
-    trace.append(_stage("memory", "pending",
-                        detail="long-term memory not built; this conversation's last turns are used as context"))
+    if memory:
+        trace.append(_stage("memory", "done", None,
+                            f"{len(memory)} note(s) the student chose to keep, from their own device"))
+    else:
+        trace.append(_stage("memory", "skipped",
+                            detail="nothing saved: memory is off unless the student turns it on"))
 
     # draft -> check -> rewrite, at most MAX_REWRITES times
     attempts, feedback, reply, fallback = [], None, None, False
     t_draft = time.perf_counter()
     llm_ms = 0
     for i in range(1 + (settings.MAX_REWRITES if monitor else 0)):
-        d = conversation.draft(redacted, history, mood.replace("_", " "), feedback)
+        d = conversation.draft(redacted, history, mood.replace("_", " "), feedback, memory)
         llm_ms += d["ms"]
         if not monitor:
             attempts.append({"draft": d["text"], "checked": False})
             reply = d["text"]
             break
-        chk = fidelity.check(d["text"])
+        chk = fidelity.verify(d["text"], second_opinion=settings.SECOND_OPINION)
         flagged = {k: v for k, v in chk["moves"].items() if v.get("flagged")}
-        attempts.append({"draft": d["text"], "checked": True, "drift": chk["drift"],
+        overturned = [k for k, v in chk["moves"].items() if v.get("overturned")]
+        attempts.append({"draft": d["text"], "checked": True, "drift": chk["drift"], "overturned": overturned,
                          "flagged": {k: {"score": v["score"], "sentence": v["sentence"]} for k, v in flagged.items()}})
         if not chk["drift"]:
             reply = d["text"]

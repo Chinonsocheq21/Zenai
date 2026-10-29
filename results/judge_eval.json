@@ -1,0 +1,60 @@
+{
+  "data": "ESConv held-out conversations (group split, seed 42), random sample",
+  "n_turns": 400,
+  "second_opinion_calls": 222,
+  "second_opinion_errors": 0,
+  "detector_alone": {
+    "advice": {
+      "precision": 0.415,
+      "recall": 0.761,
+      "f1": 0.537,
+      "flagged": 123,
+      "true_positives": 51,
+      "false_alarms": 72,
+      "missed": 16
+    },
+    "reassurance": {
+      "precision": 0.299,
+      "recall": 0.567,
+      "f1": 0.392,
+      "flagged": 127,
+      "true_positives": 38,
+      "false_alarms": 89,
+      "missed": 29
+    }
+  },
+  "detector_plus_second_opinion": {
+    "advice": {
+      "precision": 0.517,
+      "recall": 0.672,
+      "f1": 0.584,
+      "flagged": 87,
+      "true_positives": 45,
+      "false_alarms": 42,
+      "missed": 22
+    },
+    "reassurance": {
+      "precision": 0.34,
+      "recall": 0.239,
+      "f1": 0.281,
+      "flagged": 47,
+      "true_positives": 16,
+      "false_alarms": 31,
+      "missed": 51
+    }
+  },
+  "caveat": "ESConv's reassurance label includes validation our protocol wants; advice is the clean comparison.",
+  "pilot_rejections_rechecked": {
+    "drafts": 16,
+    "still_rejected": 0,
+    "now_pass": 16,
+    "examples_now_pass": [
+      "It sounds like putting in all that effort only to see poor results has left you feeling really down on yourself. Sitting with that sense of incompetence without trying to push it away can be hard. What matters most to you about doing well in this class?",
+      "It sounds like the constant demands with no break are leaving you feeling completely weighed down and alone in it all. Those feelings of overwhelm are showing up strongly right now. What do you notice about what's most important to you in how you're handling this?",
+      "It sounds like the weight of those demands is pressing in, leaving little room to breathe. You can notice that frustration as it shows up right here. What matters most to you in how you respond to this?",
+      "It sounds like you're carrying a lot of worry about your dad's choices and his health right now. That concern keeps showing up even when you try to set it aside. What do you notice about what matters most to you in how you want to show up for your parents?",
+      "That sounds like a heavy weight to carry, seeing your daughter in such a risky place and not being able to change it.  \nWhat shows up for you when you notice that heartbreak right now?"
+    ],
+    "examples_still_rejected": []
+  }
+}

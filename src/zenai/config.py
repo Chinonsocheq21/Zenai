@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     LLM_BASE_URL: str = "https://api.x.ai/v1"
     # How many times a drifting draft may be rewritten before the safe fallback.
     MAX_REWRITES: int = 2
+    # Ask the model for a second opinion on whatever the drift detector flags.
+    SECOND_OPINION: bool = True
 
     CRISIS_HOTLINE: str = "988"
     CAMPUS_COUNSELING_NAME: str = "Morgan State University Counseling Center"
