@@ -19,3 +19,4 @@ data/turns.test.jsonl
 # E1 answer keys and raw logs name each reply's condition -- never public
 data/e1-keys/
 src/zenai/student/demo-voice.json
+data/feedback.jsonl

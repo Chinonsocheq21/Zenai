@@ -17,6 +17,7 @@ dependencies = [
   "numpy<2",
   "matplotlib>=3.9",
   "edge-tts>=6.1",   # ZenAI's spoken voice (neural, no API key)
+  "segno>=1.6",      # QR code for the class demo page
 ]
 
 [project.optional-dependencies]

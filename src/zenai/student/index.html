@@ -331,6 +331,20 @@
   .vend{min-height:50px;padding:0 26px;border-radius:25px;background:var(--surface);border:1px solid var(--line2);font-weight:600;color:var(--ink);margin-top:10px}
   @media (prefers-reduced-motion: reduce){.voice.listening .vorb .ring{animation:none}}
 
+  /* did this help? */
+  .helped{display:flex;align-items:center;gap:8px;margin:-2px 0 10px 36px;font-size:12.5px;color:var(--muted)}
+  .helped button{min-height:30px;padding:0 12px;border-radius:15px;border:1px solid var(--line2);background:var(--surface);color:var(--ink2);font-size:12.5px}
+  .helped button.on{background:color-mix(in srgb, var(--accent) 14%, transparent);border-color:color-mix(in srgb, var(--accent) 40%, transparent);color:var(--accent);font-weight:600}
+  .helped.done span{display:none}
+  .pause{margin:10px 0 12px 36px;padding:12px 14px;border-radius:16px;background:var(--surface);border:1px dashed var(--line2);font-size:14px;color:var(--ink2);line-height:1.5}
+  /* class code */
+  .gate{position:absolute;inset:0;z-index:18;display:flex;flex-direction:column;justify-content:center;padding:0 30px;background:var(--bg)}
+  .gate h2{font-family:var(--serif);font-weight:400;font-size:30px;margin:18px 0 8px}
+  .gate p{color:var(--ink2);font-size:15px;line-height:1.55;margin-bottom:18px}
+  .gate input{height:56px;border-radius:16px;border:1px solid var(--line2);background:var(--surface);font:600 22px var(--mono, monospace);letter-spacing:.14em;text-align:center;text-transform:uppercase;color:var(--ink)}
+  .gate button{margin-top:12px;height:52px;border-radius:26px;background:var(--accent);color:var(--accentInk, #fff);font-weight:600;font-size:16px}
+  .gate .bad{color:var(--red, #B23A2A);font-size:13.5px;margin-top:10px;min-height:18px}
+
   /* check-in before talking */
   .before{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line2);border-radius:22px;padding:14px 14px 12px;margin:0 0 18px;text-align:left;box-shadow:var(--shadow, 0 6px 20px rgba(20,30,60,.06))}
   .before .bq{font-size:14px;font-weight:600;color:var(--ink);margin:0 4px 10px}
@@ -444,6 +458,14 @@
     <button class="vend press" id="vend">Back to typing</button>
   </section>
 
+  <section class="gate hidden" id="gate" aria-label="Class code">
+    <div class="orb" style="width:72px;height:72px" aria-hidden="true"><i></i></div>
+    <h2>Enter the class code</h2>
+    <p>This demo of ZenAI is open to the class. The code is on the screen at the front of the room.</p>
+    <input id="gcode" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Class code">
+    <button class="press" id="gok">Continue</button><div class="bad" id="gbad"></div>
+  </section>
+
   <section class="crisis hidden" id="crisis" role="dialog" aria-modal="true" aria-labelledby="c-title">
     <div class="tag"><i></i>Pausing to get you support</div>
     <h2 id="c-title">I'm stopping here, and I want to hand you to a person.</h2>
@@ -472,6 +494,33 @@ const S = {
 const consent = () => S.get("consent", {moods: false, helps: false, convo: false});
 let HISTORY = S.get("consent", {}).convo ? S.get("history", []) : [];
 const dayKey = d => { d = new Date(d); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
+
+// ---------- talking to the server ----------
+// A random id for this phone (rate limits are per device) and the class code, if
+// the demo asks for one. Both live in this phone's storage only.
+function deviceId() {
+  let d = S.get("device", null);
+  if (!d) { d = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)) ; S.set("device", d); }
+  return d;
+}
+async function api(url, body) {
+  const r = await fetch(url, {method: "POST", headers: {"Content-Type": "application/json", "X-ZenAI-Device": deviceId(),
+    "X-ZenAI-Code": S.get("code", "")}, body: JSON.stringify(body)});
+  if (r.status === 401) { await askCode(); return api(url, body); }
+  return r;
+}
+let codeWait = null;
+function askCode(wrong) {
+  if (codeWait) return codeWait;
+  $("gate").classList.remove("hidden"); $("gbad").textContent = wrong ? "That code didn't work. Check the screen and try again." : "";
+  setTimeout(() => $("gcode").focus(), 50);
+  codeWait = new Promise(res => {
+    const go = () => { const c = $("gcode").value.trim().toUpperCase(); if (!c) return; S.set("code", c);
+      $("gate").classList.add("hidden"); codeWait = null; res(); };
+    $("gok").onclick = go; $("gcode").onkeydown = e => { if (e.key === "Enter") go(); };
+  });
+  return codeWait;
+}
 
 // ---------- navigation ----------
 function go(name) {
@@ -564,6 +613,25 @@ function addMine(text) {
 function addZen(text) {
   $("log").querySelector(".hello")?.remove();
   $("log").insertAdjacentHTML("beforeend", `<div class="zenrow msg">${ORB()}<div class="zen">${esc(tidy(text))}</div></div>`);
+  scrollDown();
+}
+// "Did this help?" under each reply. Kept on this phone; sent only if the student
+// turned on "Share whether replies helped" in Privacy, and then only yes/no, which
+// specialist answered, and ZenAI's own words. Never what the student wrote.
+function addHelped(d) {
+  const id = "h" + Date.now();
+  $("log").insertAdjacentHTML("beforeend", `<div class="helped msg" id="${id}"><span>Did this help?</span>
+    <button class="press" data-v="1">Yes</button><button class="press" data-v="0">Not really</button></div>`);
+  const box = $(id);
+  box.querySelectorAll("button").forEach(b => b.onclick = () => {
+    const yes = b.dataset.v === "1";
+    box.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b));
+    box.classList.add("done");
+    const fb = S.get("feedback", []); fb.push({at: new Date().toISOString(), helpful: yes, spec: d.specialist?.name || null});
+    S.set("feedback", fb.slice(-300));
+    if (consent().share) api("/feedback", {helpful: yes, specialist: d.specialist?.name || null, reply: String(d.reply || "").slice(0, 800)}).catch(() => {});
+    box.onclick = null; box.querySelectorAll("button").forEach(x => x.onclick = null);
+  });
   scrollDown();
 }
 const PHONE_IC = `<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>`;
@@ -717,7 +785,7 @@ async function say(text) {
     if (c > 12 && c < parts[0].length - 12) parts.splice(0, 1, parts[0].slice(0, c + 1), parts[0].slice(c + 2));
   }
   const token = V.sayToken = (V.sayToken || 0) + 1;
-  const clips = parts.map(p => fetch("/tts", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({text: p})})
+  const clips = parts.map(p => api("/tts", {text: p})
     .then(r => r.ok ? r.blob() : Promise.reject(r.status)));
   clips.forEach(c => c.catch(() => {}));
   V.actx?.resume();
@@ -794,8 +862,7 @@ $("done").onclick = async () => {
   busy = true; $("donebar").classList.add("hidden"); showThinking();
   let text = "Thanks for talking with me today. I'm here whenever you want to come back.";
   try {
-    const r = await fetch("/chat/close", {method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({history: HISTORY, client: "student"})});
+    const r = await api("/chat/close", {history: HISTORY, client: "student"});
     if (r.ok) text = (await r.json()).reply || text;
   } catch (e) {}
   hideThinking(); addZen(text);
@@ -844,14 +911,19 @@ async function ask(text) {
   addMine(text);
   showThinking();
   try {
-    const r = await fetch("/chat", {method: "POST", headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({text, history: HISTORY, memory: consent().helps ? S.get("memory", []) : [], client: "student",
-                            checkin: todaysCheckin()})});
+    const r = await api("/chat", {text, history: HISTORY, memory: consent().helps ? S.get("memory", []) : [], client: "student",
+                                  checkin: todaysCheckin()});
     hideThinking();
+    if (r.status === 429) {          // usage limit: a calm pause, never an error (a crisis still gets the hand-off)
+      const m = (await r.json().catch(() => ({}))).detail?.message || "ZenAI is taking a short pause. If you need someone right now, call or text 988.";
+      $("log").insertAdjacentHTML("beforeend", `<div class="pause msg">${esc(tidy(m))}</div>`); scrollDown();
+      return null;
+    }
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
     if (d.escalate) { crisis(); return d; }
     addZen(d.reply);
+    addHelped(d);
     if (d.resources && d.resources.length) addCards(d.resources);
     HISTORY.push({role: "user", content: d.redacted_text}, {role: "assistant", content: d.reply});
     HISTORY = HISTORY.slice(-16);
@@ -924,12 +996,13 @@ function smooth(pts, lo, hi) {
   }
   return d;
 }
+function helpedN() { const fb = S.get("feedback", []); return fb.length ? `${fb.filter(f => f.helpful).length}<small style="font-size:.5em;opacity:.6">/${fb.length}</small>` : "0"; }
 function drawProgress() {
   const moods = S.get("moods", []), mem = S.get("memory", []);
   const recent = moods.filter(m => Date.now() - new Date(m.at) < 7 * 864e5).length;
   const stats = `<div class="stats"><div class="card"><div class="n">${S.get("talks", 0)}</div><div class="k">replies from ZenAI</div></div>
        <div class="card"><div class="n">${recent}</div><div class="k">check-ins this week</div></div>
-       <div class="card"><div class="n">${mem.length}</div><div class="k">notes saved</div></div></div>`;
+       <div class="card"><div class="n">${helpedN()}</div><div class="k">replies that helped</div></div></div>`;
   const notes = mem.length ? `<div class="sec">What you asked ZenAI to remember</div>${mem.map(m => `<div class="note"><span>${esc(m)}</span></div>`).join("")}` : "";
   if (!consent().moods && !moods.length) {
     $("prog").innerHTML = stats + `<div class="empty">
@@ -974,6 +1047,7 @@ const SW = [
   {k: "moods", t: "Remember my check-ins", s: "So Progress can show the shape of your weeks."},
   {k: "helps", t: "Remember what I choose", s: "Adds a \"Remember this\" link under your messages. ZenAI uses those notes as context next time."},
   {k: "convo", t: "Keep this conversation", s: "Off by default. When off, the chat is gone when you close the page."},
+  {k: "share", t: "Share whether replies helped", s: "Off by default. Sends only your yes or no and ZenAI's reply, never what you wrote, so the team can improve ZenAI."},
 ];
 const TRASH = `<svg viewBox="0 0 24 24"><path d="M4 7h16M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>`;
 function drawPrivacy() {

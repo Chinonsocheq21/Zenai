@@ -32,6 +32,15 @@ class Settings(BaseSettings):
     # ZenAI's spoken voice in voice mode: a neural voice, calm and a little slow
     TTS_VOICE: str = "en-US-AvaMultilingualNeural"
     TTS_RATE: str = "-8%"
+    # usage limits, so a shared link cannot drain the xAI credits. A crisis message is
+    # always answered with the hand-off, limited or not.
+    LIMIT_PER_10MIN: int = 20          # messages per device in any 10 minutes
+    LIMIT_PER_DAY: int = 150           # messages per device per day
+    LIMIT_GLOBAL_DAY: int = 3000       # model-backed messages per day, everyone together
+    LIMIT_TTS_PER_10MIN: int = 80      # spoken-reply clips per device in any 10 minutes
+    # class demo: when set, the student app asks for this code before it will talk
+    ACCESS_CODE: str = ""
+    PUBLIC_URL: str = ""               # the hosted address, once there is one; used by the QR page
 
     CRISIS_HOTLINE: str = "988"
     CAMPUS_COUNSELING_NAME: str = "Morgan State University Counseling Center"

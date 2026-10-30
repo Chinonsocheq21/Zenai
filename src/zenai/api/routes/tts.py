@@ -12,7 +12,7 @@ from __future__ import annotations
 import hashlib
 from collections import OrderedDict
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
 
@@ -26,10 +26,15 @@ class SpeakIn(BaseModel):
 
 
 @router.post("/tts")
-async def tts(body: SpeakIn) -> Response:
+async def tts(body: SpeakIn, req: Request) -> Response:
     import edge_tts
 
+    from zenai.api import limits
     from zenai.config import settings
+
+    limits.check_code(req)
+    if not limits.allow(req, "tts"):
+        raise HTTPException(429, {"limited": True, "message": limits.PAUSE})
 
     key = hashlib.sha1(f"{settings.TTS_VOICE}|{settings.TTS_RATE}|{body.text}".encode()).hexdigest()
     if key in _CACHE:
@@ -51,12 +56,17 @@ async def tts(body: SpeakIn) -> Response:
 
 
 @router.get("/tts/stream")
-async def tts_stream(text: str = Query(..., min_length=1, max_length=800)) -> Response:
+async def tts_stream(req: Request, text: str = Query(..., min_length=1, max_length=800)) -> Response:
     """The same voice, streamed: the app starts playing at the first chunk
     (about 1.8 s) instead of waiting for the whole clip (about 4 s)."""
     import edge_tts
 
+    from zenai.api import limits
     from zenai.config import settings
+
+    limits.check_code(req)
+    if not limits.allow(req, "tts"):
+        raise HTTPException(429, {"limited": True, "message": limits.PAUSE})
 
     key = hashlib.sha1(f"{settings.TTS_VOICE}|{settings.TTS_RATE}|{text}".encode()).hexdigest()
     if key in _CACHE:
