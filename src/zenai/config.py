@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     WORKFLOW_EVENTS: bool = True
     # a fast model also screens for indirect crisis language (can only raise risk)
     CRISIS_SCREEN: bool = True
+    # ZenAI's spoken voice in voice mode: a neural voice, calm and a little slow
+    TTS_VOICE: str = "en-US-AvaMultilingualNeural"
+    TTS_RATE: str = "-8%"
 
     CRISIS_HOTLINE: str = "988"
     CAMPUS_COUNSELING_NAME: str = "Morgan State University Counseling Center"

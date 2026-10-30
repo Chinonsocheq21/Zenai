@@ -72,3 +72,8 @@ def test_audit_page_never_reveals_the_condition():
     assert r["items"] and "monitor" not in str(r["items"][0]).lower()
     assert set(r["items"][0]) == {"id", "message", "reply"}
     assert csv  # the key lives in data/e1-keys, never served
+
+
+def test_tts_rejects_empty_and_long_text():
+    assert client.post("/tts", json={"text": ""}).status_code == 422
+    assert client.post("/tts", json={"text": "x" * 801}).status_code == 422

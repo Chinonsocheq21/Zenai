@@ -311,7 +311,7 @@
   .vbtn{min-height:44px;min-width:44px;border-radius:22px;display:grid;place-items:center;color:var(--ink2);background:var(--surface);border:1px solid var(--line2)}
   .vbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .vbtn.off{opacity:.55}
-  .vstage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:46px}
+  .vstage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;gap:40px;min-height:0}
   .vorb{position:relative;width:210px;height:210px;cursor:pointer;-webkit-tap-highlight-color:transparent}
   .vorb .orb{width:100%;height:100%;transform:scale(calc(1 + var(--lvl, 0) * .18));transition:transform .08s linear}
   .vorb .ring{position:absolute;inset:0;border-radius:50%;border:2px solid color-mix(in srgb, var(--orbB) 55%, transparent);opacity:0;pointer-events:none}
@@ -324,7 +324,8 @@
   .voice.speaking .vorb .orb::before{animation:morph 3.5s ease-in-out infinite}
   .voice.speaking .vorb .orb::after{animation:glow 1.4s ease-in-out infinite}
   .vstate{font-family:var(--serif);font-size:24px;color:var(--ink);text-align:center;min-height:32px}
-  .vcap{font-size:16px;line-height:1.55;color:var(--ink2);text-align:center;max-width:330px;min-height:78px}
+  .vcap{font-size:16px;line-height:1.55;color:var(--ink2);text-align:center;max-width:330px;min-height:78px;max-height:270px;overflow-y:auto;flex:0 1 auto}
+  .voice.speaking .vorb{width:170px;height:170px;transition:width .4s, height .4s}
   .vcap.zen{font-family:var(--serif);font-size:18.5px;color:var(--ink)}
   .vhint{font-size:12.5px;color:var(--muted);text-align:center;max-width:300px;line-height:1.5}
   .vend{min-height:50px;padding:0 26px;border-radius:25px;background:var(--surface);border:1px solid var(--line2);font-weight:600;color:var(--ink);margin-top:10px}
@@ -603,13 +604,18 @@ if (["localhost", "127.0.0.1"].includes(location.hostname)) {
 }
 const getSR = () => window.SpeechRecognition || window.webkitSpeechRecognition;
 const V = {on: false, state: "idle", rec: null, stream: null, ctx: null, raf: 0, speak: S.get("voiceSpeak", true), heard: "",
-           mic: 0, pulse: 0, meterless: false};
+           mic: 0, pulse: 0, spk: 0, meterless: false};
 // The orb's motion = the louder of the real mic level and a pulse on every
 // word the recognizer hears. The pulse keeps it alive where a phone won't
 // share the microphone between the meter and speech recognition.
 function orbLoop() {
   V.pulse *= .9;
-  const lvl = V.state === "listening" ? Math.max(V.mic, V.pulse) : V.state === "speaking" ? .12 + V.pulse * .45 : 0;
+  if (V.an && V.state === "speaking") {            // the real loudness of ZenAI's voice
+    V.an.getByteTimeDomainData(V.buf); let sum = 0;
+    for (const b of V.buf) { const x = (b - 128) / 128; sum += x * x; }
+    V.spk = V.spk * .65 + Math.min(1, Math.sqrt(sum / V.buf.length) * 4.5) * .35;
+  } else V.spk = 0;
+  const lvl = V.state === "listening" ? Math.max(V.mic, V.pulse) : V.state === "speaking" ? .08 + Math.max(V.pulse * .45, V.spk) : 0;
   $("vorb").style.setProperty("--lvl", lvl.toFixed(3));
   if (V.on) V.raf = requestAnimationFrame(orbLoop);
 }
@@ -642,7 +648,7 @@ function meterOff() {
 }
 function listen() {
   if (!V.on) return;
-  try { speechSynthesis.cancel(); } catch (e) {}
+  stopSpeaking();
   const rec = new (getSR())();
   rec.lang = "en-US"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
   V.rec = rec; V.heard = "";
@@ -686,20 +692,66 @@ function pickVoice() {
   for (const n of pref) { const v = vs.find(x => x.name === n); if (v) return v; }
   return vs.find(v => v.lang === "en-US") || vs[0] || null;
 }
-function say(text) {
+// ZenAI's voice: a neural voice from the server (/tts), played through an
+// analyser so the orb moves with the actual sound. The browser's own voice is
+// only the fallback when the speech service can't be reached.
+const SILENT = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=";
+function audioReady() {
+  if (V.audio) return;
+  V.audio = new Audio(); V.audio.preload = "auto";
+  try {
+    V.actx = new (window.AudioContext || window.webkitAudioContext)();
+    V.an = V.actx.createAnalyser(); V.an.fftSize = 512; V.buf = new Uint8Array(V.an.fftSize);
+    V.actx.createMediaElementSource(V.audio).connect(V.an); V.an.connect(V.actx.destination);
+  } catch (e) { V.an = null; }
+}
+async function say(text) {
   text = tidy(text);
-  if (!V.speak || !("speechSynthesis" in window)) { vset("idle", "Tap the orb to answer", text, true); return; }
+  if (!V.speak) { vset("idle", "Tap the orb to answer", text, true); return; }
+  // One clip per sentence, all requested at once: the first (short) one is ready
+  // soonest, and each later one is ready by the time the one before it ends.
+  const parts = text.match(/[^.?!]+[.?!]+["”]?\s*|[^.?!]+$/g)?.map(x => x.trim()).filter(Boolean) || [text];
+  // a short first clip starts the voice sooner: split a long opening sentence at its first comma
+  if (parts[0].split(" ").length > 9) {
+    const c = parts[0].indexOf(", ");
+    if (c > 12 && c < parts[0].length - 12) parts.splice(0, 1, parts[0].slice(0, c + 1), parts[0].slice(c + 2));
+  }
+  const token = V.sayToken = (V.sayToken || 0) + 1;
+  const clips = parts.map(p => fetch("/tts", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({text: p})})
+    .then(r => r.ok ? r.blob() : Promise.reject(r.status)));
+  clips.forEach(c => c.catch(() => {}));
+  V.actx?.resume();
+  for (let i = 0; i < clips.length; i++) {
+    let blob;
+    try { blob = await clips[i]; } catch (e) { if (i === 0 && token === V.sayToken) sayBrowser(text); return; }
+    if (!V.on || token !== V.sayToken) return;
+    const url = URL.createObjectURL(blob);
+    const done = new Promise(res => { V.audio.onended = res; V.audio.onerror = res; });
+    V.audio.onplaying = () => { if (V.state !== "speaking") vset("speaking", "ZenAI", text, true); };
+    V.audio.src = url;
+    try { await V.audio.play(); } catch (e) { URL.revokeObjectURL(url); if (i === 0) sayBrowser(text); return; }
+    await done; URL.revokeObjectURL(url);
+    if (!V.on || token !== V.sayToken) return;
+  }
+  if (V.on && V.state === "speaking") listen();
+}
+function sayBrowser(text) {
+  if (!("speechSynthesis" in window)) { vset("idle", "Tap the orb to answer", text, true); return; }
   const u = new SpeechSynthesisUtterance(text);
   const v = pickVoice(); if (v) u.voice = v;
   u.rate = .96; u.pitch = 1;
   u.onboundary = () => { V.pulse = 1; };
   u.onstart = () => { clearTimeout(V.guard); vset("speaking", "ZenAI", text, true); };
-  // a phone with speech blocked never fires onstart: show the words instead of waiting forever
   clearTimeout(V.guard);
   V.guard = setTimeout(() => { if (V.on && V.state !== "speaking") { speechSynthesis.cancel(); vset("idle", "Tap the orb to answer", text, true); } }, 2500);
   u.onend = () => { if (V.on && V.state === "speaking") listen(); };
   u.onerror = () => { if (V.on) vset("idle", "Tap the orb to answer", text, true); };
   speechSynthesis.speak(u);
+}
+function stopSpeaking() {
+  V.sayToken = (V.sayToken || 0) + 1;
+  try { V.audio?.pause(); } catch (e) {}
+  try { speechSynthesis.cancel(); } catch (e) {}
 }
 async function voiceOn() {
   if (!getSR()) {
@@ -708,7 +760,9 @@ async function voiceOn() {
   }
   V.on = true;
   $("voice").classList.remove("hidden");
-  try { speechSynthesis.speak(new SpeechSynthesisUtterance("")); } catch (e) {}   // unlocks speech on iOS
+  audioReady();                                   // inside the tap, so iOS lets it play later
+  try { V.audio.src = SILENT; V.audio.play().catch(() => {}); V.actx?.resume(); } catch (e) {}
+  try { speechSynthesis.speak(new SpeechSynthesisUtterance("")); } catch (e) {}
   if (!V.meterless) await meterOn();
   cancelAnimationFrame(V.raf); orbLoop();
   listen();
@@ -716,7 +770,7 @@ async function voiceOn() {
 function voiceOff() {
   V.on = false; V.state = "idle";
   try { V.rec?.abort(); } catch (e) {}
-  try { speechSynthesis.cancel(); } catch (e) {}
+  stopSpeaking();
   meterOff(); cancelAnimationFrame(V.raf); V.pulse = 0;
   $("vorb").style.setProperty("--lvl", 0);
   $("voice").classList.add("hidden");
@@ -724,13 +778,13 @@ function voiceOff() {
 $("mic").onclick = voiceOn;
 $("vend").onclick = voiceOff;
 $("vorb").onclick = () => {
-  if (V.state === "speaking") { speechSynthesis.cancel(); listen(); }       // interrupt and answer
+  if (V.state === "speaking") { stopSpeaking(); listen(); }                // interrupt and answer
   else if (V.state === "listening") { try { V.rec?.stop(); } catch (e) {} } // done talking
   else if (V.state === "idle") listen();
 };
 function drawMute() { $("vmute").classList.toggle("off", !V.speak); $("vmute").querySelector(".wave").style.display = V.speak ? "" : "none";
   $("vmute").setAttribute("aria-label", V.speak ? "Spoken replies on" : "Spoken replies off"); }
-$("vmute").onclick = () => { V.speak = !V.speak; S.set("voiceSpeak", V.speak); if (!V.speak) speechSynthesis.cancel(); drawMute(); };
+$("vmute").onclick = () => { V.speak = !V.speak; S.set("voiceSpeak", V.speak); if (!V.speak) stopSpeaking(); drawMute(); };
 drawMute();
 
 // ---------- closing a conversation ----------

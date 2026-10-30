@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from zenai.api.routes import analyze, audit, chat, fidelity, health, workflow
+from zenai.api.routes import analyze, audit, chat, fidelity, health, tts, workflow
 
 
 @asynccontextmanager
@@ -26,7 +26,24 @@ async def lifespan(_: FastAPI):
             fidelity.check("warm up.")
     except RuntimeError as e:
         print(f"[zenai] drift detector not loaded: {e}")
+    # Warm the speech service in the background: the first request pays ~3.5 s of
+    # connection setup, every later one starts speaking in ~0.3 s.
+    import asyncio
+
+    async def _warm_voice():
+        try:
+            import edge_tts
+
+            from zenai.config import settings
+
+            async for _ in edge_tts.Communicate("Hi.", settings.TTS_VOICE).stream():
+                pass
+        except Exception:  # noqa: BLE001, S110 -- voice is optional; the app falls back
+            pass
+
+    task = asyncio.create_task(_warm_voice())
     yield
+    task.cancel()
 
 
 app = FastAPI(
@@ -41,6 +58,7 @@ app.include_router(fidelity.router)
 app.include_router(chat.router)
 app.include_router(workflow.router)
 app.include_router(audit.router)
+app.include_router(tts.router)
 
 # The console is served by the API itself: one process, no CORS, nothing to
 # configure on demo day. Open http://127.0.0.1:8000/ .

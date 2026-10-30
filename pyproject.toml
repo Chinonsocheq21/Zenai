@@ -16,6 +16,7 @@ dependencies = [
   # a silent exit, not an error. Drop this pin only when the project moves to 3.11.
   "numpy<2",
   "matplotlib>=3.9",
+  "edge-tts>=6.1",   # ZenAI's spoken voice (neural, no API key)
 ]
 
 [project.optional-dependencies]
