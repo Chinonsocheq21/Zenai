@@ -7,6 +7,12 @@
 <meta name="theme-color" content="#0A1426" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
 <title>ZenAI</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ZenAI">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cdefs%3E%3CradialGradient id=%22g%22 cx=%2235%25%22 cy=%2230%25%22 r=%2275%25%22%3E%3Cstop offset=%220%22 stop-color=%22%23FFD9B0%22/%3E%3Cstop offset=%22.45%22 stop-color=%22%23F08A4B%22/%3E%3Cstop offset=%221%22 stop-color=%22%231B3D6F%22/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2215%22 fill=%22url(%23g)%22/%3E%3C/svg%3E">
 <style>
   :root{
@@ -571,7 +577,31 @@ function addCards(list) {
 // Listen with the browser's speech recognition, send the words through ask()
 // like any typed message, speak the checked reply with an on-device voice,
 // then listen again. The orb follows the real microphone level while listening.
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+// Demo recordings only (a simulator has no voice). On localhost, and only when
+// student/demo-voice.json exists (it is never committed) or ?demo=voice&say=...
+// is given, scripted words are fed through the same voice flow, word by word.
+// Never active on a deployed host. Everything after recognition is live.
+const DEMO_LINES = [];
+if (["localhost", "127.0.0.1"].includes(location.hostname)) {
+  const q = new URLSearchParams(location.search);
+  const DemoSR = class {
+    start() {
+      const text = DEMO_LINES.shift(); this.onstart && this.onstart();
+      if (!text) { setTimeout(() => { this.onerror && this.onerror({error: "aborted"}); this.onend && this.onend(); }, 300); return; }
+      const w = text.split(" "); let i = 0;
+      setTimeout(() => this.onspeechstart && this.onspeechstart(), 700);
+      const step = () => { i++; this.onresult && this.onresult({results: [[{transcript: w.slice(0, i).join(" ")}]]});
+        this.t = setTimeout(i < w.length ? step : () => this.onend && this.onend(), i < w.length ? 230 : 900); };
+      this.t = setTimeout(step, 1100);
+    }
+    stop() { clearTimeout(this.t); this.onend && this.onend(); }
+    abort() { clearTimeout(this.t); }
+  };
+  const use = l => { if (l && l.length) { DEMO_LINES.push(...l); window.SpeechRecognition = DemoSR; } };
+  if (q.get("demo") === "voice") use(q.getAll("say"));
+  else fetch("demo-voice.json").then(r => r.ok ? r.json() : []).then(use).catch(() => {});
+}
+const getSR = () => window.SpeechRecognition || window.webkitSpeechRecognition;
 const V = {on: false, state: "idle", rec: null, stream: null, ctx: null, raf: 0, speak: S.get("voiceSpeak", true), heard: "",
            mic: 0, pulse: 0, meterless: false};
 // The orb's motion = the louder of the real mic level and a pulse on every
@@ -613,7 +643,7 @@ function meterOff() {
 function listen() {
   if (!V.on) return;
   try { speechSynthesis.cancel(); } catch (e) {}
-  const rec = new SR();
+  const rec = new (getSR())();
   rec.lang = "en-US"; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
   V.rec = rec; V.heard = "";
   vset("listening", "Listening", "");
@@ -672,7 +702,7 @@ function say(text) {
   speechSynthesis.speak(u);
 }
 async function voiceOn() {
-  if (!SR) {
+  if (!getSR()) {
     $("err").textContent = "Voice isn't available in this browser yet. Safari on iPhone and Chrome both support it.";
     $("err").classList.remove("hidden"); return;
   }
