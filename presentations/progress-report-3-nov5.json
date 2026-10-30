@@ -1,0 +1,125 @@
+{
+  "title": "ZenAI, Progress Report 3",
+  "theme": "paper",
+  "accent": "link",
+  "font": "sans",
+  "slides": [
+    {
+      "layout": "title",
+      "title": "ZenAI",
+      "subtitle": "A working app that stays inside the counseling protocol",
+      "note": "20 seconds. 'At the midterm we showed the design. Today ZenAI runs: a student app, a backend you can watch, and numbers on how well it holds the protocol.'",
+      "objects": [
+        { "id": "kicker", "kind": "text", "x": 8, "y": 8, "w": 84, "h": 6, "text": "COSC 490 · Project 5 · Group 3 · Progress Report 3 · November 5, 2026", "size": 13, "align": "center", "color": "muted", "tracking": 1.5, "uppercase": true },
+        { "id": "team", "kind": "text", "x": 8, "y": 84, "w": 84, "h": 7, "text": "Abraham Irabor  ·  Fnu Soh Tah Fon  ·  Joseph Williams  ·  Chinonso Egeolu", "size": 15, "weight": 600, "align": "center", "color": "accent" }
+      ]
+    },
+    {
+      "layout": "image",
+      "title": "ZenAI in a minute",
+      "subtitle": "▶  Plays in the .pptx  ·  backup: zenai.unv.run/#film",
+      "image": "artifacts/media/zenai-pr3/pr3-film-poster.jpg",
+      "video": "presentations/media/zenai-launch-film.mp4",
+      "note": "PLAY THE FILM, 68 seconds. Every phone shot in it is the real app recorded running, with live replies. The crisis message in it is synthetic and labelled."
+    },
+    {
+      "layout": "bullets",
+      "title": "Since the midterm: from design to a running app",
+      "bullets": [
+        "The **Fidelity Monitor is built**: every reply is checked before a student sees it",
+        "A **student app**: check in, talk or speak, verified Morgan offices, a gentle close",
+        "**Four specialists**, chosen per message by a model router",
+        "A **crisis check that reads the whole conversation**, not one message",
+        "Replies went from **8.4 s to 2.4 s**",
+        "A **backend viewer** that shows each message moving through the pipeline, live"
+      ],
+      "note": "The midterm promised the Fidelity Monitor for Oct 16 to 27. It shipped, and it is measured on the results slide."
+    },
+    {
+      "layout": "image",
+      "title": "One message, eight stages",
+      "image": "artifacts/media/zenai-pr3/pr3-architecture.png",
+      "subtitle": "The two dark stages are the safety rails. Crisis runs before any language model sees the message.",
+      "note": "Walk left to right in one breath. Stress the two exits: a crisis stops the turn before any reply is written, and a drifting draft is rewritten or replaced."
+    },
+    {
+      "layout": "image",
+      "title": "The student app",
+      "image": "artifacts/media/zenai-pr3/pr3-app-flow.png",
+      "subtitle": "Real screens from the running app, recorded Oct 29. Live replies, checked by the Fidelity Monitor.",
+      "note": "Check-in comes first so ZenAI knows how heavy today is before it answers. Resources are only the verified Morgan offices with real numbers, never invented."
+    },
+    {
+      "layout": "split",
+      "title": "Say it out loud",
+      "bullets": [
+        "Tap the mic and the **orb moves while it listens**",
+        "ZenAI answers in a **calm neural voice**, not a robotic one",
+        "Speech to text runs **in the phone's browser**; audio is never stored",
+        "Every spoken reply passes **the same Fidelity Monitor** as typed ones"
+      ],
+      "image": "artifacts/media/zenai-pr3/pr3-voice.png"
+    },
+    {
+      "layout": "image",
+      "title": "Behind the screen: every stage, live",
+      "image": "artifacts/media/zenai-pr3/pr3-wf-normal.png",
+      "subtitle": "The workflow viewer. A message sent from the app appears here with what each stage decided and how long it took.",
+      "note": "This is what the live demo will show. Point at: privacy found nothing to remove, crisis risk 0.10 against a threshold of 0.35, mood, and the router choosing Academic Stress with its reason."
+    },
+    {
+      "layout": "image",
+      "title": "The Fidelity Monitor at work",
+      "image": "artifacts/media/zenai-pr3/pr3-wf-check.png",
+      "subtitle": "The draft is checked for advice, reassurance and diagnosis, then sent. A flagged draft is rewritten up to twice.",
+      "note": "Three layers: a trained drift detector, a second-opinion model on anything it flags, and a short list of phrases that are never sent. If a draft still drifts after two rewrites, a safe fallback goes out instead."
+    },
+    {
+      "layout": "split",
+      "title": "When it matters most, it stops talking",
+      "bullets": [
+        "Patterns, then **the conversation so far**, then a model screen",
+        "Over the threshold: **no reply is generated**, the student gets 988 and the Counseling Center",
+        "After a crisis, **help stays pinned** at the top of the chat",
+        "Held-out test: **10 of 10** hidden crises caught, **0 of 100** everyday messages flagged"
+      ],
+      "image": "artifacts/media/zenai-pr3/pr3-crisis.png",
+      "note": "The message on screen is synthetic. The threshold is set low on purpose: a false alarm costs a moment, a miss costs far more."
+    },
+    {
+      "layout": "image",
+      "title": "Measured, not assumed",
+      "image": "artifacts/media/zenai-pr3/pr3-results.png",
+      "subtitle": "Protocol breaks rated blind by an independent model (E1 v2); human marking of the same 158 replies is in progress.",
+      "note": "Say the footnote out loud. The 7.6% to 0% comes from an independent AI rater on a blind sheet; the human marks will confirm or correct it."
+    },
+    {
+      "layout": "stat",
+      "body": "38 / 40",
+      "title": "We tried to break it, on messages it had never seen",
+      "subtitle": "Jailbreaks, reassurance bait, diagnosis bait, role override, hidden crisis. The first red team passed 36 of 48; we fixed what failed and it passed 48 of 48. Then a fresh held-out set: 38 of 40."
+    },
+    {
+      "layout": "section",
+      "title": "Live demo",
+      "subtitle": "Your phone, our backend",
+      "note": "Before class: double-click 'Start ZenAI Class Demo' on the Desktop. It opens the projector page with the QR and today's class code. Keep the workflow viewer open in a second tab.\n\n1. Classmates scan and send a message. Switch to the workflow viewer and follow one through the stages.\n2. Send the synthetic crisis line yourself and show the turn stop at stage 2.\n3. Turn on voice and let ZenAI answer out loud.\n\nBackup if the network fails: play the film again and use the screenshots on slides 7 to 9."
+    },
+    {
+      "layout": "bullets",
+      "title": "A repository anyone can run",
+      "bullets": [
+        "**56 automated tests**, run by GitHub Actions on every push",
+        "Every number in this deck comes from a **script in the repo** with its output in `results/`",
+        "The counseling rules are written down in `docs/protocol.md`, and the code follows them",
+        "No keys in the repo; nothing a student types is kept",
+        "github.com/Chinonsocheq21/Zenai"
+      ]
+    },
+    {
+      "layout": "quote",
+      "body": "ZenAI. A place to slow down for a minute.",
+      "subtitle": "zenai.unv.run  ·  github.com/Chinonsocheq21/Zenai  ·  ZenAI is not a counselor. In crisis, call or text 988."
+    }
+  ]
+}

@@ -4,6 +4,8 @@
     python3 tools/build_deliverables.py
 
     presentations/midterm-oct15.json  ->  presentations/ZenAI-Midterm-Oct15.pptx
+    python3 tools/build_deliverables.py pr3
+    presentations/progress-report-3-nov5.json -> presentations/ZenAI-Progress-Report-3-Nov5.pptx
     docs/build-plan.md               ->  docs/ZenAI-Build-Plan.docx
     docs/diagrams.md                 ->  docs/ZenAI-Diagrams-Source.docx
 
@@ -171,7 +173,11 @@ def _bullets(slide, x, y, w, h, items, size=18):
 
 
 def build_pptx(src="presentations/midterm-oct15.json",
-               out="presentations/ZenAI-Midterm-Oct15.pptx"):
+               out="presentations/ZenAI-Midterm-Oct15.pptx", accent=None):
+    # One accent per deck: the midterm is green, later decks use the app's navy.
+    global GREEN
+    if accent is not None:
+        GREEN = accent
     deck = json.load(open(src))
     prs = Presentation()
     prs.slide_width, prs.slide_height = Inches(SW), Inches(SH)
@@ -219,6 +225,18 @@ def build_pptx(src="presentations/midterm-oct15.json",
                 _text(sl, SW * o["x"] / 100, SH * o["y"] / 100, SW * o["w"] / 100,
                       SH * o["h"] / 100, t, o.get("size", 14), col,
                       bold=(o.get("weight", 400) >= 600), align=PP_ALIGN.CENTER)
+
+        elif lay == "image" and s.get("video") and os.path.exists(s["video"]):
+            # a slide that names its own video embeds it
+            _title(sl, s.get("title", ""))
+            vw = 8.8
+            vh = vw * 9 / 16
+            vx, vy = (SW - vw) / 2, 1.7
+            _rect(sl, vx - 0.05, vy - 0.05, vw + 0.1, vh + 0.1, WHITE, LINE)
+            sl.shapes.add_movie(s["video"], Inches(vx), Inches(vy), Inches(vw), Inches(vh),
+                                poster_frame_image=img, mime_type="video/mp4")
+            _text(sl, 0.75, vy + vh + 0.14, 11.8, 0.3, s.get("subtitle", ""),
+                  12.5, MUTED, align=PP_ALIGN.CENTER)
 
         elif lay == "image" and i == 1 and os.path.exists(FILM) and not film_done:
             # THE FILM: a real embedded video, plays in PowerPoint and Keynote
@@ -363,6 +381,12 @@ def build_docx(md_path, out_path, title, subtitle):
 
 
 if __name__ == "__main__":
+    import sys
+    if sys.argv[1:] == ["pr3"]:
+        print("→", build_pptx("presentations/progress-report-3-nov5.json",
+                              "presentations/ZenAI-Progress-Report-3-Nov5.pptx",
+                              accent=RGBColor(0x1B, 0x3D, 0x6F)))
+        sys.exit()
     print("→", build_pptx())
     print("→", build_docx("docs/build-plan.md", "docs/ZenAI-Build-Plan.docx",
                           "ZenAI — Build Plan",
