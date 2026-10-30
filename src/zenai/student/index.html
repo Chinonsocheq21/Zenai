@@ -498,6 +498,8 @@ const dayKey = d => { d = new Date(d); return d.getFullYear() + "-" + String(d.g
 // ---------- talking to the server ----------
 // A random id for this phone (rate limits are per device) and the class code, if
 // the demo asks for one. Both live in this phone's storage only.
+// a class-demo link or QR can carry the code (#code=ZEN-1234): keep it and tidy the address
+(() => { const m = location.hash.match(/code=([A-Za-z0-9-]{3,20})/); if (m) { S.set("code", m[1].toUpperCase()); history.replaceState(null, "", location.pathname + location.search); } })();
 function deviceId() {
   let d = S.get("device", null);
   if (!d) { d = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)) ; S.set("device", d); }

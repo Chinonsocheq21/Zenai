@@ -78,8 +78,10 @@ def present_info(req: Request) -> dict:
 
     port = req.url.port or 8000
     lan = f"http://{lan_ip()}:{port}/student/"
-    return {"lan_url": lan, "public_url": settings.PUBLIC_URL or None,
-            "url": (settings.PUBLIC_URL.rstrip("/") + "/student/") if settings.PUBLIC_URL else lan,
+    url = (settings.PUBLIC_URL.rstrip("/") + "/student/") if settings.PUBLIC_URL else lan
+    return {"lan_url": lan, "public_url": settings.PUBLIC_URL or None, "url": url,
+            # the QR carries the code in the fragment, so scanning skips typing it
+            "scan_url": url + (f"#code={settings.ACCESS_CODE}" if settings.ACCESS_CODE else ""),
             "code": settings.ACCESS_CODE or None}
 
 

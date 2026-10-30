@@ -34,7 +34,7 @@
   <div>
     <div class="orb"></div>
     <h1>Scan to try <b>ZenAI</b>.</h1>
-    <p class="sub">Point your phone's camera at the code. Same Wi-Fi as this laptop. Nothing you type is kept, and nothing is shared with the university.</p>
+    <p class="sub" id="sub">Point your phone's camera at the code. Nothing you type is kept, and nothing is shared with the university.</p>
     <div class="code" id="codeBox" hidden><span>CLASS CODE</span><b id="code"></b></div>
   </div>
   <div class="card"><img id="qr" alt="QR code for the ZenAI student app"><div class="url" id="url"></div></div>
@@ -42,10 +42,11 @@
 <div class="foot"><span>ZenAI is not a counselor. In crisis, call or text 988.</span><span id="hint"></span><a href="/workflow/" target="_blank">Watch replies go through the pipeline →</a></div>
 <script>
 fetch("/present/info").then(r => r.json()).then(d => {
-  document.getElementById("qr").src = "/qr.svg?data=" + encodeURIComponent(d.url);
+  document.getElementById("qr").src = "/qr.svg?data=" + encodeURIComponent(d.scan_url || d.url);
   document.getElementById("url").textContent = d.url.replace(/^https?:\/\//, "");
   if (d.code) { document.getElementById("code").textContent = d.code; document.getElementById("codeBox").hidden = false; }
-  if (!d.public_url) document.getElementById("hint").innerHTML = '<span class="warn">Local Wi-Fi mode: voice needs the hosted https address</span>';
+  if (!d.public_url) { document.getElementById("hint").innerHTML = '<span class="warn">Wi-Fi only mode: phones must be on this laptop\'s Wi-Fi; voice needs the https link</span>';
+    document.getElementById("sub").textContent = "Point your phone's camera at the code. Same Wi-Fi as this laptop. Nothing you type is kept, and nothing is shared with the university."; }
 });
 </script>
 </body>

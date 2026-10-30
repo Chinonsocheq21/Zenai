@@ -20,3 +20,4 @@ data/turns.test.jsonl
 data/e1-keys/
 src/zenai/student/demo-voice.json
 data/feedback.jsonl
+tools/bin/
