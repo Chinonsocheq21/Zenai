@@ -2,27 +2,40 @@
 
 Serves the shuffled replies from results/e1/<tag>/audit_replies.csv WITHOUT
 the condition (monitor on or off), and saves each mark as it is made to
-results/e1/<tag>/marks-human.json. Local only: a request from anywhere but this
-machine is refused, so the page cannot be used on a deployed server.
+results/e1/<tag>/marks-<rater>.json. On this machine it just works. From
+anywhere else (a teammate on the tunnel link) it needs the class code and a
+rater name, so each teammate's marks land in their own file and nobody can
+overwrite the owner's "human" sheet.
 """
 
 from __future__ import annotations
 
 import csv
 import json
+import re
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
+from zenai.api import limits
+
 router = APIRouter(tags=["audit"])
 ROOT = Path(__file__).resolve().parents[4] / "results" / "e1"
-LOCAL = {"127.0.0.1", "::1", "localhost", "testclient"}
+RATER = re.compile(r"^[a-z0-9-]{1,20}$")
 
 
-def _local(req: Request) -> None:
-    if (req.client.host if req.client else "") not in LOCAL:
-        raise HTTPException(403, "The marking page only works on this machine.")
+def _allowed(req: Request, rater: str) -> None:
+    from zenai.config import settings
+
+    if not RATER.match(rater):
+        raise HTTPException(422, "Rater names are lowercase letters, digits and dashes.")
+    if limits.is_local(req):
+        return
+    if settings.ACCESS_CODE and rater != "human":
+        limits.check_code(req)
+        return
+    raise HTTPException(403, {"code_required": True, "message": "Enter your name and the team code to mark."})
 
 
 def _dir(tag: str) -> Path:
@@ -34,7 +47,7 @@ def _dir(tag: str) -> Path:
 
 @router.get("/audit/items")
 def items(tag: str, req: Request, rater: str = "human") -> dict:
-    _local(req)
+    _allowed(req, rater)
     d = _dir(tag)
     rows = list(csv.DictReader((d / "audit_replies.csv").open()))
     marks_path = d / f"marks-{rater}.json"
@@ -55,7 +68,7 @@ class Mark(BaseModel):
 
 @router.post("/audit/mark")
 def mark(m: Mark, req: Request) -> dict:
-    _local(req)
+    _allowed(req, m.rater)
     d = _dir(m.tag)
     p = d / f"marks-{m.rater}.json"
     marks = json.loads(p.read_text()) if p.exists() else {}

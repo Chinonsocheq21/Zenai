@@ -77,3 +77,34 @@ def test_present_page_and_qr():
     assert info["url"].endswith("/student/")
     q = client.get("/qr.svg", params={"data": info["url"]})
     assert q.status_code == 200 and q.text.lstrip().startswith("<?xml") or "<svg" in q.text
+
+
+def test_tunnel_requests_are_not_local(monkeypatch):
+    """cloudflared connects from 127.0.0.1; its header must stop it passing as local."""
+    from fastapi.testclient import TestClient
+
+    from zenai.api.main import app
+    from zenai.config import settings
+
+    monkeypatch.setattr(settings, "ACCESS_CODE", "ZEN-1234")
+    c = TestClient(app)
+    via = {"cf-connecting-ip": "203.0.113.9"}
+    assert c.get("/present/info", headers=via).status_code == 403
+    assert c.get("/workflow/recent", headers=via).status_code == 403
+    assert c.get("/feedback/summary", headers=via).status_code == 403
+    assert c.get("/present/info").status_code == 200
+
+
+def test_audit_for_teammates_needs_code_and_name(monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from zenai.api.main import app
+    from zenai.config import settings
+
+    monkeypatch.setattr(settings, "ACCESS_CODE", "ZEN-1234")
+    c = TestClient(app)
+    via = {"cf-connecting-ip": "203.0.113.9"}
+    assert c.get("/audit/items?tag=e1-v2", headers=via).status_code == 403          # no name
+    assert c.get("/audit/items?tag=e1-v2&rater=abe", headers=via).status_code == 401  # no code
+    ok = c.get("/audit/items?tag=e1-v2&rater=abe", headers={**via, "x-zenai-code": "zen-1234"})
+    assert ok.status_code in (200, 404)            # 404 only where the sheet isn't checked in

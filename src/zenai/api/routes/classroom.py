@@ -26,7 +26,7 @@ FEEDBACK = Path(__file__).resolve().parents[4] / "data" / "feedback.jsonl"
 
 
 def _local(req: Request) -> None:
-    if (req.client.host if req.client else "") not in limits.LOCAL:
+    if not limits.is_local(req):
         raise HTTPException(403, "Only available on this machine.")
 
 

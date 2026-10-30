@@ -36,7 +36,7 @@ SOFT = RGBColor(0xE3, 0xEF, 0xE9)
 LINE = RGBColor(0xE4, 0xE0, 0xD8)
 SER = "Georgia"
 
-TEAM = "Abraham Irabor  ·  Fnu Soh Tah Fon  ·  Joseph Williams  ·  Chinonso Egeolu"
+TEAM = "Abraham Irabor  ·  Fnu Soh Tah Fon  ·  Chinonso Egeolu"
 
 
 def clean(t: str) -> str:

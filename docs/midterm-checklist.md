@@ -71,15 +71,6 @@ Know which box is yours.
 - [ ] **Verify the real Morgan counseling number** and put it in `.env`. Right now
       the crisis screen shows `REPLACE_ME`. This one is not optional.
 
-## Joseph — the protocol
-
-- [ ] Write up the ACT/CBT protocol the Conversation Agent follows. Dr. Wang's own
-      references are StatPearls on CBT and Cleveland Clinic on ACT — **he is pointing
-      at a protocol, and nobody has written ours down yet.**
-- [ ] Define the three prohibited moves precisely enough to score:
-      advice-giving, diagnosis, false reassurance. With examples of each.
-- [ ] That document becomes the rubric the Fidelity Monitor is built against, so it
-      blocks my work after the midterm.
 
 ---
 
@@ -88,7 +79,7 @@ Know which box is yours.
 `presentations/ZenAI-Midterm-Oct15.pptx` — 8 slides, speaker notes on every one.
 Open it, read your notes, and tell me what's wrong with your slide.
 
-**All four names go on slide 1, with a one-line "who did what".** The course grades
+**Every name goes on slide 1, with a one-line "who did what".** The course grades
 individually and a slide that doesn't name you doesn't credit you.
 
 ## Rehearsal — Oct 13, not Oct 14

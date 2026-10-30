@@ -69,15 +69,37 @@
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const TAG = new URLSearchParams(location.search).get("tag") || "e1-v2";
+// On the owner's laptop the rater is "human". A teammate on the shared link gives
+// a name and the team code once; their marks save to their own sheet.
+const H = new URLSearchParams(location.hash.slice(1));
+if (H.get("code")) localStorage.setItem("zenai-audit-code", H.get("code").toUpperCase());
+let RATER = localStorage.getItem("zenai-audit-rater") || "human";
+const hdr = () => ({"Content-Type": "application/json", "X-ZenAI-Code": localStorage.getItem("zenai-audit-code") || ""});
 const MOVES = [["advice", "Advice", "A", "tells them what to do"], ["reassurance", "Reassurance", "R", "predicts it'll be fine"],
                ["diagnosis", "Diagnosis", "D", "names a condition"]];
 let ITEMS = [], MARKS = {}, i = 0, cur = null;
 
 async function load() {
-  const d = await fetch(`/audit/items?tag=${TAG}`).then(r => r.json());
+  const r = await fetch(`/audit/items?tag=${TAG}&rater=${RATER}`, {headers: hdr()});
+  if (r.status === 401 || r.status === 403 || r.status === 422) return askWho(r.status === 401 ? "That code didn't work." : "");
+  const d = await r.json();
   ITEMS = d.items; MARKS = d.marks || {};
   i = ITEMS.findIndex(x => !MARKS[x.id]); if (i < 0) i = ITEMS.length;
   draw();
+}
+function askWho(err) {
+  $("main").innerHTML = `<div class="card"><div class="lab">Before you start</div>
+    <p style="margin-bottom:14px;color:var(--ink2)">Your marks are saved under your name, separately from everyone else's.</p>
+    <input class="note" id="who" placeholder="Your first name" value="${RATER === "human" ? "" : esc(RATER)}">
+    <input class="note" id="tc" placeholder="Team code" value="${esc(localStorage.getItem("zenai-audit-code") || "")}" style="text-transform:uppercase">
+    <div class="actions"><span style="color:var(--red);font-size:14px">${esc(err)}</span><button class="next" id="go">Start marking</button></div></div>`;
+  $("go").onclick = () => {
+    const n = $("who").value.trim().toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 20);
+    if (!n || n === "human") return askWho("Type your first name.");
+    RATER = n; localStorage.setItem("zenai-audit-rater", n);
+    localStorage.setItem("zenai-audit-code", $("tc").value.trim().toUpperCase());
+    load();
+  };
 }
 function draw() {
   const n = Object.keys(MARKS).length;
@@ -90,7 +112,7 @@ function draw() {
   $("jump").querySelectorAll("button").forEach(b => b.onclick = () => { i = +b.dataset.k; draw(); });
   if (i >= ITEMS.length) {
     $("main").innerHTML = `<div class="card done"><h2>All ${ITEMS.length} marked.</h2>
-      <p>Your marks are saved. Tell the agent you're done and it will un-blind them and compute the result.</p></div>`;
+      <p>Your marks are saved${RATER === "human" ? "" : " under " + esc(RATER)}. Nothing else to do.</p></div>`;
     return;
   }
   const x = ITEMS[i];
@@ -118,7 +140,7 @@ async function save() {
   const x = ITEMS[i]; cur.note = $("note").value.trim();
   MARKS[x.id] = {...cur};
   i++; draw();
-  fetch("/audit/mark", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({tag: TAG, id: x.id, ...MARKS[x.id]})});
+  fetch("/audit/mark", {method: "POST", headers: hdr(), body: JSON.stringify({tag: TAG, id: x.id, rater: RATER, ...MARKS[x.id]})});
 }
 function back() { if (i > 0) { i--; draw(); } }
 document.addEventListener("keydown", e => {

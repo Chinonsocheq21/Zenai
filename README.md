@@ -7,7 +7,7 @@
 
 COSC 490 — Senior Capstone, Morgan State University, Fall 2026.
 Project 5: *"Develop an model for psychological counseling."*
-Group 3 — Abraham Irabor · Fnu Soh Tah Fon · Joseph Williams · Chinonso Egeolu
+Group 3 — Abraham Irabor · Fnu Soh Tah Fon · Chinonso Egeolu
 
 ---
 
@@ -152,12 +152,11 @@ chosen by a recall constraint, not by F1 — and we state what precision we paid
 
 | | Owns |
 |---|---|
-| **Chinonso** | Orchestrator · infra · DB · CI · **Fidelity Monitor** |
+| **Chinonso** | Orchestrator · infra · DB · CI · **Fidelity Monitor** · Conversation Agent · **the ACT protocol** (`docs/protocol.md`) · Memory · Privacy |
 | **Soh** | Distress classifier · data · eval · Mood Check-In · Progress |
 | **Abraham** | **Crisis & Safety** · risk classifier · escalation · Referral |
-| **Joseph** | Conversation Agent · **the ACT/CBT protocol & fidelity rubric** · Memory · Privacy |
 
-Branch → PR → one approval → merge. Every artifact carries all four names and a
+Branch → PR → one approval → merge. Every artifact carries every name and a
 one-line "who did what" — the course grades individually.
 
 ## Before the demo

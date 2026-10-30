@@ -32,7 +32,7 @@ GAPS -- say these out loud.
     false reassurance ("you'll be fine"). Only the second is drift, so this
     label over-flags. Expect reassurance precision to be the weak number.
   * Diagnosis has no labelled data at all. It needs hand-labelled examples
-    against Joseph's written protocol.
+    against the written protocol (docs/protocol.md).
 """
 
 from __future__ import annotations

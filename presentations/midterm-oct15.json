@@ -31,7 +31,7 @@
           "y": 84,
           "w": 84,
           "h": 7,
-          "text": "Abraham Irabor  ·  Fnu Soh Tah Fon  ·  Joseph Williams  ·  Chinonso Egeolu",
+          "text": "Abraham Irabor  ·  Fnu Soh Tah Fon  ·  Chinonso Egeolu",
           "size": 15,
           "weight": 600,
           "align": "center",
@@ -75,7 +75,7 @@
         "Status: **drift detector trained**; scoring against the six ACT processes is next"
       ],
       "image": "artifacts/media/zenai-console/03-fidelity-drift.png",
-      "note": "45 seconds. This is the contribution, and the screenshot is the real console, not the film.\n\nThe film's drifting reply — 'You've got this! Try breaking your notes into 25-minute blocks.' — is rejected for BOTH moves, and the detector points at the exact sentence carrying each one: 'You've got this!' is reassurance, 'Try breaking…' is advice. The film's in-protocol reply passes.\n\nBe straight about what's next: the drift-detection half is trained; scoring against the six ACT processes needs Joseph's written protocol, and diagnosis needs labelled examples — there is no public dataset for it."
+      "note": "45 seconds. This is the contribution, and the screenshot is the real console, not the film.\n\nThe film's drifting reply — 'You've got this! Try breaking your notes into 25-minute blocks.' — is rejected for BOTH moves, and the detector points at the exact sentence carrying each one: 'You've got this!' is reassurance, 'Try breaking…' is advice. The film's in-protocol reply passes.\n\nBe straight about what's next: the drift-detection half is trained; scoring against the six ACT processes needs the written protocol, and diagnosis needs labelled examples — there is no public dataset for it."
     },
     {
       "layout": "split",
@@ -188,7 +188,7 @@
     },
     {
       "layout": "quote",
-      "subtitle": "ZenAI · Abraham Irabor · Fnu Soh Tah Fon · Joseph Williams · Chinonso Egeolu",
+      "subtitle": "ZenAI · Abraham Irabor · Fnu Soh Tah Fon · Chinonso Egeolu",
       "body": "Not a counselor. A support tool that knows when to step back.",
       "note": "Close on this line and stop talking. Then: 'Questions?'"
     }

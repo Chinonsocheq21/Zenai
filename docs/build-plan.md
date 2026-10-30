@@ -2,7 +2,7 @@
 ## An AI counselor that stays inside the protocol
 
 **COSC 490 · Project 5 · Group 3 (g3-p5) · Sep 30 → Dec 3, 2026**
-Abraham Irabor · Fnu Soh Tah Fon · Joseph Williams · Chinonso Egeolu
+Abraham Irabor · Fnu Soh Tah Fon · Chinonso Egeolu
 
 ---
 
@@ -33,17 +33,13 @@ verbatim:
 Fifteen days, no code, and the graded thing is a trained model. Everything in Part 3 is
 built around that one fact.
 
-**Two things to fix in the room, not by email:**
+**One thing to fix in the room, not by email:**
 
-1. **The PR1 document carries only Abraham's and Soh's names.** Mine isn't on it and
-   neither is Joseph's — and the rubric grades individually (*"present in team, grade
+1. **The PR1 document carries only Abraham's and Soh's names.** Mine isn't on it, and the rubric grades individually (*"present in team, grade
    individually"*, and PR1 said *"only people who submitted AND presented"*). I uploaded
    it to Canvas, so my submission is recorded, but the document doesn't show a
-   contribution from me. Every future artifact carries all four names plus a one-line
+   contribution from me. Every future artifact carries every name plus a one-line
    "who did what", and my name goes on it because of work that's actually mine.
-2. **Joseph hasn't appeared on anything yet.** Not an accusation — he may have been
-   working on something that didn't make the write-up. Worth asking directly at the
-   first meeting so the work split below is real rather than aspirational.
 
 ---
 
@@ -162,10 +158,10 @@ the six ACT processes, trained on a rubric-labelled set the team builds.
 | **Oct 1 – Oct 7** | Datasets downloaded, cleaned, split; distress taxonomy mapping agreed | Soh |
 | **Oct 4 – Oct 11** | Distress classifier trained, baselines, macro-F1 | Soh |
 | **Oct 4 – Oct 12** | Crisis classifier, threshold sweep, confusion matrix | Abraham |
-| **Oct 6 – Oct 12** | ACT/CBT protocol written up; the fidelity rubric drafted | Joseph |
+| **Oct 6 – Oct 12** | ACT/CBT protocol written up; the fidelity rubric drafted | Chinonso |
 | **Oct 8 – Oct 12** | Models wired behind `/analyze`; `runs` logging | Chinonso |
 | **Oct 12 – Oct 13** | Eval notebook prints every number; **Lucidchart diagrams finalised** | Soh + Chinonso |
-| **Oct 13** | **Deck built, rehearsed with a timer, all four names on it** | all |
+| **Oct 13** | **Deck built, rehearsed with a timer, every name on it** | all |
 | **Oct 14** | Code pushed to GitHub. *The rubric says so explicitly.* | all |
 | **Oct 15** | **Present** | all |
 
@@ -175,7 +171,7 @@ slide with a placeholder on Oct 15 is worse than a slide that isn't there.
 
 ---
 
-## Part 4 — Dividing the work among four
+## Part 4 — Dividing the work
 
 The principle stays the same as any good split: **everyone owns something end to end**
 — code, its slide, its section of the report — so that one person going quiet stalls one
@@ -189,7 +185,6 @@ actually want to do.
 | **Chinonso** | Orchestrator · infra · Docker · CI · DB · `runs` tracing · **the Fidelity Monitor** | Architecture + dev environment | Stack up, models served, `/analyze` live |
 | **Soh** | **Distress classifier** · data pipeline · eval harness · Mood Check-In · Progress Agent | The core-area model slide | Trained classifier + metrics |
 | **Abraham** | **Crisis & Safety Agent** · risk classifier · escalation path · Resource & Referral | Safety + crisis recall | Crisis classifier + threshold analysis |
-| **Joseph** | Conversation Agent · **the ACT/CBT protocol and fidelity rubric** · Memory · Privacy | Protocol + ethics | The written protocol + labelled rubric set |
 
 After the midterm, the Tier-2 specialists (Academic Stress, Stress-Relief, Wellness
 Schedule) get split one each — they're thin wrappers over the Conversation Agent with

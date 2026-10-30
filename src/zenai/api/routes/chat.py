@@ -52,7 +52,7 @@ def _limited_turn(body: ChatIn) -> dict:
 
 def _local_tool(req: Request) -> bool:
     # the console and the workflow viewer on this laptop are not rate limited
-    return (req.client.host if req.client else "") in limits.LOCAL and not req.headers.get("x-zenai-device")
+    return limits.is_local(req) and not req.headers.get("x-zenai-device")
 
 
 @router.post("/chat")

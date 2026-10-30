@@ -14,6 +14,9 @@ from collections import defaultdict, deque
 from fastapi import HTTPException, Request
 
 LOCAL = {"127.0.0.1", "::1", "localhost", "testclient"}
+# A tunnel (cloudflared) connects from this machine, so a request that came
+# through it looks local unless the proxy headers are checked too.
+PROXY_HEADERS = ("cf-connecting-ip", "x-forwarded-for", "forwarded", "x-real-ip")
 _lock = threading.Lock()
 _hits: dict = defaultdict(deque)          # (bucket, device) -> timestamps
 _global = {"day": "", "n": 0}
@@ -22,9 +25,23 @@ PAUSE = ("ZenAI is taking a short pause because a lot of messages came in at onc
          "Try again in a few minutes. If you need someone right now, call or text 988.")
 
 
+def is_local(req: Request) -> bool:
+    """True only for a request made on this machine, not one relayed by a tunnel."""
+    host = req.client.host if req.client else ""
+    return host in LOCAL and not any(req.headers.get(h) for h in PROXY_HEADERS)
+
+
+def client_ip(req: Request) -> str:
+    host = req.client.host if req.client else "unknown"
+    if host in LOCAL:                      # behind our own tunnel: trust what it says
+        fwd = req.headers.get("cf-connecting-ip") or (req.headers.get("x-forwarded-for") or "").split(",")[0]
+        return fwd.strip() or host
+    return host
+
+
 def device(req: Request) -> str:
     d = (req.headers.get("x-zenai-device") or "").strip()[:64]
-    return d or f"ip:{req.client.host if req.client else 'unknown'}"
+    return d or f"ip:{client_ip(req)}"
 
 
 def check_code(req: Request) -> None:
