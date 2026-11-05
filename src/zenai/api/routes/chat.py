@@ -31,10 +31,11 @@ class ChatIn(BaseModel):
     checkin: Literal["Light", "A bit much", "Heavy", "Very heavy", "I'm not okay"] | None = None
 
 
-def _limited_turn(body: ChatIn) -> dict:
-    """Over the limit: no model is called, but the crisis check still runs on the
-    patterns and the conversation rules, so a student in crisis is never told to
-    come back later."""
+def _crisis_only(body: ChatIn, note: str) -> dict | None:
+    """The crisis check without any language model: patterns and conversation
+    rules only. Returns the hand-off when it escalates, else None. Used whenever
+    the model can't be called (over the limit, no key, model down), so a student
+    in crisis is never told to come back later."""
     from zenai.agents.privacy import redact
     from zenai.config import settings
     from zenai.models.crisis import assess
@@ -46,8 +47,19 @@ def _limited_turn(body: ChatIn) -> dict:
         return {"escalate": True, "crisis_risk": a["risk"], "redacted_text": redacted, "reply": None, "attempts": [],
                 "trace": [], "escalation": {"hotline": settings.CRISIS_HOTLINE, "campus": settings.CAMPUS_COUNSELING_NAME,
                                             "phone": settings.CAMPUS_COUNSELING_PHONE, "action": "human_handoff"},
-                "note": "Usage limit reached; the crisis check still ran."}
+                "note": note}
+    return None
+
+
+def _limited_turn(body: ChatIn) -> dict:
+    hand = _crisis_only(body, "Usage limit reached; the crisis check still ran.")
+    if hand:
+        return hand
     raise HTTPException(429, {"limited": True, "message": limits.PAUSE})
+
+
+DOWN = ("ZenAI can't reply right now. Try again in a few minutes. "
+        "If you need someone now, call or text 988.")
 
 
 def _local_tool(req: Request) -> bool:
@@ -64,12 +76,18 @@ def chat(body: ChatIn, req: Request) -> dict:
     if not _local_tool(req) and not limits.allow(req, "chat"):
         return _limited_turn(body)
     if not llm.available():
-        raise HTTPException(503, "No language model configured (XAI_API_KEY in .env).")
+        hand = _crisis_only(body, "No language model configured; the crisis check still ran.")
+        if hand:
+            return hand
+        raise HTTPException(503, {"down": True, "message": DOWN})
     try:
         return turn.run(body.text, [m.model_dump() for m in body.history], body.monitor,
                         memory=[m[:200] for m in body.memory], client=body.client, checkin=body.checkin)
     except llm.LLMError as e:
-        raise HTTPException(502, str(e)) from e
+        hand = _crisis_only(body, "Language model unavailable; the crisis check still ran.")
+        if hand:
+            return hand
+        raise HTTPException(502, {"down": True, "message": DOWN}) from e
 
 
 class CloseIn(BaseModel):

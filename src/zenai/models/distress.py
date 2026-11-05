@@ -16,6 +16,7 @@ from pathlib import Path
 # repo/src/zenai/models/distress.py -> repo/models/distress, wherever we run from
 MODEL_DIR = Path(__file__).resolve().parents[3] / "models" / "distress"
 TFIDF = MODEL_DIR / "tfidf.joblib"
+PLAIN = MODEL_DIR / "tfidf.json.gz"     # same model as plain numbers: no scikit-learn needed
 
 
 @lru_cache(maxsize=1)
@@ -26,6 +27,10 @@ def _model():
         return "transformer", pipeline(
             "text-classification", model=str(MODEL_DIR), tokenizer=str(MODEL_DIR), top_k=None
         )
+    if PLAIN.exists():
+        from zenai.models.linear import LinearTextModel
+
+        return "tfidf", LinearTextModel(PLAIN)
     if TFIDF.exists():
         import joblib
 

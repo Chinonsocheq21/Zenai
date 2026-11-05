@@ -29,12 +29,17 @@ from functools import lru_cache
 from pathlib import Path
 
 MODEL = Path(__file__).resolve().parents[3] / "models" / "fidelity" / "drift.joblib"
+PLAIN = MODEL.with_suffix(".json.gz")   # same model as plain numbers: no scikit-learn needed
 THRESHOLDS = {"advice": 0.40, "reassurance": 0.45}
 _SENT = re.compile(r"(?<=[.!?])\s+")
 
 
 @lru_cache(maxsize=1)
 def _model():
+    if PLAIN.exists():
+        from zenai.models.linear import LinearTextModel
+
+        return LinearTextModel(PLAIN)
     if not MODEL.exists():
         raise RuntimeError(f"No drift detector at {MODEL}. Run: python -m training.train_drift")
     import joblib
@@ -43,7 +48,7 @@ def _model():
 
 
 def available() -> bool:
-    return MODEL.exists()
+    return PLAIN.exists() or MODEL.exists()
 
 
 def sentences(text: str) -> list[str]:
@@ -61,8 +66,9 @@ def check(reply: str) -> dict:
     moves = {}
     for move, th in THRESHOLDS.items():
         i = cls.index(move)
-        j = int(probs[:, i].argmax())
-        score = float(probs[j, i])
+        col = [float(row[i]) for row in probs]    # plain lists or a numpy array, both work
+        j = max(range(len(col)), key=col.__getitem__)
+        score = col[j]
         moves[move] = {
             "score": round(score, 3),
             "threshold": th,
@@ -75,7 +81,7 @@ def check(reply: str) -> dict:
                   "against the ACT/CBT protocol",
     }
     per_sentence = [
-        {"text": s, **{mv: round(float(probs[k, cls.index(mv)]), 3) for mv in THRESHOLDS}}
+        {"text": s, **{mv: round(float(probs[k][cls.index(mv)]), 3) for mv in THRESHOLDS}}
         for k, s in enumerate(sents)
     ]
     return {

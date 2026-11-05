@@ -1,9 +1,16 @@
 __pycache__/
 *.py[cod]
-.venv/
+.venv
 .env
 data/cache/
-/models/
+# models: only the two small runtime models are committed (Vercel builds from GitHub)
+/models/*
+!/models/distress/
+!/models/fidelity/
+/models/distress/*
+/models/fidelity/*
+!/models/distress/tfidf.json.gz
+!/models/fidelity/drift.json.gz
 *.ckpt
 *.safetensors
 .ipynb_checkpoints/
@@ -11,7 +18,7 @@ data/cache/
 
 # fetched data and local env
 data/raw/
-.venv/
+.venv
 
 # conversation logs (redacted, but still not for GitHub)
 data/turns.jsonl
