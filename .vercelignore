@@ -1,0 +1,14 @@
+# Only the running app goes to Vercel. Everything else stays in the repo.
+.venv
+data
+design
+docs
+presentations
+results
+training
+tools
+tests
+*.ipynb
+models/distress/*.json
+src/zenai/student/demo-voice.json
+*.joblib

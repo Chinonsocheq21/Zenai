@@ -64,3 +64,35 @@ def test_explicit_crisis_never_reaches_the_screen(monkeypatch):
         raise AssertionError("screen should not run")
     monkeypatch.setattr(crisis_screen, "screen", boom)
     assert crisis.assess("I want to kill myself")["risk"] >= T
+
+
+def test_crisis_handoff_without_language_model(monkeypatch):
+    """No key, or the model is down: a crisis still gets the hand-off, not an error."""
+    from fastapi.testclient import TestClient
+
+    from zenai import llm
+    from zenai.api.main import app
+
+    monkeypatch.setattr(llm, "available", lambda: False)
+    c = TestClient(app)
+    r = c.post("/chat", json={"text": "I want to end my life"})
+    assert r.status_code == 200 and r.json()["escalate"] is True
+    r = c.post("/chat", json={"text": "long day, just tired"})
+    assert r.status_code == 503 and "988" in r.json()["detail"]["message"]
+
+
+def test_crisis_handoff_when_model_errors(monkeypatch):
+    from fastapi.testclient import TestClient
+
+    from zenai import llm
+    from zenai.agents import turn
+    from zenai.api.main import app
+
+    monkeypatch.setattr(llm, "available", lambda: True)
+
+    def boom(*a, **k):
+        raise llm.LLMError("down")
+
+    monkeypatch.setattr(turn, "run", boom)
+    r = TestClient(app).post("/chat", json={"text": "I want to end my life"})
+    assert r.status_code == 200 and r.json()["escalate"] is True
