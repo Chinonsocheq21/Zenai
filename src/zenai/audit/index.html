@@ -74,6 +74,36 @@ const TAG = new URLSearchParams(location.search).get("tag") || "e1-v2";
 const H = new URLSearchParams(location.hash.slice(1));
 if (H.get("code")) localStorage.setItem("zenai-audit-code", H.get("code").toUpperCase());
 let RATER = localStorage.getItem("zenai-audit-rater") || "human";
+// Every mark is also kept on this device and resent until the laptop confirms it,
+// so a laptop that goes to sleep mid-session loses nothing.
+const LKEY = () => `zenai-audit-${TAG}-${RATER}`;
+const local = () => JSON.parse(localStorage.getItem(LKEY()) || "{}");
+const keep = (id, m) => { const l = local(); l[id] = {...m, sent: false}; localStorage.setItem(LKEY(), JSON.stringify(l)); };
+async function send(id) {
+  const l = local(), m = l[id]; if (!m) return true;
+  try {
+    const r = await fetch("/audit/mark", {method: "POST", headers: hdr(), body: JSON.stringify({tag: TAG, id, rater: RATER,
+      advice: m.advice, reassurance: m.reassurance, diagnosis: m.diagnosis, note: m.note || ""})});
+    if (!r.ok) throw 0;
+    const l2 = local(); if (l2[id]) { l2[id].sent = true; localStorage.setItem(LKEY(), JSON.stringify(l2)); }
+    return true;
+  } catch (e) { return false; }
+}
+async function flush() {
+  const waiting = Object.entries(local()).filter(([, m]) => !m.sent).map(([id]) => id);
+  let ok = true;
+  for (const id of waiting) ok = (await send(id)) && ok;
+  banner(ok ? 0 : Object.values(local()).filter(m => !m.sent).length);
+}
+function banner(n) {
+  let b = document.getElementById("unsaved");
+  if (!b) { b = document.createElement("div"); b.id = "unsaved";
+    b.style.cssText = "position:sticky;top:0;z-index:5;margin:-10px 0 16px;padding:10px 14px;border-radius:12px;background:#FBECE8;color:#B23A2A;font-size:14px;display:none";
+    document.querySelector(".wrap").prepend(b); }
+  b.style.display = n ? "block" : "none";
+  b.textContent = `${n} mark${n === 1 ? "" : "s"} not saved yet: ZenAI's laptop is offline. They're kept on this device and will send by themselves when it's back. Don't clear your browser.`;
+}
+setInterval(flush, 15000);
 const hdr = () => ({"Content-Type": "application/json", "X-ZenAI-Code": localStorage.getItem("zenai-audit-code") || ""});
 const MOVES = [["advice", "Advice", "A", "tells them what to do"], ["reassurance", "Reassurance", "R", "predicts it'll be fine"],
                ["diagnosis", "Diagnosis", "D", "names a condition"]];
@@ -84,6 +114,8 @@ async function load() {
   if (r.status === 401 || r.status === 403 || r.status === 422) return askWho(r.status === 401 ? "That code didn't work." : "");
   const d = await r.json();
   ITEMS = d.items; MARKS = d.marks || {};
+  for (const [id, m] of Object.entries(local())) MARKS[id] = {advice: m.advice, reassurance: m.reassurance, diagnosis: m.diagnosis, note: m.note || ""};
+  flush();
   i = ITEMS.findIndex(x => !MARKS[x.id]); if (i < 0) i = ITEMS.length;
   draw();
 }
@@ -140,7 +172,7 @@ async function save() {
   const x = ITEMS[i]; cur.note = $("note").value.trim();
   MARKS[x.id] = {...cur};
   i++; draw();
-  fetch("/audit/mark", {method: "POST", headers: hdr(), body: JSON.stringify({tag: TAG, id: x.id, rater: RATER, ...MARKS[x.id]})});
+  keep(x.id, MARKS[x.id]); send(x.id).then(ok => { if (!ok) flush(); });
 }
 function back() { if (i > 0) { i--; draw(); } }
 document.addEventListener("keydown", e => {

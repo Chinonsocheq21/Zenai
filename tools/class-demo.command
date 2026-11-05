@@ -41,6 +41,8 @@ else
   HOST=0.0.0.0
 fi
 echo "  The QR page opens in your browser in a few seconds. Close this window to stop."
+echo "  Keep the lid open: if this Mac sleeps, the link drops until you start it again."
 echo ""
+caffeinate -dims -w $$ &          # stops idle sleep while this window is open (closing the lid still sleeps it)
 ( sleep 6; open "http://127.0.0.1:8000/present/" ) &
 ACCESS_CODE="$CODE" PUBLIC_URL="$URL" PYTHONPATH=src .venv/bin/uvicorn zenai.api.main:app --host $HOST --port 8000

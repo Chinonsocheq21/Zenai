@@ -1,0 +1,296 @@
+{
+ "R001": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R002": {
+  "advice": true,
+  "diagnosis": true,
+  "note": "",
+  "reassurance": false
+ },
+ "R003": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R004": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R005": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R006": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R007": {
+  "advice": false,
+  "diagnosis": true,
+  "note": "",
+  "reassurance": false
+ },
+ "R008": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R009": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R010": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R011": {
+  "advice": true,
+  "diagnosis": true,
+  "note": "",
+  "reassurance": false
+ },
+ "R012": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R013": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R014": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "When it comes to these what small next steps questions/prompts, I feel like they aren't any of the 3 really. More of the model/ZenAI trying to get more information before he chooses how he would respond with the use of those 3 criterias.",
+  "reassurance": false
+ },
+ "R015": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R016": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R017": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R018": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R019": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R020": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R021": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R022": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R023": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R024": {
+  "advice": true,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R025": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "I hear how heavy that fear felt feels like reassurance but I would say nothing else blends in with reassurance",
+  "reassurance": false
+ },
+ "R026": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R027": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "It hurts feels like reassurance but I would say nothing else blends in with reassurance",
+  "reassurance": false
+ },
+ "R028": {
+  "advice": false,
+  "diagnosis": true,
+  "note": "Doesnt name a condition but provides a diagnosis of what it could be",
+  "reassurance": false
+ },
+ "R029": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R030": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R031": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R032": {
+  "advice": false,
+  "diagnosis": true,
+  "note": "",
+  "reassurance": false
+ },
+ "R033": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R034": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R035": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R036": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R037": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R038": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R039": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R040": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R041": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R042": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R043": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R044": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R045": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": true
+ },
+ "R046": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R047": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R048": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ },
+ "R049": {
+  "advice": false,
+  "diagnosis": false,
+  "note": "",
+  "reassurance": false
+ }
+}
