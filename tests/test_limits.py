@@ -108,3 +108,71 @@ def test_audit_for_teammates_needs_code_and_name(monkeypatch):
     assert c.get("/audit/items?tag=e1-v2&rater=abe", headers=via).status_code == 401  # no code
     ok = c.get("/audit/items?tag=e1-v2&rater=abe", headers={**via, "x-zenai-code": "zen-1234"})
     assert ok.status_code in (200, 404)            # 404 only where the sheet isn't checked in
+
+
+class FakeUpstash:
+    """Stands in for Upstash's REST pipeline: shared counts, like one Redis."""
+
+    def __init__(self, fail=False):
+        self.n, self.fail, self.calls = {}, fail, 0
+
+    def post(self, url, json, headers, timeout):
+        import httpx
+
+        self.calls += 1
+        if self.fail:
+            raise httpx.ConnectError("down")
+        out = []
+        for cmd in json:
+            if cmd[0] == "INCR":
+                self.n[cmd[1]] = self.n.get(cmd[1], 0) + 1
+                out.append({"result": self.n[cmd[1]]})
+            else:
+                out.append({"result": 1})
+        req = httpx.Request("POST", url)
+        return httpx.Response(200, json=out, request=req)
+
+
+def _redis_env(monkeypatch, fake):
+    import httpx
+
+    monkeypatch.setenv("KV_REST_API_URL", "https://example.upstash.io")
+    monkeypatch.setenv("KV_REST_API_TOKEN", "test-token")
+    monkeypatch.setattr(httpx, "post", fake.post)
+
+
+def test_limits_are_shared_through_redis(monkeypatch):
+    """Two server instances (memory cleared between calls) still share one allowance."""
+    fake = FakeUpstash()
+    _redis_env(monkeypatch, fake)
+    from starlette.requests import Request
+
+    req = Request({"type": "http", "headers": [(b"x-zenai-device", b"phone-1")], "client": ("1.2.3.4", 1)})
+    assert limits.allow(req)
+    limits.reset()                          # a different instance: empty memory
+    assert limits.allow(req)
+    limits.reset()
+    assert not limits.allow(req)            # cap is 2 in this test file
+    assert fake.calls == 3
+    assert not any("phone-1" in k for k in fake.n)   # device ids are hashed
+
+
+def test_redis_down_falls_back_and_crisis_still_answered(monkeypatch):
+    _redis_env(monkeypatch, FakeUpstash(fail=True))
+    from zenai import llm
+    from zenai.agents import turn
+
+    monkeypatch.setattr(llm, "available", lambda: True)
+    monkeypatch.setattr(turn, "run", lambda *a, **k: {"escalate": False, "reply": "ok", "redacted_text": "x"})
+    h = {"X-ZenAI-Device": "phone-2"}
+    assert client.post("/chat", json={"text": "hi"}, headers=h).status_code == 200
+    assert client.post("/chat", json={"text": "hi"}, headers=h).status_code == 200
+    assert client.post("/chat", json={"text": "hi"}, headers=h).status_code == 429   # memory limit held
+    r = client.post("/chat", json={"text": "I want to end my life"}, headers=h)
+    assert r.status_code == 200 and r.json()["escalate"] is True
+
+
+def test_nothing_is_local_on_vercel(monkeypatch):
+    monkeypatch.setenv("VERCEL", "1")
+    assert client.get("/present/info").status_code == 403
+    assert client.get("/workflow/recent").status_code == 403
