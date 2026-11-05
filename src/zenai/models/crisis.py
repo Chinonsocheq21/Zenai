@@ -41,6 +41,12 @@ HIGH_RISK = re.compile(
     r"|say(ing)?\s+(my\s+)?goodbyes?\s+(to\s+everyone|for\s+good)"
     r"|giv(e|ing)\s+away\s+(all\s+)?my\s+(stuff|things|belongings)"
     r"|(go\s+to\s+)?sleep\s+(forever|and\s+(never|not)\s+wake\s+up)"
+    # passive ideation: "the point" of LIVING, not of a class or a chore. Without
+    # these, the rules alone (model down, or over the usage limit) missed it.
+    r"|(don'?t|do\s+not|can'?t|cannot)\s+see\s+(the|a|any)\s+point\s+(of|in)\s+"
+    r"(being\s+here|being\s+alive|living|life|existing|going\s+on|waking\s+up|anything\s+anymore)"
+    r"|(what'?s|what\s+is)\s+the\s+point\s+(of|in)\s+(being\s+here|being\s+alive|living|life|existing|going\s+on|waking\s+up)"
+    r"|no\s+point\s+(in\s+)?(being\s+here|being\s+alive|living|existing|going\s+on|waking\s+up)"
     r")\b",
     re.IGNORECASE,
 )

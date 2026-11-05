@@ -96,3 +96,14 @@ def test_crisis_handoff_when_model_errors(monkeypatch):
     monkeypatch.setattr(turn, "run", boom)
     r = TestClient(app).post("/chat", json={"text": "I want to end my life"})
     assert r.status_code == 200 and r.json()["escalate"] is True
+
+
+def test_passive_ideation_caught_by_rules_alone():
+    """The model screen usually catches these; the rules must too, for when it can't run."""
+    from zenai.models.crisis import assess
+
+    for t in ["I don't see the point of being here anymore", "honestly i dont see the point in living",
+              "what's the point of being alive", "there's no point in going on"]:
+        assert assess(t, [], None, screen=False)["risk"] >= 0.35, t
+    for t in ["I don't see the point of this assignment", "no point in going to that lecture"]:
+        assert assess(t, [], None, screen=False)["risk"] < 0.35, t
