@@ -364,6 +364,38 @@
   .safebar{display:flex;align-items:center;justify-content:center;gap:10px;font-size:12.5px;padding:8px 12px;margin:6px 14px 0;border-radius:14px;
            background:color-mix(in srgb, #B23A2A 9%, var(--surface));color:var(--ink);border:1px solid color-mix(in srgb, #B23A2A 25%, transparent)}
   .safebar a{color:#B23A2A;font-weight:700;text-decoration:none;white-space:nowrap}
+
+  /* ---------- laptop: sidebar + a wide, centred conversation ---------- */
+  .sidefoot{display:none}
+  @media (min-width:960px){
+    body{background:var(--bg)}
+    .app{max-width:none;display:grid;grid-template-columns:260px minmax(0,1fr);grid-template-rows:auto 1fr auto;
+         grid-template-areas:"head main" "nav main" "foot main";box-shadow:none}
+    .app > header{grid-area:head;padding:26px 22px 18px}
+    .app > header h1{font-size:24px}
+    .app > header .mini{width:34px;height:34px}
+    .app > header .pill{display:none}
+    .app > main{grid-area:main;border-left:1px solid var(--line);
+         background:radial-gradient(70% 55% at 85% 0%, color-mix(in srgb, var(--peach) 22%, transparent), transparent 70%)}
+    nav{grid-area:nav;align-self:start;flex-direction:column;gap:4px;margin:6px 14px;padding:8px;border-radius:22px}
+    nav.hidden{display:flex !important;visibility:hidden}
+    nav button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;min-height:46px;padding:0 14px;font-size:15px;border-radius:14px}
+    nav button svg{width:20px;height:20px}
+    .sidefoot{grid-area:foot;display:block;margin:0 22px 24px;font-size:12.5px;line-height:1.6;color:var(--muted)}
+    .sidefoot b{display:block;color:var(--ink2);font-size:13px;margin-bottom:4px}
+    .sidefoot a{color:#B23A2A;font-weight:700;text-decoration:none}
+    .screen{max-width:760px;margin:0 auto;padding:36px 40px 48px}
+    .welcome{max-width:560px;padding-top:7vh !important}
+    #talk{max-width:820px;margin:0 auto}
+    .log{padding:28px 40px 16px}
+    .composer{padding:12px 40px 28px}
+    .me{max-width:68%}
+    .zen{max-width:74%;font-size:17px}
+    .hello{padding-top:8vh}
+    .safebar,.donebar{margin-left:40px;margin-right:40px}
+    .voice,.gate{left:260px}
+    .crisis{padding:48px max(40px, calc((100% - 640px) / 2))}   /* full window: the sidebar is covered too */
+  }
 </style>
 </head>
 <body>
@@ -441,6 +473,8 @@
     <button data-go="progress" class="press"><svg viewBox="0 0 24 24"><path d="M3 17c3 0 4-7 7-7s3 5 6 5 3-6 5-8"/></svg>Progress</button>
     <button data-go="privacy" class="press"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/></svg>Privacy</button>
   </nav>
+
+  <div class="sidefoot"><b>Not a counselor.</b>In crisis, call or text <a href="tel:988">988</a>, any time.<br>Nothing you type is shared with the university.</div>
 
   <!-- CRISIS: covers everything, and there is no text box on it -->
   <!-- VOICE: the orb listens, thinks and speaks; every word goes through the same checked pipeline -->
