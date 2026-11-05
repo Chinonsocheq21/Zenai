@@ -539,8 +539,12 @@ function deviceId() {
   if (!d) { d = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)) ; S.set("device", d); }
   return d;
 }
+// Where the API lives: the same server when this page is served at /student/
+// (the laptop and the class launcher), /api when it is hosted (Vercel serves the
+// app at /app/ and the API under /api).
+const API = location.pathname.startsWith("/student") ? "" : "/api";
 async function api(url, body) {
-  const r = await fetch(url, {method: "POST", headers: {"Content-Type": "application/json", "X-ZenAI-Device": deviceId(),
+  const r = await fetch(API + url, {method: "POST", headers: {"Content-Type": "application/json", "X-ZenAI-Device": deviceId(),
     "X-ZenAI-Code": S.get("code", "")}, body: JSON.stringify(body)});
   if (r.status === 401) { await askCode(); return api(url, body); }
   return r;
@@ -573,7 +577,7 @@ $("start").onclick = () => { S.set("welcomed", true); go("talk"); };
 
 // ---------- crisis ----------
 let RES = {hotline: "988", campus: "Morgan State University Counseling Center", phone: ""};
-fetch("/resources").then(r => r.json()).then(d => { RES = d; }).catch(() => {});
+fetch(API + "/resources").then(r => r.json()).then(d => { RES = d; }).catch(() => {});
 function crisis() {
   if (typeof V !== "undefined" && V.on) voiceOff();
   $("c-hot").textContent = "Call or text " + RES.hotline;
@@ -950,7 +954,9 @@ async function ask(text) {
     const r = await api("/chat", {text, history: HISTORY, memory: consent().helps ? S.get("memory", []) : [], client: "student",
                                   checkin: todaysCheckin()});
     hideThinking();
-    if (r.status === 429) {          // usage limit: a calm pause, never an error (a crisis still gets the hand-off)
+    if (r.status === 429 || r.status === 502 || r.status === 503) {
+      // usage limit, or the model is down: a calm pause, never an error. The server
+      // already ran the crisis check, so a crisis still gets the hand-off.
       const m = (await r.json().catch(() => ({}))).detail?.message || "ZenAI is taking a short pause. If you need someone right now, call or text 988.";
       $("log").insertAdjacentHTML("beforeend", `<div class="pause msg">${esc(tidy(m))}</div>`); scrollDown();
       return null;

@@ -1,3 +1,5 @@
+import os
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -26,7 +28,9 @@ class Settings(BaseSettings):
     ROUTER_LLM: bool = True
     ROUTER_MODEL: str = "grok-4.20-0309-non-reasoning"
     # live pipeline events for /workflow/ (testing phase; redacted text only, memory only)
-    WORKFLOW_EVENTS: bool = True
+    # Off when hosted (env VERCEL): the viewer is a laptop tool, and a hosted server
+    # has no reason to keep even redacted text in memory.
+    WORKFLOW_EVENTS: bool = not os.environ.get("VERCEL")
     # a fast model also screens for indirect crisis language (can only raise risk)
     CRISIS_SCREEN: bool = True
     # ZenAI's spoken voice in voice mode: a neural voice, calm and a little slow
