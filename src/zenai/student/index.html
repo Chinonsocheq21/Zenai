@@ -67,7 +67,11 @@
          position:relative;z-index:5}
   header .mini{width:28px;height:28px}
   header h1{font-family:var(--serif);font-weight:500;font-size:20px;letter-spacing:.2px}
-  header .pill{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);
+  header .hlinks{margin-left:auto;display:flex;align-items:center;gap:2px}
+  header .hlink{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink2);flex:none}
+  header .hlink:active{background:var(--surface)}
+  header .hlink svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  header .pill{margin-left:8px;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);
                background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 11px;
                backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
   header .pill svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
@@ -338,12 +342,16 @@
   .helped.done span{display:none}
   .pause{margin:10px 0 12px 36px;padding:12px 14px;border-radius:16px;background:var(--surface);border:1px dashed var(--line2);font-size:14px;color:var(--ink2);line-height:1.5}
   /* class code */
-  .gate{position:absolute;inset:0;z-index:18;display:flex;flex-direction:column;justify-content:center;padding:0 30px;background:var(--bg)}
-  .gate h2{font-family:var(--serif);font-weight:400;font-size:30px;margin:18px 0 8px}
-  .gate p{color:var(--ink2);font-size:15px;line-height:1.55;margin-bottom:18px}
+  .gate,.acct{position:absolute;inset:0;z-index:18;display:flex;flex-direction:column;justify-content:center;padding:0 30px;background:var(--bg)}
+  .gate h2,.acct h2{font-family:var(--serif);font-weight:400;font-size:30px;margin:18px 0 8px}
+  .gate p,.acct p{color:var(--ink2);font-size:15px;line-height:1.55;margin-bottom:18px}
   .gate input{height:56px;border-radius:16px;border:1px solid var(--line2);background:var(--surface);font:600 22px var(--mono, monospace);letter-spacing:.14em;text-align:center;text-transform:uppercase;color:var(--ink)}
-  .gate button{margin-top:12px;height:52px;border-radius:26px;background:var(--accent);color:var(--accentInk, #fff);font-weight:600;font-size:16px}
+  .gate button,.acct button{margin-top:12px;height:52px;border-radius:26px;background:var(--accent);color:var(--accentInk, #fff);font-weight:600;font-size:16px}
   .gate .bad{color:var(--red, #B23A2A);font-size:13.5px;margin-top:10px;min-height:18px}
+  .acct .alt{display:flex;align-items:center;justify-content:center;margin-top:10px;height:48px;border-radius:24px;
+             border:1px solid var(--line2);background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;text-decoration:none}
+  .acct .close{display:block;margin:16px auto 0;min-height:44px;padding:0 18px;font-size:15px;font-weight:600;
+               color:var(--ink2);text-decoration:underline;text-underline-offset:3px;background:none}
 
   /* check-in before talking */
   .before{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--line2);border-radius:22px;padding:14px 14px 12px;margin:0 0 18px;text-align:left;box-shadow:var(--shadow, 0 6px 20px rgba(20,30,60,.06))}
@@ -393,7 +401,7 @@
     .zen{max-width:74%;font-size:17px}
     .hello{padding-top:8vh}
     .safebar,.donebar{margin-left:40px;margin-right:40px}
-    .voice,.gate{left:260px}
+    .voice,.gate,.acct{left:260px}
     .crisis{padding:48px max(40px, calc((100% - 640px) / 2))}   /* full window: the sidebar is covered too */
   }
 </style>
@@ -402,6 +410,13 @@
 <div class="app" id="app">
   <header>
     <div class="orb mini" aria-hidden="true"><i></i></div><h1>ZenAI</h1>
+    <div class="hlinks">
+      <a class="hlink press" href="/" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg></a>
+      <a class="hlink press" href="/help" aria-label="Help"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.5 2.5 0 1 1 3.4 2.3c-.8.35-1.4 1-1.4 2"/><path d="M12 17h.01"/></svg></a>
+      <button class="hlink press" id="acctBtn" aria-label="Account" aria-haspopup="dialog" aria-expanded="false">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>
+      </button>
+    </div>
     <span class="pill"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Private</span>
   </header>
 
@@ -500,6 +515,15 @@
     <button class="press" id="gok">Continue</button><div class="bad" id="gbad"></div>
   </section>
 
+  <section class="acct hidden" id="acct" role="dialog" aria-modal="true" aria-label="Account">
+    <div class="orb" style="width:72px;height:72px" aria-hidden="true"><i></i></div>
+    <h2>Account</h2>
+    <p>Signing in with your Morgan .edu email is coming soon. Until then, nothing here needs an account: your settings and any saved conversation stay on this device.</p>
+    <button class="press" id="acctPrivacy">Privacy and data</button>
+    <a class="alt press" href="/help">Help</a>
+    <button class="close press" id="acctClose">Close</button>
+  </section>
+
   <section class="crisis hidden" id="crisis" role="dialog" aria-modal="true" aria-labelledby="c-title">
     <div class="tag"><i></i>Pausing to get you support</div>
     <h2 id="c-title">I'm stopping here, and I want to hand you to a person.</h2>
@@ -574,6 +598,15 @@ function go(name) {
 }
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => go(b.dataset.go));
 $("start").onclick = () => { S.set("welcomed", true); go("talk"); };
+
+// ---------- account menu (sign-in itself is a later milestone) ----------
+function toggleAcct(open) {
+  $("acct").classList.toggle("hidden", !open);
+  $("acctBtn").setAttribute("aria-expanded", open ? "true" : "false");
+}
+$("acctBtn").onclick = () => toggleAcct(true);
+$("acctClose").onclick = () => toggleAcct(false);
+$("acctPrivacy").onclick = () => { toggleAcct(false); go("privacy"); };
 
 // ---------- crisis ----------
 let RES = {hotline: "988", campus: "Morgan State University Counseling Center", phone: ""};
