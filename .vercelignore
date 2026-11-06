@@ -12,3 +12,12 @@ tests
 models/distress/*.json
 src/zenai/student/demo-voice.json
 *.joblib
+# Vercel's Python builder prefers pyproject.toml over requirements.txt, and
+# pyproject.toml is the full training stack (torch, transformers: about 5.7 GB).
+# Hide it so the function installs only requirements.txt.
+pyproject.toml
+uv.lock
+setup.sh
+Dockerfile
+docker-compose.yml
+README.md
