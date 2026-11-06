@@ -5,31 +5,17 @@ router = APIRouter(tags=["health"])
 
 @router.get("/health")
 def health() -> dict:
-    """M0 acceptance test. All three read "ok" or M0 is not done."""
-    out = {"db": "down", "redis": "down", "models": "down"}
-    try:
-        from sqlalchemy import text
+    """What the service can reach. Chat never depends on db or limits: a crisis
+    is handed off with all of them down."""
+    import os
+    from pathlib import Path
 
-        from zenai.db.session import engine
+    from zenai.db import store
 
-        with engine.connect() as c:
-            c.execute(text("SELECT 1"))
-        out["db"] = "ok"
-    except Exception as e:  # noqa: BLE001
-        out["db"] = f"error: {e.__class__.__name__}"
-    try:
-        import redis
-
-        from zenai.config import settings
-
-        redis.Redis.from_url(settings.REDIS_URL).ping()
-        out["redis"] = "ok"
-    except Exception as e:  # noqa: BLE001
-        out["redis"] = f"error: {e.__class__.__name__}"
-    try:
-        from pathlib import Path
-
-        out["models"] = "ok" if Path("models/distress").exists() else "not trained yet"
-    except Exception as e:  # noqa: BLE001
-        out["models"] = f"error: {e.__class__.__name__}"
-    return out
+    models = Path(__file__).resolve().parents[4] / "models"
+    limits_store = "redis" if (os.environ.get("KV_REST_API_URL") or os.environ.get("UPSTASH_REDIS_REST_URL")) else "memory"
+    return {
+        "db": "ok" if store.ping() else "unavailable",
+        "limits": limits_store,
+        "models": "ok" if (models / "distress").exists() and (models / "fidelity").exists() else "missing",
+    }
