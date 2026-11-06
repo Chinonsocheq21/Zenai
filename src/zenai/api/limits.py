@@ -89,7 +89,10 @@ def _redis() -> tuple[str, str] | None:
 
 
 def _allow_redis(conn: tuple[str, str], bucket: str, dev: str, now: float) -> bool:
-    """Fixed windows in Redis: one INCR per window, counted in a single round trip."""
+    """Fixed windows in Redis, counted the same way as the memory path: read the
+    counts first, and only count the request (device windows AND the shared daily
+    total) once it is allowed. A device that is already capped and keeps retrying
+    must not use up the campus-wide daily budget for everyone else."""
     import httpx
 
     from zenai.config import settings
@@ -98,14 +101,21 @@ def _allow_redis(conn: tuple[str, str], bucket: str, dev: str, now: float) -> bo
     keys = [(f"zl:{bucket}:{h}:{w}:{int(now // w)}", w, cap) for w, cap in _rules(bucket)]
     if bucket == "chat":
         keys.append((f"zl:global:{time.strftime('%Y-%m-%d', time.gmtime(now))}", 86400, settings.LIMIT_GLOBAL_DAY))
+    url, tok = conn
+    auth = {"Authorization": f"Bearer {tok}"}
+
+    r = httpx.post(f"{url}/pipeline", json=[["GET", k] for k, _, _ in keys], headers=auth, timeout=1.5)
+    r.raise_for_status()
+    now_counts = [int(x["result"] or 0) for x in r.json()]
+    if any(n >= cap for n, (_, _, cap) in zip(now_counts, keys)):
+        return False                       # refused: nothing is counted
+
     cmds = []
     for k, w, _ in keys:
         cmds += [["INCR", k], ["EXPIRE", k, str(w + 60)]]
-    url, tok = conn
-    r = httpx.post(f"{url}/pipeline", json=cmds, headers={"Authorization": f"Bearer {tok}"}, timeout=1.5)
+    r = httpx.post(f"{url}/pipeline", json=cmds, headers=auth, timeout=1.5)
     r.raise_for_status()
-    counts = [int(x["result"]) for x in r.json()[0::2]]
-    return all(n <= cap for n, (_, _, cap) in zip(counts, keys))
+    return True
 
 
 def allow(req: Request, bucket: str = "chat") -> bool:

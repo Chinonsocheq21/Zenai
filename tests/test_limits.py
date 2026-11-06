@@ -124,7 +124,9 @@ class FakeUpstash:
             raise httpx.ConnectError("down")
         out = []
         for cmd in json:
-            if cmd[0] == "INCR":
+            if cmd[0] == "GET":
+                out.append({"result": str(self.n[cmd[1]]) if cmd[1] in self.n else None})
+            elif cmd[0] == "INCR":
                 self.n[cmd[1]] = self.n.get(cmd[1], 0) + 1
                 out.append({"result": self.n[cmd[1]]})
             else:
@@ -153,7 +155,6 @@ def test_limits_are_shared_through_redis(monkeypatch):
     assert limits.allow(req)
     limits.reset()
     assert not limits.allow(req)            # cap is 2 in this test file
-    assert fake.calls == 3
     assert not any("phone-1" in k for k in fake.n)   # device ids are hashed
 
 
@@ -176,3 +177,16 @@ def test_nothing_is_local_on_vercel(monkeypatch):
     monkeypatch.setenv("VERCEL", "1")
     assert client.get("/present/info").status_code == 403
     assert client.get("/workflow/recent").status_code == 403
+
+
+def test_a_capped_device_does_not_drain_the_daily_total(monkeypatch):
+    """Retries from a device that is already over its cap are refused AND not counted."""
+    fake = FakeUpstash()
+    _redis_env(monkeypatch, fake)
+    from starlette.requests import Request
+
+    req = Request({"type": "http", "headers": [(b"x-zenai-device", b"stuck-client")], "client": ("1.2.3.4", 1)})
+    allowed = [limits.allow(req) for _ in range(50)]
+    assert allowed.count(True) == 2
+    day = [v for k, v in fake.n.items() if k.startswith("zl:global:")]
+    assert day == [2]                       # 48 refused retries counted nowhere
