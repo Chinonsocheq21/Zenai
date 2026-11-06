@@ -21,3 +21,6 @@ setup.sh
 Dockerfile
 docker-compose.yml
 README.md
+web/node_modules
+web/.next
+web/out

@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+/* ZenAI's palette: the same warm paper, navy and orange as the app */
+@theme {
+  --color-paper: #f7f3ec;
+  --color-paper2: #efe8dc;
+  --color-card: #fffdf9;
+  --color-ink: #14203a;
+  --color-ink2: #46516a;
+  --color-muted: #7c8599;
+  --color-line: #e5ddcf;
+  --color-navy: #1b3d6f;
+  --color-navy2: #2b5a9a;
+  --color-orange: #e8742e;
+  --color-crisis: #b23a2a;
+  --color-crisisbg: #fbece8;
+  --color-calm: #2f7d62;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+  --font-serif: "New York", "Iowan Old Style", Georgia, serif;
+}
+
+html { scroll-behavior: smooth; }
+body { background: var(--color-paper); color: var(--color-ink); -webkit-font-smoothing: antialiased; }
+:focus-visible { outline: 3px solid var(--color-navy2); outline-offset: 2px; border-radius: 6px; }
+
+.orb {
+  border-radius: 9999px;
+  background: radial-gradient(circle at 34% 28%, #ffe3cc, #f2a26b 26%, #e8742e 46%, #8e6c8e 72%, #1b3d6f);
+  box-shadow: 0 0 80px rgba(232, 116, 46, 0.35);
+  animation: breathe 7s ease-in-out infinite;
+}
+@keyframes breathe { 50% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .orb { animation: none; } html { scroll-behavior: auto; } }
