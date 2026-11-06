@@ -190,3 +190,16 @@ def test_a_capped_device_does_not_drain_the_daily_total(monkeypatch):
     assert allowed.count(True) == 2
     day = [v for k, v in fake.n.items() if k.startswith("zl:global:")]
     assert day == [2]                       # 48 refused retries counted nowhere
+
+
+def test_hosted_service_keeps_no_turn_log_or_feedback_file(monkeypatch, tmp_path):
+    from zenai.agents import turn
+    from zenai.api.routes import classroom
+
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setattr(turn, "LOG", tmp_path / "turns.jsonl")
+    monkeypatch.setattr(classroom, "FEEDBACK", tmp_path / "fb.jsonl")
+    turn._log({"redacted_text": "x", "escalate": False}, True)
+    r = client.post("/feedback", json={"helpful": True, "reply": "ok"}, headers=DEV)
+    assert r.status_code == 200 and r.json()["stored"] is False
+    assert not (tmp_path / "turns.jsonl").exists() and not (tmp_path / "fb.jsonl").exists()
