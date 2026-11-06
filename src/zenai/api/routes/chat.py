@@ -96,6 +96,13 @@ def _chat(body: ChatIn, req: Request) -> dict:
         if hand:
             return hand
         raise HTTPException(502, {"down": True, "message": DOWN}) from e
+    except Exception:
+        # Anything unexpected in the turn: the crisis check still runs before the
+        # error is reported (zenai.api.errors logs it without any text).
+        hand = _crisis_only(body, "Something failed; the crisis check still ran.")
+        if hand:
+            return hand
+        raise
 
 
 class CloseIn(BaseModel):

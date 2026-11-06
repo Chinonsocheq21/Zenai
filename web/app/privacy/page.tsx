@@ -74,7 +74,7 @@ export default function Privacy() {
         <ul className="list-disc space-y-2 pl-5">
           <li><b className="text-ink">xAI</b> provides the language model that drafts and checks replies. It receives redacted text, under xAI's API terms.</li>
           <li><b className="text-ink">Microsoft</b> speech service turns ZenAI's replies into a voice, when you use voice.</li>
-          <li><b className="text-ink">Vercel</b> hosts the website and app. Like any host, it processes technical request data such as IP addresses.</li>
+          <li><b className="text-ink">Vercel</b> hosts the website and app. Like any host, it processes technical request data such as IP addresses. Its Web Analytics counts page views without cookies; we cut each address down to the page's path first, so nothing you typed is ever part of it.</li>
           <li><b className="text-ink">Upstash</b> stores usage counters keyed by a scrambled version of your device ID. They expire within about a day and contain no messages.</li>
         </ul>
       </Section>
