@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
+from zenai.api import errors
 from zenai.api.routes import (
     aggregate,
     analyze,
@@ -65,6 +66,7 @@ app = FastAPI(
     description="An AI counselor that stays inside the protocol. COSC 490 Project 5, Group 3.",
     version="0.1.0",
 )
+errors.install(app)
 app.include_router(health.router)
 app.include_router(analyze.router)
 app.include_router(fidelity.router)

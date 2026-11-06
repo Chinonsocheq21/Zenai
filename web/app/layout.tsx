@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
+import SiteAnalytics from "./analytics";
 import "./globals.css";
 
 const SITE = process.env.VERCEL_PROJECT_PRODUCTION_URL
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <main id="main">{children}</main>
         <SiteFooter />
+        <SiteAnalytics />
       </body>
     </html>
   );
