@@ -11,6 +11,7 @@ GET  /qr.svg?data=   a QR code for that address
 from __future__ import annotations
 
 import json
+import os
 import socket
 import time
 from pathlib import Path
@@ -41,11 +42,16 @@ def feedback(body: FeedbackIn, req: Request) -> dict:
     limits.check_code(req)
     if not limits.allow(req, "tts"):          # shares the light bucket; one tap per reply at most
         raise HTTPException(429, {"limited": True, "message": limits.PAUSE})
-    FEEDBACK.parent.mkdir(parents=True, exist_ok=True)
-    with FEEDBACK.open("a") as f:
-        f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "helpful": body.helpful,
-                            "specialist": body.specialist, "reply": body.reply}) + "\n")
-    return {"ok": True}
+    if os.environ.get("VERCEL"):              # no disk on the hosted service; stored with accounts later
+        return {"ok": True, "stored": False}
+    try:
+        FEEDBACK.parent.mkdir(parents=True, exist_ok=True)
+        with FEEDBACK.open("a") as f:
+            f.write(json.dumps({"at": time.strftime("%Y-%m-%dT%H:%M:%S"), "helpful": body.helpful,
+                                "specialist": body.specialist, "reply": body.reply}) + "\n")
+    except OSError:
+        return {"ok": True, "stored": False}
+    return {"ok": True, "stored": True}
 
 
 @router.get("/feedback/summary")

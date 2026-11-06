@@ -15,6 +15,7 @@ against. Every turn is logged (redacted text only) to data/turns.jsonl.
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from datetime import datetime, timezone
@@ -178,7 +179,11 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
 
 
 def _log(out: dict, monitor: bool) -> None:
-    """Redacted text only -- the raw message is never written anywhere."""
+    """Redacted text only -- the raw message is never written anywhere. A
+    research log on the developer's laptop only: never on the hosted service,
+    where nothing a student types is kept."""
+    if os.environ.get("VERCEL"):
+        return
     try:
         LOG.parent.mkdir(parents=True, exist_ok=True)
         with LOG.open("a") as f:
