@@ -1,0 +1,66 @@
+"use client";
+
+import { useState } from "react";
+
+const FIELDS = [
+  { id: "name", label: "Your name", type: "text", auto: "name", required: true },
+  { id: "email", label: "Work email", type: "email", auto: "email", required: true },
+  { id: "institution", label: "Institution", type: "text", auto: "organization", required: true },
+  { id: "role", label: "Your role", type: "text", auto: "organization-title", required: false },
+] as const;
+
+export default function PilotForm() {
+  const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [error, setError] = useState("");
+
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+    setState("sending");
+    try {
+      const r = await fetch("/api/pilot", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+      if (r.ok) return setState("sent");
+      const d = await r.json().catch(() => ({}));
+      setError(d.detail?.message || (r.status === 422 ? "Please check the fields and try again." : "That didn't work. Try again in a minute."));
+      setState("error");
+    } catch {
+      setError("That didn't work. Check your connection and try again.");
+      setState("error");
+    }
+  }
+
+  if (state === "sent") {
+    return (
+      <div role="status" className="rounded-3xl border border-line bg-card p-8 text-center">
+        <p className="font-serif text-2xl">Thank you.</p>
+        <p className="mt-2 text-ink2">We've received your request and will reply to the email you gave.</p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} className="grid gap-4 rounded-3xl border border-line bg-card p-6 md:grid-cols-2 md:p-8">
+      {FIELDS.map((f) => (
+        <div key={f.id}>
+          <label htmlFor={f.id} className="text-sm font-medium text-ink2">{f.label}{f.required ? "" : " (optional)"}</label>
+          <input id={f.id} name={f.id} type={f.type} autoComplete={f.auto} required={f.required}
+            className="mt-1.5 w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none focus:border-navy" />
+        </div>
+      ))}
+      <div className="md:col-span-2">
+        <label htmlFor="message" className="text-sm font-medium text-ink2">What would you like to know? (optional)</label>
+        <textarea id="message" name="message" rows={4} maxLength={2000}
+          className="mt-1.5 w-full rounded-2xl border border-line bg-paper px-4 py-3 outline-none focus:border-navy" />
+      </div>
+      <div aria-hidden className="hidden"><label htmlFor="website">Website</label><input id="website" name="website" tabIndex={-1} autoComplete="off" /></div>
+      {state === "error" && <p role="alert" className="text-sm text-crisis md:col-span-2">{error}</p>}
+      <div className="md:col-span-2">
+        <button type="submit" disabled={state === "sending"}
+          className="w-full rounded-full bg-navy px-6 py-3.5 font-semibold text-white hover:bg-navy2 disabled:opacity-60 md:w-auto">
+          {state === "sending" ? "Sending..." : "Request a pilot"}
+        </button>
+        <p className="mt-3 text-xs text-muted">We use these details only to reply to you. This form is for staff; students don't need to sign up for anything.</p>
+      </div>
+    </form>
+  );
+}

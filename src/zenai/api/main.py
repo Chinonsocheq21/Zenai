@@ -14,6 +14,7 @@ from zenai.api.routes import (
     classroom,
     fidelity,
     health,
+    pilot,
     tts,
     workflow,
 )
@@ -73,6 +74,7 @@ app.include_router(tts.router)
 app.include_router(classroom.router)
 app.include_router(auth.router)
 app.include_router(checkins.router)
+app.include_router(pilot.router)
 
 # The console is served by the API itself: one process, no CORS, nothing to
 # configure on demo day. Open http://127.0.0.1:8000/ .
