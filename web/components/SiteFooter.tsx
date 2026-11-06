@@ -19,6 +19,7 @@ export default function SiteFooter() {
           <h2 className="mb-3 font-semibold text-ink">ZenAI</h2>
           <ul className="space-y-2 text-ink2">
             <li><a href="/app/" className="hover:text-navy">Try ZenAI</a></li>
+            <li><Link href="/signin/" className="hover:text-navy">Sign in</Link></li>
             <li><Link href="/how-it-works/" className="hover:text-navy">How it works</Link></li>
             <li><Link href="/safety/" className="hover:text-navy">Safety</Link></li>
             <li><Link href="/help/" className="hover:text-navy">Get help now</Link></li>
