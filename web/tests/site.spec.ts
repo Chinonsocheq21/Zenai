@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-const PAGES = ["/", "/how-it-works/", "/safety/", "/help/", "/privacy/", "/terms/"];
+const PAGES = ["/", "/how-it-works/", "/safety/", "/universities/", "/help/", "/privacy/", "/terms/", "/signin/"];
 
 for (const path of PAGES) {
   test(`${path} loads, fits the screen, and has the way to help and to the app`, async ({ page, isMobile }) => {

@@ -28,6 +28,7 @@ export default function SiteFooter() {
         <nav aria-label="About" className="text-sm">
           <h2 className="mb-3 font-semibold text-ink">About</h2>
           <ul className="space-y-2 text-ink2">
+            <li><Link href="/universities/" className="hover:text-navy">For universities</Link></li>
             <li><Link href="/privacy/" className="hover:text-navy">Privacy</Link></li>
             <li><Link href="/terms/" className="hover:text-navy">Terms</Link></li>
             <li><a href="https://github.com/Chinonsocheq21/Zenai" className="hover:text-navy">Source on GitHub</a></li>
