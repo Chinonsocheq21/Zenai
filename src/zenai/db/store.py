@@ -62,6 +62,15 @@ MIGRATIONS: list[tuple[int, str]] = [
         created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
     );
     """),
+    (2, """
+    CREATE TABLE usage_weekly (
+        week   DATE NOT NULL,
+        campus TEXT NOT NULL,
+        metric TEXT NOT NULL,
+        n      INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY (week, campus, metric)
+    );
+    """),
 ]
 
 LOGIN_TTL = timedelta(minutes=15)
@@ -221,3 +230,19 @@ def add_pilot_request(conn, name: str, email: str, institution: str, role: str =
     return int(conn.execute(
         "INSERT INTO pilot_requests (name, email, institution, role, message) VALUES (%s, %s, %s, %s, %s) RETURNING id",
         (name, email, institution, role, message)).fetchone()[0])
+
+
+# ---------------------------------------------------------------- campus trends
+def bump(conn, week: date, campus: str, metrics: dict[str, int]) -> None:
+    """Add to this week's counters. Counts only: no text, no ids, no timestamps finer than a week."""
+    for metric, n in metrics.items():
+        conn.execute(
+            "INSERT INTO usage_weekly (week, campus, metric, n) VALUES (%s, %s, %s, %s) "
+            "ON CONFLICT (week, campus, metric) DO UPDATE SET n = usage_weekly.n + EXCLUDED.n",
+            (week, campus, metric, n))
+
+
+def weekly(conn, campus: str, since: date) -> list[tuple[date, str, int]]:
+    return [(w, m, int(n)) for w, m, n in conn.execute(
+        "SELECT week, metric, n FROM usage_weekly WHERE campus = %s AND week >= %s ORDER BY week, metric",
+        (campus, since)).fetchall()]

@@ -69,6 +69,14 @@ def _local_tool(req: Request) -> bool:
 
 @router.post("/chat")
 def chat(body: ChatIn, req: Request) -> dict:
+    out = _chat(body, req)
+    from zenai.api.routes import aggregate
+
+    aggregate.record_turn(req, body, out)       # weekly counts only; can never fail the reply
+    return out
+
+
+def _chat(body: ChatIn, req: Request) -> dict:
     from zenai import llm
     from zenai.agents import turn
 
