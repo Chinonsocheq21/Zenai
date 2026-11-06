@@ -63,7 +63,38 @@ def client_ip(req: Request) -> str:
     return host
 
 
+_accounts: dict[str, tuple[int, float]] = {}      # session hash -> (user id, cached until)
+
+
+def _account(req: Request) -> str | None:
+    """A signed-in student's limits follow the account, not the device, so a phone
+    and a laptop share one allowance. Any trouble here falls back to the device."""
+    sid = req.cookies.get("zenai_session")
+    if not sid:
+        return None
+    key, now = hashlib.sha256(sid.encode()).hexdigest(), time.time()
+    hit = _accounts.get(key)
+    if hit and hit[1] > now:
+        return f"acct:{hit[0]}"
+    try:
+        from zenai.db import store
+
+        with store.connect() as conn:
+            u = store.user_for_session(conn, sid)
+    except Exception:  # noqa: BLE001 -- the database is optional for limits
+        return None
+    if not u:
+        return None
+    if len(_accounts) > 5000:
+        _accounts.clear()
+    _accounts[key] = (u["id"], now + 300)
+    return f"acct:{u['id']}"
+
+
 def device(req: Request) -> str:
+    acct = _account(req)
+    if acct:
+        return acct
     d = (req.headers.get("x-zenai-device") or "").strip()[:64]
     return d or f"ip:{client_ip(req)}"
 
@@ -152,6 +183,7 @@ def allow(req: Request, bucket: str = "chat") -> bool:
 
 
 def reset() -> None:
+    _accounts.clear()
     with _lock:
         _hits.clear()
         _global.update(day="", n=0)

@@ -5,7 +5,18 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from zenai.api.routes import analyze, audit, auth, chat, classroom, fidelity, health, tts, workflow
+from zenai.api.routes import (
+    analyze,
+    audit,
+    auth,
+    chat,
+    checkins,
+    classroom,
+    fidelity,
+    health,
+    tts,
+    workflow,
+)
 
 
 @asynccontextmanager
@@ -61,6 +72,7 @@ app.include_router(audit.router)
 app.include_router(tts.router)
 app.include_router(classroom.router)
 app.include_router(auth.router)
+app.include_router(checkins.router)
 
 # The console is served by the API itself: one process, no CORS, nothing to
 # configure on demo day. Open http://127.0.0.1:8000/ .
