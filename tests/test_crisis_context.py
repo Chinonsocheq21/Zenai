@@ -1,5 +1,7 @@
 """The crisis check reads the conversation, and context only ever raises risk."""
 
+import pytest
+
 from zenai.config import settings
 from zenai.models import crisis
 
@@ -107,3 +109,27 @@ def test_passive_ideation_caught_by_rules_alone():
         assert assess(t, [], None, screen=False)["risk"] >= 0.35, t
     for t in ["I don't see the point of this assignment", "no point in going to that lecture"]:
         assert assess(t, [], None, screen=False)["risk"] < 0.35, t
+
+
+@pytest.mark.parametrize("text", [
+    "I don’t want to be here anymore",          # iPhone curly apostrophe
+    "I don’t see the point of being here anymore",
+    "I wanna die",
+    "thinking about jumping off the bridge tonight",
+    "i’m going to end it",
+    "I want to hang myself",
+])
+def test_rules_alone_catch_phone_typing_and_informal_language(text):
+    from zenai.models.crisis import assess
+
+    assert assess(text, [], None, screen=False)["risk"] >= 0.35, text
+
+
+@pytest.mark.parametrize("text", [
+    "this exam is killing me", "I’m dying to see the game tonight", "we jumped off the bus early",
+    "I want to end this semester strong", "the bridge on campus is closed",
+])
+def test_ordinary_language_stays_clear(text):
+    from zenai.models.crisis import assess
+
+    assert assess(text, [], None, screen=False)["risk"] < 0.35, text

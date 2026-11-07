@@ -41,6 +41,11 @@ HIGH_RISK = re.compile(
     r"|say(ing)?\s+(my\s+)?goodbyes?\s+(to\s+everyone|for\s+good)"
     r"|giv(e|ing)\s+away\s+(all\s+)?my\s+(stuff|things|belongings)"
     r"|(go\s+to\s+)?sleep\s+(forever|and\s+(never|not)\s+wake\s+up)"
+    # informal and method language the rules missed (found in the engineering review)
+    r"|(wanna|gonna|going\s+to|want\s+to)\s+(die|kill\s+my\s?self|end\s+(it|my\s+life))"
+    r"|jump(ing)?\s+(off|from|in\s+front\s+of)\s+(a|the|this|my)?\s*(bridge|roof|building|balcony|train|car|cliff|window)"
+    r"|(hang|hanging)\s+my\s?self|slit(ting)?\s+my\s+(wrists?|throat)"
+    r"|(pills|bottle)\s+(to|and)\s+(end|die|not\s+wake)"
     # passive ideation: "the point" of LIVING, not of a class or a chore. Without
     # these, the rules alone (model down, or over the usage limit) missed it.
     r"|(don'?t|do\s+not|can'?t|cannot)\s+see\s+(the|a|any)\s+point\s+(of|in)\s+"
@@ -91,7 +96,17 @@ WARNING_SCORE = 0.25
 HEAVY_CHECKINS = {"Very heavy", "I'm not okay"}
 
 
+# Phones type curly apostrophes and quotes by default ("don’t"); the patterns are
+# written with straight ones, so everything is normalized first.
+_QUOTES = str.maketrans({"\u2019": "'", "\u2018": "'", "\u02bc": "'", "\u201c": '"', "\u201d": '"', "\uff07": "'"})
+
+
+def normalize(text: str) -> str:
+    return " ".join(text.translate(_QUOTES).split())
+
+
 def _lexicon_score(text: str) -> float:
+    text = normalize(text)
     if HIGH_RISK.search(text):
         return 0.99
     if ELEVATED.search(text):
