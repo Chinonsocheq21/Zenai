@@ -1,17 +1,18 @@
-import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMeta } from "@/components/meta";
 
-export const metadata: Metadata = {
-  title: "How it works",
-  description: "What happens to a message in ZenAI, stage by stage, and how every reply is checked before a student sees it.",
-};
+export const metadata = pageMeta(
+  "/how-it-works/",
+  "How it works",
+  "What happens to a message in ZenAI, stage by stage, and how every reply is checked before a student sees it.",
+);
 
 const STAGES = [
-  ["Privacy", "Names, emails, phone numbers and student IDs are removed first. Every later stage, and every log, only ever sees the redacted text."],
+  ["Privacy", "Names, emails, phone numbers and student IDs are removed from the message first. Every later stage only ever sees the redacted message, and ZenAI does not write message text to its logs."],
   ["Crisis check", "Rules, the conversation so far, today's check-in, and a model screen. If there is risk, the turn ends here. See Safety."],
   ["Mood", "A distress classifier reads how the message lands (anxiety, low mood, overwhelm, isolation and more), so the reply can meet it."],
   ["Route", "A fast model picks the focus that fits. If it is unavailable, keyword rules take over."],
-  ["Memory", "Only notes the student chose to keep, from their own device. Off by default."],
+  ["Memory", "Only notes the student chose to keep, from their own device, sent along with the message. Off by default. Removing names from saved notes too is being added."],
   ["Draft", "The reply is written on the Acceptance and Commitment Therapy protocol: reflect what was said, notice the thought, connect to what matters, ask one open question."],
   ["Fidelity Monitor", "Checks the draft before anyone sees it. Explained below."],
   ["Send", "Only a reply that passed. If every rewrite still drifts, a fixed protocol-safe line goes instead."],

@@ -4,8 +4,8 @@ import Orb from "./Orb";
 export default function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-line bg-paper2/60">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 md:grid-cols-[1.4fr_1fr_1fr]">
-        <div>
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 sm:grid-cols-3 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="sm:col-span-3 md:col-span-1">
           <div className="flex items-center gap-2.5"><Orb size={26} /><span className="font-serif text-xl">ZenAI</span></div>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-ink2">
             A place to slow down for a minute. ZenAI is not a counselor and does not replace one.
@@ -34,9 +34,18 @@ export default function SiteFooter() {
             <li><a href="https://github.com/Chinonsocheq21/Zenai" className="hover:text-navy">Source on GitHub</a></li>
           </ul>
         </nav>
+        <nav aria-label="Trust" className="text-sm">
+          <h2 className="mb-3 font-semibold text-ink">Trust</h2>
+          <ul className="space-y-2 text-ink2">
+            <li><Link href="/security/" className="hover:text-navy">Security</Link></li>
+            <li><Link href="/accessibility/" className="hover:text-navy">Accessibility</Link></li>
+            <li><Link href="/contact/" className="hover:text-navy">Contact</Link></li>
+            <li><Link href="/status/" className="hover:text-navy">Status</Link></li>
+          </ul>
+        </nav>
       </div>
       <p className="border-t border-line px-5 py-5 text-center text-xs text-muted">
-        ZenAI · COSC 490 Capstone · Morgan State University · {new Date().getFullYear()}
+        ZenAI · Built at Morgan State University · {new Date().getFullYear()}
       </p>
     </footer>
   );

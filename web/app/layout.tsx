@@ -2,11 +2,8 @@ import type { Metadata, Viewport } from "next";
 import SiteFooter from "@/components/SiteFooter";
 import SiteHeader from "@/components/SiteHeader";
 import SiteAnalytics from "./analytics";
+import { OG_IMAGE, SITE } from "@/components/meta";
 import "./globals.css";
-
-const SITE = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
@@ -14,7 +11,16 @@ export const metadata: Metadata = {
   description:
     "A support chat for Morgan State students, grounded in Acceptance and Commitment Therapy. Every reply is checked before a student sees it, and a crisis is handed to a person.",
   icons: { icon: "/icon.png", apple: "/icon.png" },
-  openGraph: { title: "ZenAI", description: "A place to slow down for a minute.", images: ["/media/film-poster.jpg"] },
+  // "./" resolves to each page's own path, so pages that set nothing still get their own canonical.
+  alternates: { canonical: "./" },
+  openGraph: {
+    title: "ZenAI · A place to slow down for a minute",
+    description: "A support chat for Morgan State students. Every reply is checked before a student sees it, and a crisis is handed to a person.",
+    url: "./",
+    siteName: "ZenAI",
+    type: "website",
+    images: [OG_IMAGE],
+  },
 };
 
 export const viewport: Viewport = { themeColor: "#f7f3ec", width: "device-width", initialScale: 1 };

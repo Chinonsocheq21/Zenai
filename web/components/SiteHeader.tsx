@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Orb from "./Orb";
 
 const LINKS = [
@@ -16,6 +16,17 @@ const LINKS = [
 export default function SiteHeader() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const menuBtn = useRef<HTMLButtonElement>(null);
+
+  // Escape closes the mobile menu and puts focus back on the button that opened it.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { setOpen(false); menuBtn.current?.focus(); }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
   const here = (h: string) => (h === "/" ? path === "/" : path?.startsWith(h));
 
   return (
@@ -43,7 +54,7 @@ export default function SiteHeader() {
           <a href="/app/" className="hidden rounded-full bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy2 sm:inline-block">
             Try ZenAI
           </a>
-          <button type="button" className="rounded-full p-2 md:hidden" aria-expanded={open} aria-controls="mobile-nav"
+          <button ref={menuBtn} type="button" className="rounded-full p-2 md:hidden" aria-expanded={open} aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
