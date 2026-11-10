@@ -203,3 +203,86 @@ def test_hosted_service_keeps_no_turn_log_or_feedback_file(monkeypatch, tmp_path
     r = client.post("/feedback", json={"helpful": True, "reply": "ok"}, headers=DEV)
     assert r.status_code == 200 and r.json()["stored"] is False
     assert not (tmp_path / "turns.jsonl").exists() and not (tmp_path / "fb.jsonl").exists()
+
+
+# ---------------------------------------------------------------- per-IP windows
+
+def _req(dev: str, ip: str):
+    from starlette.requests import Request
+
+    return Request({"type": "http", "headers": [(b"x-zenai-device", dev.encode()),
+                                                (b"x-vercel-forwarded-for", ip.encode())],
+                    "client": ("10.0.0.1", 1)})
+
+
+@pytest.fixture
+def hosted(monkeypatch):
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setattr(limits, "IP_PER_10MIN", 5)
+    for k in ("KV_REST_API_URL", "KV_REST_API_TOKEN", "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"):
+        monkeypatch.delenv(k, raising=False)
+
+
+def test_rotating_device_ids_hits_the_ip_cap(hosted):
+    allowed = [limits.allow(_req(f"rotated-{i}", "198.51.100.7")) for i in range(20)]
+    assert allowed.count(True) == 5 and allowed[:5] == [True] * 5
+
+
+def test_rotating_device_ids_through_chat(hosted, monkeypatch):
+    from zenai import llm
+    from zenai.agents import turn
+
+    monkeypatch.setattr(llm, "available", lambda: True)
+    monkeypatch.setattr(turn, "run", lambda *a, **k: {"escalate": False, "reply": "ok", "redacted_text": "x"})
+    codes = [client.post("/chat", json={"text": "hi"},
+                         headers={"X-ZenAI-Device": f"script-{i}", "x-vercel-forwarded-for": "198.51.100.8"}).status_code
+             for i in range(8)]
+    assert codes == [200] * 5 + [429] * 3
+    r = client.post("/chat", json={"text": "I want to kill myself"},
+                    headers={"X-ZenAI-Device": "script-99", "x-vercel-forwarded-for": "198.51.100.8"})
+    assert r.status_code == 200 and r.json()["escalate"] is True          # a crisis is never limited
+
+
+def test_two_ips_do_not_share(hosted):
+    for i in range(5):
+        assert limits.allow(_req(f"a-{i}", "198.51.100.1"))
+    assert not limits.allow(_req("a-new", "198.51.100.1"))
+    assert limits.allow(_req("b-0", "198.51.100.2"))
+
+
+def test_device_window_still_applies_under_the_ip_cap(hosted):
+    assert limits.allow(_req("one", "198.51.100.3")) and limits.allow(_req("one", "198.51.100.3"))
+    assert not limits.allow(_req("one", "198.51.100.3"))                  # device cap is 2 here
+    assert limits.allow(_req("two", "198.51.100.3"))
+
+
+def test_refused_requests_are_not_counted_against_the_ip(hosted):
+    # A capped device retrying must not use up its address's allowance.
+    for _ in range(30):
+        limits.allow(_req("stuck", "198.51.100.4"))
+    assert [limits.allow(_req(f"other-{i}", "198.51.100.4")) for i in range(3)] == [True, True, True]
+
+
+def test_ip_cap_through_redis_and_ips_are_hashed(hosted, monkeypatch):
+    fake = FakeUpstash()
+    _redis_env(monkeypatch, fake)
+    allowed = [limits.allow(_req(f"rot-{i}", "198.51.100.9")) for i in range(12)]
+    assert allowed.count(True) == 5
+    ip_keys = {k: v for k, v in fake.n.items() if k.startswith("zl:chat:ip:")}
+    assert ip_keys and max(ip_keys.values()) == 5                        # refused ones not counted
+    assert [v for k, v in fake.n.items() if k.startswith("zl:global:")] == [5]
+    assert not any("198.51.100.9" in k or "rot-" in k for k in fake.n)
+    assert limits.allow(_req("rot-x", "198.51.100.10"))                  # another address is separate
+
+
+def test_pilot_bucket_lives_in_limits(hosted):
+    from zenai.api.routes import pilot
+
+    assert pilot.PER_HOUR == limits.PILOT_PER_HOUR == 5
+    for _ in range(5):
+        assert pilot.allow(_req("counselor", "198.51.100.20"))
+    assert not limits.allow(_req("counselor", "198.51.100.20"), "pilot")   # per device
+    assert not pilot.allow(_req("fresh-device", "198.51.100.20"))           # per IP too
+    assert pilot.allow(_req("fresh-device", "198.51.100.21"))
+    assert limits.allow(_req("counselor", "198.51.100.20"), "chat")         # buckets are separate
+    assert any(k[0] == "pilot" for k in limits._hits)

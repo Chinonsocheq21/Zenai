@@ -13,20 +13,16 @@ A request must be impossible to lose:
   * The requester gets a short confirmation, best effort: with Resend's test
     sender only the account owner can receive mail, so a failed confirmation
     never fails the request. Every email has a 10 s timeout.
-  * Pilot requests have their own rate-limit bucket (PER_HOUR per device per
-    hour), counted here with the same Redis-or-memory approach as
-    zenai.api.limits, rather than borrowing another bucket.
+  * Pilot requests have their own rate-limit bucket, "pilot" in
+    zenai.api.limits (PILOT_PER_HOUR per device AND per IP per hour, Redis or
+    memory like every other bucket), rather than borrowing another bucket.
 """
 
 from __future__ import annotations
 
-import hashlib
 import logging
 import os
 import re
-import threading
-import time
-from collections import defaultdict, deque
 
 import httpx
 from fastapi import APIRouter, HTTPException, Request
@@ -40,13 +36,9 @@ router = APIRouter(prefix="/pilot", tags=["pilot"])
 EMAIL = re.compile(r"^[^@\s]{1,64}@([A-Za-z0-9-]+\.)+[A-Za-z]{2,}$")
 RESEND = "https://api.resend.com/emails"
 TIMEOUT = 10
-PER_HOUR = 5                         # pilot requests per device per hour
-WINDOW = 3600
+PER_HOUR = limits.PILOT_PER_HOUR     # pilot requests per device and per IP per hour
 OUTBOX: list[dict] = []              # local and tests without Resend: mail lands here
 log = logging.getLogger("zenai.pilot")
-
-_lock = threading.Lock()
-_hits: dict[str, deque] = defaultdict(deque)
 
 
 class PilotIn(BaseModel):
@@ -60,42 +52,14 @@ class PilotIn(BaseModel):
 
 # ---------------------------------------------------------------- rate limit
 
-def _allow_redis(conn: tuple[str, str], dev: str, now: float) -> bool:
-    url, tok = conn
-    key = f"zl:pilot:{hashlib.sha256(dev.encode()).hexdigest()[:24]}:{int(now // WINDOW)}"
-    auth = {"Authorization": f"Bearer {tok}"}
-    r = httpx.post(f"{url}/pipeline", json=[["GET", key]], headers=auth, timeout=1.5)
-    r.raise_for_status()
-    if int(r.json()[0]["result"] or 0) >= PER_HOUR:
-        return False
-    r = httpx.post(f"{url}/pipeline", json=[["INCR", key], ["EXPIRE", key, str(WINDOW + 60)]],
-                   headers=auth, timeout=1.5)
-    r.raise_for_status()
-    return True
-
-
 def allow(req: Request) -> bool:
-    """True if this device may send one more pilot request this hour (and count it)."""
-    now, dev = time.time(), limits.device(req)
-    conn = limits._redis()
-    if conn:
-        try:
-            return _allow_redis(conn, dev, now)
-        except (httpx.HTTPError, ValueError, KeyError, TypeError, IndexError) as e:
-            log.warning("pilot limit: Redis unavailable (%s), counting in memory", type(e).__name__)
-    with _lock:
-        q = _hits[dev]
-        while q and now - q[0] > WINDOW:
-            q.popleft()
-        if len(q) >= PER_HOUR:
-            return False
-        q.append(now)
-        return True
+    """True if this device and this address may send one more pilot request this
+    hour (and count it). The bucket lives in zenai.api.limits."""
+    return limits.allow(req, "pilot")
 
 
 def reset() -> None:
-    with _lock:
-        _hits.clear()
+    """Clear the outbox. Rate-limit counts are cleared by limits.reset()."""
     OUTBOX.clear()
 
 
