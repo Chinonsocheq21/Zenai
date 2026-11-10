@@ -1,30 +1,144 @@
 @import "tailwindcss";
 
-/* ZenAI's palette: the same warm paper, navy and orange as the app */
-@theme {
-  --color-paper: #f7f3ec;
-  --color-paper2: #efe8dc;
-  --color-card: #fffdf9;
-  --color-ink: #14203a;
-  --color-ink2: #46516a;
-  --color-muted: #5f6878;
-  --color-line: #e5ddcf;
-  --color-navy: #1b3d6f;
-  --color-navy2: #2b5a9a;
-  /* orange is the darker shade, safe for text and for white text on it (WCAG AA);
-     orangefill is the bright brand orange, for fills with ink text and decoration only */
-  --color-orange: #b4541a;
-  --color-orangefill: #e8742e;
-  --color-crisis: #b23a2a;
-  --color-crisisbg: #fbece8;
-  --color-calm: #27694f;
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-  --font-serif: "New York", "Iowan Old Style", Georgia, serif;
+/* ZenAI design system for the site.
+   One token set, the same values as the student app (src/zenai/student/index.html :root):
+   paper = --bg, paper2 = --bg2, card = --solid, ink/ink2/muted, line = --line2,
+   navy = --blue, navy2 = --blue2, orange = --orangeInk, orangefill = --orange,
+   crisis = --red, crisisbg = --redsoft, calm = --ok, ring = --ring.
+   Dark mode (prefers-color-scheme) swaps the same tokens to the app's dark values,
+   so every existing class (bg-paper, text-ink2, border-line...) follows without page edits. */
+
+/* One self-hosted serif for headings: Source Serif 4 (SIL OFL 1.1, see /fonts/SourceSerif4-OFL.md).
+   Latin subset, variable weight 400 to 600, about 50 KB. */
+@font-face {
+  font-family: "Source Serif 4";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/SourceSerif4-latin-wght.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-html { scroll-behavior: smooth; }
-body { background: var(--color-paper); color: var(--color-ink); -webkit-font-smoothing: antialiased; }
-:focus-visible { outline: 3px solid var(--color-navy2); outline-offset: 2px; border-radius: 6px; }
+@theme {
+  --color-paper: #f5f1ea;
+  --color-paper2: #efe8dd;
+  --color-card: #ffffff;
+  --color-ink: #14233d;
+  --color-ink2: #3c4a61;
+  --color-muted: #5f6878;
+  --color-line: rgba(20, 35, 61, 0.14);
+  --color-navy: #1b3d6f;
+  --color-navy2: #2e5a99;
+  /* orange is the text shade: #9a4512 rather than the app's #b4541a, because #b4541a is only 4.4:1
+     on this paper at eyebrow size. orangefill is the bright brand orange, for fills with ink text
+     and decoration only; bg-orange (white text on it) uses fill-orange. */
+  --color-orange: #9a4512;
+  --color-orangefill: #e8792f;
+  --color-crisis: #b3321f;
+  --color-crisisbg: #fbece8;
+  --color-calm: #2f7a5e;
+  --color-ring: #2e5a99;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: "Source Serif 4", "New York", "Iowan Old Style", Georgia, serif;
+
+  /* Six sizes, nothing else: 13 / 15 / 17 / 22 / 32 / display (40 to 56, fluid).
+     Tailwind's named sizes fold onto them, so existing classes keep working. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.45;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.55;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.0625rem;
+  --text-lg--line-height: 1.6;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.3;
+  --text-2xl: 1.375rem;
+  --text-2xl--line-height: 1.3;
+  --text-3xl: 2rem;
+  --text-3xl--line-height: 1.15;
+  --text-4xl: 2rem;
+  --text-4xl--line-height: 1.15;
+  --text-5xl: clamp(2.5rem, 1.75rem + 3vw, 3.5rem);
+  --text-5xl--line-height: 1.05;
+  --text-6xl: clamp(2.5rem, 1.75rem + 3vw, 3.5rem);
+  --text-6xl--line-height: 1.05;
+
+  /* Solid fills that carry white text. Same as the text tokens in light mode,
+     kept dark in dark mode so white on them stays AA. */
+  --color-fill-navy: #1b3d6f;
+  --color-fill-crisis: #b3321f;
+  --color-fill-orange: #b4541a;
+  --color-fill-ink: #14233d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-paper: #0a1426;
+    --color-paper2: #0e1b33;
+    --color-card: #15233f;
+    --color-ink: #eef1f7;
+    --color-ink2: #c3ccdb;
+    --color-muted: #8e9ab0;
+    --color-line: rgba(200, 214, 240, 0.16);
+    --color-navy: #9bbdf0;
+    --color-navy2: #3b6cb3;
+    --color-orange: #f2a46e;
+    --color-orangefill: #e8792f;
+    --color-crisis: #ff8a73;
+    --color-crisisbg: rgba(255, 138, 115, 0.12);
+    --color-calm: #7fd0b0;
+    --color-ring: #9bbdf0;
+
+    --color-fill-navy: #2b5592;
+    --color-fill-crisis: #b3321f;
+    --color-fill-orange: #b4541a;
+    --color-fill-ink: #15233f;
+  }
+}
+
+@layer base {
+  html { color-scheme: light dark; scroll-behavior: smooth; }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-family: var(--font-serif); }
+}
+
+:focus-visible { outline: 3px solid var(--color-ring); outline-offset: 2px; border-radius: 6px; }
+
+@layer utilities {
+  /* Fold the one-off pixel sizes the pages use onto the six steps. */
+  /* Sections filled with ink are dark in both modes, so text on them uses the dark-mode shade. */
+  .bg-ink .text-orange { color: #f2a46e; }
+
+  .text-\[11px\] { font-size: var(--text-xs); }
+  .text-\[14\.5px\], .text-\[15px\], .text-\[15\.5px\] { font-size: var(--text-sm); }
+  .text-\[17px\] { font-size: var(--text-base); }
+  .text-\[22px\] { font-size: var(--text-xl); }
+  .text-\[42px\], .md\:text-\[42px\] { font-size: var(--text-3xl); }
+  .text-\[44px\], .md\:text-\[64px\] { font-size: var(--text-5xl); }
+
+  /* In dark mode navy, crisis, orange and ink become light text colors, so the places that use
+     them as solid fills behind white text keep a dark fill instead. Same class names, no page edits. */
+  @media (prefers-color-scheme: dark) {
+    .bg-navy, .focus\:bg-navy:focus, .hover\:bg-navy:hover { background-color: var(--color-fill-navy); }
+    .border-navy.bg-navy { border-color: var(--color-fill-navy); }
+    .bg-crisis, .hover\:bg-crisis:hover { background-color: var(--color-fill-crisis); }
+    .bg-orange { background-color: var(--color-fill-orange); }
+    .bg-ink { background-color: var(--color-fill-ink); }
+    .border-ink { border-color: var(--color-fill-ink); }
+    .bg-white { background-color: var(--color-card); }
+    .bg-orangefill { color: #1a1208; }
+    .bg-\[\#e6f3ec\] { background-color: rgba(127, 208, 176, 0.12); }
+  }
+}
 
 .orb {
   border-radius: 9999px;
