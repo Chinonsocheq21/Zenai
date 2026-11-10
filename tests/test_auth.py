@@ -16,6 +16,7 @@ def fresh(monkeypatch):
     limits.reset()
     monkeypatch.delenv("RESEND_API_KEY", raising=False)
     monkeypatch.delenv("VERCEL", raising=False)
+    monkeypatch.delenv("PUBLIC_URL", raising=False)
     yield
     auth._migrated.cache_clear()
 
@@ -24,10 +25,21 @@ def client() -> TestClient:
     return TestClient(app, follow_redirects=False)
 
 
+def token_of(link: str) -> str:
+    return link.split("token=", 1)[1]
+
+
+def press(c: TestClient, token: str):
+    """What the button on the sign-in page sends."""
+    return c.post("/auth/verify", data={"token": token})
+
+
 def sign_in(c: TestClient, email="kim@morgan.edu") -> None:
     assert c.post("/auth/start", json={"email": email}).status_code == 200
     link = auth.OUTBOX[-1]["link"]
-    r = c.get(link.replace("http://testserver", ""))
+    page = c.get(link.replace("http://testserver", ""))
+    assert page.status_code == 200 and 'method="post"' in page.text
+    r = press(c, token_of(link))
     assert r.status_code == 303 and r.headers["location"] == "/app/?signin=ok"
 
 
@@ -43,15 +55,16 @@ def test_link_signs_in_once(pg):
     c = client()
     sign_in(c)
     assert c.get("/auth/me").json() == {"signed_in": True, "campus": "morgan.edu", "sync_checkins": False}
-    again = client().get(auth.OUTBOX[-1]["link"].replace("http://testserver", ""))
+    again = press(client(), token_of(auth.OUTBOX[-1]["link"]))
     assert again.headers["location"] == "/app/?signin=expired"
-    assert client().get("/auth/verify?token=made-up").headers["location"] == "/app/?signin=expired"
+    assert press(client(), "made-up").headers["location"] == "/app/?signin=expired"
+    assert client().post("/auth/verify").headers["location"] == "/app/?signin=expired"
 
 
 def test_cookie_is_httponly_and_lax(pg):
     c = client()
     c.post("/auth/start", json={"email": "kim@morgan.edu"})
-    r = c.get(auth.OUTBOX[-1]["link"].replace("http://testserver", ""))
+    r = press(c, token_of(auth.OUTBOX[-1]["link"]))
     cookie = r.headers["set-cookie"].lower()
     assert "httponly" in cookie and "samesite=lax" in cookie and "path=/" in cookie
 
@@ -112,3 +125,78 @@ def test_database_down_is_calm_and_chat_still_works(monkeypatch):
     monkeypatch.setattr(llm, "available", lambda: False)
     r = c.post("/chat", json={"text": "I want to end my life"})
     assert r.status_code == 200 and r.json()["escalate"] is True
+
+
+def test_scanner_opening_the_link_leaves_it_usable(pg):
+    """Safe Links / Proofpoint fetch the link first. That GET must not use the token."""
+    c = client()
+    c.post("/auth/start", json={"email": "kim@morgan.edu"})
+    link = auth.OUTBOX[-1]["link"].replace("http://testserver", "")
+    scanner = client()
+    for _ in range(3):
+        page = scanner.get(link)
+        assert page.status_code == 200 and "set-cookie" not in page.headers
+        assert "Sign in to ZenAI" in page.text and "<script" not in page.text.lower()
+        assert " on" + "click" not in page.text.lower() and "http" not in page.text.split("<body>")[1]
+    assert scanner.get("/auth/me").json()["signed_in"] is False
+    assert press(c, token_of(link)).headers["location"] == "/app/?signin=ok"
+    assert c.get("/auth/me").json()["signed_in"] is True
+
+
+def test_page_does_not_reveal_whether_the_token_is_valid(pg):
+    c = client()
+    c.post("/auth/start", json={"email": "kim@morgan.edu"})
+    real = token_of(auth.OUTBOX[-1]["link"])
+    a, b = client().get(f"/auth/verify?token={real}"), client().get("/auth/verify?token=made-up")
+    assert a.status_code == b.status_code == 200
+    assert a.text.replace(real, "T") == b.text.replace("made-up", "T")
+    assert a.headers["cache-control"] == "no-store"
+    evil = client().get('/auth/verify?token="><b>x')
+    assert '"><b>' not in evil.text and "&quot;&gt;&lt;b&gt;" in evil.text
+
+
+def test_post_signs_in_once(pg):
+    c = client()
+    c.post("/auth/start", json={"email": "kim@morgan.edu"})
+    tok = token_of(auth.OUTBOX[-1]["link"])
+    first, second = press(client(), tok), press(client(), tok)
+    assert first.headers["location"] == "/app/?signin=ok" and "zenai_session" in first.headers["set-cookie"]
+    assert second.headers["location"] == "/app/?signin=expired" and "set-cookie" not in second.headers
+
+
+def test_post_from_another_site_is_refused(pg):
+    c = client()
+    c.post("/auth/start", json={"email": "kim@morgan.edu"})
+    tok = token_of(auth.OUTBOX[-1]["link"])
+    r = client().post("/auth/verify", data={"token": tok}, headers={"Origin": "https://evil.example"})
+    assert r.headers["location"] == "/app/?signin=expired" and "set-cookie" not in r.headers
+    assert press(client(), tok).headers["location"] == "/app/?signin=ok"   # still usable by the student
+
+
+def test_forged_host_does_not_change_the_emailed_link(pg, monkeypatch):
+    monkeypatch.setenv("PUBLIC_URL", "https://zenai-app.vercel.app/")
+    c = client()
+    c.post("/auth/start", json={"email": "kim@morgan.edu"}, headers={"Host": "evil.example"})
+    link = auth.OUTBOX[-1]["link"]
+    assert link.startswith("https://zenai-app.vercel.app/auth/verify?token=") and "evil" not in link
+
+
+def test_unset_public_url_only_trusts_local_requests(pg, monkeypatch):
+    c = client()
+    c.post("/auth/start", json={"email": "kim@morgan.edu"})
+    assert auth.OUTBOX[-1]["link"].startswith("http://testserver/auth/verify?token=")   # on this machine
+    c.post("/auth/start", json={"email": "lee@morgan.edu"},
+           headers={"Host": "evil.example", "X-Forwarded-For": "203.0.113.9"})        # via a tunnel/proxy
+    assert auth.OUTBOX[-1]["link"].startswith("https://zenai-app.vercel.app/auth/verify?token=")
+
+
+def test_hosted_without_public_url_uses_the_production_address(pg, monkeypatch):
+    import httpx
+
+    sent = []
+    monkeypatch.setenv("VERCEL", "1")
+    monkeypatch.setenv("RESEND_API_KEY", "re_test")
+    monkeypatch.setattr(httpx, "post", lambda url, json, headers, timeout: sent.append(json) or
+                        httpx.Response(200, json={"id": "x"}, request=httpx.Request("POST", url)))
+    client().post("/auth/start", json={"email": "kim@morgan.edu"}, headers={"Host": "evil.example"})
+    assert "https://zenai-app.vercel.app/auth/verify?token=" in sent[0]["text"] and "evil" not in sent[0]["text"]

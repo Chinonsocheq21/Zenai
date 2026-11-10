@@ -30,7 +30,7 @@ def fresh(monkeypatch):
 def signed_in() -> TestClient:
     c = TestClient(app, follow_redirects=False)
     c.post("/auth/start", json={"email": "kim@morgan.edu"})
-    c.get(auth.OUTBOX[-1]["link"].replace("http://testserver", ""))
+    c.post("/auth/verify", data={"token": auth.OUTBOX[-1]["link"].split("token=", 1)[1]})
     return c
 
 
