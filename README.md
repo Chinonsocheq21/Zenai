@@ -1,165 +1,226 @@
 # ZenAI
 
-**Project site:** https://zenai.unv.run
+**A support chat that stays inside the protocol.**
 
+ZenAI is a support chat for university students, grounded in Acceptance and
+Commitment Therapy (ACT). Every reply is checked against the protocol before the
+student sees it, and a student in a crisis is handed off to people (988 and the
+campus counseling center) instead of being answered by a model. ZenAI is not a
+counselor and not therapy. It is a self-help tool that escalates.
 
-**An AI counselor that stays inside the protocol.**
+Built by Morgan State University computer science students as a senior capstone
+(COSC 490, Fall 2026).
 
-COSC 490 — Senior Capstone, Morgan State University, Fall 2026.
-Project 5: *"Develop an model for psychological counseling."*
-Group 3 — Abraham Irabor · Fnu Soh Tah Fon · Chinonso Egeolu
+## Try it
 
----
+ZenAI is live at **https://zenai-app.vercel.app**
 
-## What's in this folder
-
-Everything for ZenAI lives here. Open the files in the left column directly —
-the right column is the source they are built from.
-
-| Open this | Built from | What it is |
-|---|---|---|
-| `presentations/ZenAI-Midterm-Oct15.pptx` | `presentations/midterm-oct15.json` | The Oct 15 deck, 7 slides, **with speaker notes**. Slide 3 carries the rendered architecture diagram. |
-| `docs/ZenAI-Build-Plan.docx` | `docs/build-plan.md` | The full plan, Sep 30 → Dec 3 — scope, the three experiments, who owns what, the schedule. |
-| `docs/diagrams/*.png` | `docs/diagrams.md` | The four flowcharts as images: architecture, one-turn sequence, data model, timeline. Drop straight into a slide or a report. |
-| `docs/ZenAI-Diagrams-Source.docx` | `docs/diagrams.md` | The Mermaid source to paste into Lucidchart. |
-| `design/screens.html` | — | The five UI screens. **Double-click to open in a browser.** Also live at `https://zenai-screens.unv.run`. |
-| `design/screens-preview.png` | — | The same five screens as one image. |
-
-Then the project itself:
-
-| | |
+| Address | What it is |
 |---|---|
-| `src/zenai/` | The application — agents, API, database models |
-| `training/` | The classifiers. **This is the midterm.** |
-| `tests/` | What runs in CI |
-| `tools/build_deliverables.py` | Rebuilds the .pptx and .docx from their sources |
+| https://zenai-app.vercel.app/ | The site: how it works, safety, privacy, for universities |
+| https://zenai-app.vercel.app/app/ | The student app (installable on a phone) |
+| https://zenai-app.vercel.app/api/ | The API the app talks to (`/api/chat`, `/api/health`, ...) |
 
-### Regenerating the documents
+No account is needed to chat. Signing in (with a Morgan email) is optional and
+only exists so check-ins can sync between devices. "Get help now" in the app's
+header shows the crisis numbers at any time.
 
-Edit the **source** (the `.json` or `.md`), never the `.pptx` or `.docx` —
-those are build output and get overwritten.
+## How a message moves
 
-```bash
-pip install python-pptx python-docx
-python3 tools/build_deliverables.py
-```
+One turn is eight stages, in this order (`src/zenai/agents/turn.py`). The order
+is the safety design.
 
-### Re-rendering the diagrams
+1. **Privacy.** Names, emails, phone numbers, student ID numbers, links and
+   handles are removed (`agents/privacy.py`). Only the redacted text is used
+   from here on.
+2. **Crisis.** Patterns and conversation rules first (`models/crisis.py`): an
+   earlier crisis sign in the conversation, a heavy check-in, or a recent
+   hand-off in the same session all raise the risk. If that escalates, the turn
+   stops and no model ever sees the message. Otherwise a fast model screen reads
+   the recent conversation for indirect risk (`models/crisis_screen.py`). It can
+   only raise risk, never lower it. Escalation means a hand-off, never a reply.
+3. **Mood.** A small distress classifier reads how the message lands
+   (`models/distress.py`, plain numbers in `models/distress/`).
+4. **Route.** A focus is picked: Academic Stress, Stress-Relief, Wellness
+   Schedule or Resource & Referral (`agents/specialists.py`). A model routes,
+   with rules as the instant fallback.
+5. **Memory.** Notes the student chose to keep, sent from their own device.
+   Off unless the student turns it on.
+6. **Conversation.** The language model (xAI's Grok) drafts an ACT-consistent
+   reply (`agents/conversation.py`).
+7. **Fidelity.** The Fidelity Monitor checks the draft for the three moves a
+   counselor is taught not to make: advice, reassurance and diagnosis
+   (`models/fidelity.py`). A drift detector flags sentences, a second model
+   opinion can overturn a flag, and some phrases are never sent whatever the
+   second opinion says. A rejected draft is rewritten with the reason, up to
+   two times, then a protocol-safe fallback question is sent instead.
+8. **Send.** The checked reply goes to the student.
 
-Edit `docs/diagrams.md`, then paste the block into Lucidchart
-(Insert → Diagram as code → Mermaid) or re-render to PNG with any Mermaid tool.
+The whole turn has a 45 second deadline (Vercel stops a function at 60). Past
+the crisis check, a turn that runs out of time sends the safe fallback, never
+an unchecked draft.
 
----
+## Safety design
 
-## The idea
+- **Crisis first, before anything that could refuse.** `/api/chat` runs the
+  rules-only crisis check before the usage limit, the class code or the model
+  (`api/routes/chat.py`). Over the limit, no model key, model down, or an
+  unexpected error: a crisis message still gets the hand-off.
+- **The app checks too.** The student app carries the explicit crisis patterns
+  itself (`student/crisis-rules.js`, generated from `models/crisis.py`), so the
+  hand-off works with no network at all. Campus numbers are built in.
+- **No text box during a hand-off.** ZenAI does not try to talk anyone down. It
+  shows 988 and the Morgan Counseling Center, with numbers from a verified list
+  (`config.py`, `agents/resources.py`), never from the model.
+- **After a hand-off**, if the student chooses "I'm safe, take me back", any
+  warning sign for the rest of the session hands off again.
+- **The monitor cannot be switched off from outside.** The `monitor: false`
+  switch exists only for the E1 experiment and is honoured only on the
+  researcher's own machine, never on the hosted service.
+- **Errors never leak words.** `api/errors.py` logs the route, error type and
+  location only: no message, no body, no headers.
+- **Usage limits** per device and a global daily cap (`api/limits.py`), kept in
+  Redis when hosted and in memory otherwise. If Redis errors or is slow, the
+  limits fall back to memory, and the crisis check runs before any limit.
 
-The known failure mode of an LLM counselor is **therapeutic drift**: under
-pressure it starts giving advice, reassuring, or quietly diagnosing — the three
-things a trained counselor is specifically taught *not* to do. Woebot, Wysa,
-Youper, Replika and Ash all control for this with prompt instructions and hope.
-None of them score each response against the protocol and refuse to send it when
-it drifts. None publish a drift rate, or a crisis-detection recall number.
+## Privacy
 
-ZenAI does both. Every candidate reply is scored against the six ACT processes —
-acceptance, defusion, present-moment contact, self-as-context, values, committed
-action — plus a detector for the three prohibited moves. A reply that drifts is
-rejected and regenerated, and every score is logged.
+What is **not** stored by ZenAI:
 
-**ZenAI is not a counselor and never claims to be.** It is a support tool that
-escalates. The crisis rail runs *before* any therapy content is generated.
+- Messages and replies. The hosted server uses the redacted text to write a
+  reply, then keeps nothing. The research log (`data/turns.jsonl`) is written
+  only on the researcher's laptop, never on Vercel.
+- Email addresses. An account is a keyed hash of the email
+  (`db/store.py`), so the account table can't be turned back into a list of
+  who uses ZenAI.
+- Message text in logs, analytics or error reports. Web Analytics counts page
+  views only, with no cookies, and each address is cut to its path first
+  (`student/analytics.js`).
+
+What **is** stored, and where:
+
+| What | Where | How long |
+|---|---|---|
+| Sign-in links and sessions, as SHA-256 hashes | Neon Postgres | 15 minutes / 30 days |
+| Check-ins (a day and a level), only if the student signed in and turned syncing on | Neon Postgres | Until syncing is turned off or the account is deleted |
+| Weekly campus counts (messages, conversations, hand-offs, starting check-in, focus), no text, no who | Neon Postgres | Kept as weekly totals; any count under 10 is shown as hidden |
+| Pilot requests typed in by staff | Neon Postgres | Until the pilot conversation ends |
+| Usage counters, keyed by a hashed device id | Upstash Redis | About a day |
+| Conversation, check-ins and memory notes, only if turned on | The student's own browser | Until deleted in the app's Privacy screen |
+
+Who else processes data: xAI receives the redacted message, recent
+conversation and any saved memory notes to draft and check replies. Zero data
+retention has not been confirmed on ZenAI's xAI account, so assume xAI may keep
+that redacted text for a time. Microsoft's speech service receives reply text
+(never the student's message) when voice is on. Vercel hosts, Upstash keeps
+counters, Neon is the database, Resend sends sign-in emails. The full policy is
+at https://zenai-app.vercel.app/privacy/.
 
 ## Architecture
 
-Ten agents in four tiers — see `docs/diagrams.md` (Mermaid, paste into Lucidchart).
+```
+browser (site at /, app at /app/)
+   |  static files from Vercel's CDN (Next.js export + the app)
+   v
+/api/*  ->  one Python function (api/index.py mounts the FastAPI app under /api)
+              |-- xAI Grok: drafts, second opinion, routing, crisis screen
+              |-- Upstash Redis: usage limits (falls back to memory)
+              |-- Neon Postgres: accounts, synced check-ins, campus counts, pilot requests
+              '-- Resend: sign-in and pilot emails
+```
 
-- **Tier 0 · every turn** — Privacy → Crisis & Safety. Risk detected → escalate, stop.
-- **Tier 1 · core loop** — Orchestrator → Mood Check-In → Memory → Conversation → **Fidelity Monitor**
-- **Tier 2 · routed** — Academic Stress · Stress-Relief · Wellness Schedule · Resource & Referral
-- **Tier 3 · longitudinal** — Progress
+- The site (`web/`) is Next.js 16 with `output: "export"`: plain static files.
+- The student app (`src/zenai/student/`) is a single HTML page with no build
+  step. Locally the API serves it at `/student/`; on Vercel it is copied to
+  `/app/`.
+- The API (`src/zenai/api/`) is FastAPI. The two small models run from plain
+  numbers in `models/*/*.json.gz` (`models/linear.py`), so the hosted function
+  needs no scikit-learn, numpy or torch.
+- Chat depends on nothing but the function itself and the model. The database
+  and Redis are optional: when they are down, features that need them degrade
+  and chat continues.
 
-## The console
+Hosting and operations: [`docs/hosting.md`](docs/hosting.md).
 
-The working frontend. It sends a message through the real pipeline on your
-machine and shows each stage of the turn as it runs.
+## Run it locally
 
 ```bash
-./setup.sh                                                   # once
+./setup.sh                                   # once: virtualenv and dependencies
+echo "XAI_API_KEY=..." > .env                # your own key; without it only the crisis path answers
 PYTHONPATH=src .venv/bin/uvicorn zenai.api.main:app --port 8000
 ```
 
-Open **http://127.0.0.1:8000**. The raw API is still at `/docs`.
+Then open http://127.0.0.1:8000/student/ for the student app,
+http://127.0.0.1:8000/app/ for the console that draws each stage of a turn,
+and http://127.0.0.1:8000/workflow/ for the live pipeline viewer. A database is
+not needed to chat; set `ZENAI_DATABASE_URL` to try accounts.
 
-What it shows is exactly what runs, and nothing more. Privacy, the crisis check
-and the mood model are live. Memory, the Conversation Agent, the Fidelity
-Monitor and sending a reply are drawn in gold as **not built yet** — the API's
-`trace` reports them that way, and the console draws the trace. When the crisis
-rail trips, every later stage is skipped and the text box disappears.
-
-The crisis hand-off shows the Morgan Counseling Center (443-885-3130, weekdays
-8:30–5) and Morgan's 24/7 crisis line (1-800-422-0009), both verified on
-morgan.edu on 2026-10-15. Override with `CAMPUS_COUNSELING_PHONE` in `.env`.
-
-![console](docs/console/02-crisis.png)
-
-## Running it
-
-**First time on a new machine:** `./setup.sh` — makes the virtualenv, installs
-everything (including the two pins that are not optional, see below) and fetches
-the training data. Docker not required; works on macOS system Python 3.9.
+Tests:
 
 ```bash
-cp .env.example .env
-docker compose up
-curl localhost:8000/health        # {"db":"ok","redis":"ok","models":"..."}
+.venv/bin/python -m pytest -q                          # API, turn, crisis, accounts (throwaway Postgres)
+cd web && npm run build && npx playwright test         # the site, on phone, tablet and laptop sizes
 ```
 
-API docs: http://localhost:8000/docs — **this is the midterm UI.** No front end
-before Oct 15; the rubric says GUI does not count at this stage.
+`tests/test_crisis_context.py` covers the crisis rail and must stay green.
 
-## The models
+## Project layout
 
-| | What | Where |
-|---|---|---|
-| **1 · Distress** | 6-class classifier over GoEmotions + EmpatheticDialogues | `training/train_distress.py` |
-| **2 · Crisis** | Risk classifier, **recall-optimised**, lexicon floor | `src/zenai/models/crisis.py` |
-| **3 · Fidelity — drift** | Detects advice and reassurance in a candidate reply, sentence by sentence. ESConv, split by conversation: macro-F1 **0.590** vs 0.269 baseline | `training/train_drift.py` |
-| **3b · Fidelity — ACT processes** | Scores replies against the six ACT processes; needs the written protocol | — |
-
-> **Two dependency pins that are not optional.** `numpy<2`, because the torch
-> wheels that still support Python 3.9 were built against the NumPy 1.x C API and
-> NumPy 2 makes every tensor→array call fail with *"Failed to initialize NumPy:
-> _ARRAY_API not found"* — which shows up as a **silent exit, not an error**.
-> And `accelerate>=0.26`, without which `Trainer` refuses to start. `setup.sh`
-> handles both.
-
-```bash
-.venv/bin/python -m training.datasets                        # class balance first
-.venv/bin/python -m training.train_distress --baseline       # TF-IDF, seconds
-.venv/bin/python -m training.train_distress                  # distilroberta, ~15 min CPU
-.venv/bin/python -m training.train_distress --no-supplement  # the ablation
-.venv/bin/python -m training.train_drift           # the Fidelity Monitor's drift detector
-```
-
-**Read `training/taxonomy.py` before training.** Two of the six classes
-(`overwhelm`, `isolation`) have no clean GoEmotions source. That is documented,
-not hidden, and the supplement that fixes it is a real contribution.
-
-**`training/crisis_threshold.py` makes the argument that carries the grade:** a
-missed crisis and a false alarm are not the same error, so the threshold is
-chosen by a recall constraint, not by F1 — and we state what precision we paid.
-
-## Who owns what
-
-| | Owns |
+| Path | What it is |
 |---|---|
-| **Chinonso** | Orchestrator · infra · DB · CI · **Fidelity Monitor** · Conversation Agent · **the ACT protocol** (`docs/protocol.md`) · Memory · Privacy |
-| **Soh** | Distress classifier · data · eval · Mood Check-In · Progress |
-| **Abraham** | **Crisis & Safety** · risk classifier · escalation · Referral |
+| `api/index.py` | Vercel entry point: mounts the app under `/api` |
+| `src/zenai/agents/` | The turn and its stages: privacy, conversation, specialists, resources |
+| `src/zenai/models/` | Crisis patterns and screen, distress classifier, Fidelity Monitor |
+| `src/zenai/api/` | FastAPI app, routes, limits, error handling |
+| `src/zenai/db/store.py` | Accounts storage and migrations |
+| `src/zenai/student/` | The student app |
+| `src/zenai/web/`, `workflow/`, `audit/`, `present/` | Laptop tools: console, pipeline viewer, audit and class-demo pages |
+| `web/` | The public site (Next.js static export) and its Playwright tests |
+| `models/` | Exported model weights the function loads |
+| `training/` | Training and evaluation scripts (E1, red team, crisis threshold) |
+| `results/` | Evaluation output, misses included |
+| `tests/` | pytest suite |
+| `tools/smoke.py` | Smoke test against a deployed URL |
+| `docs/` | Build plan, ACT protocol, diagrams, hosting |
+| `vercel.json`, `.vercelignore`, `requirements.txt` | What Vercel builds and installs |
 
-Branch → PR → one approval → merge. Every artifact carries every name and a
-one-line "who did what" — the course grades individually.
+## Results
 
-## Before the demo
+All numbers link to files in `results/`. They are early and small, and we
+report the misses.
 
-- [ ] Seed the database and cache model outputs so the demo runs offline
-- [ ] Use synthetic text for the crisis demo, and say out loud that it is synthetic
+**E1, does the Fidelity Monitor reduce drift?** (`results/e1/e1-v2/result.json`)
+79 student messages, each answered with the monitor on and off, 158 replies,
+rated blind.
+
+| Rater | Monitor off | Monitor on |
+|---|---|---|
+| GPT (AI) | 6 of 79 drifted | 0 of 79 |
+| Claude (AI) | 0 of 79 drifted | 0 of 79 |
+| Human (in progress, 49 of 158 marked) | 13 of 28 drifted | 7 of 21 |
+
+Both AI raters found 0 protocol breaks in 79 replies with the monitor on. But
+the Claude rater also found 0 with it off, so it can't tell the conditions
+apart, and the GPT rater's difference rests on 6 replies. The human marking so
+far is stricter than either AI rater and agrees with them poorly (Cohen's kappa
+0.0 and 0.12). Human review is in progress; until it finishes, treat E1 as
+unsettled.
+
+**Red team** (`results/redteam/`). Messages written by other models to break
+ZenAI, judged by a separate auditor model (GPT), never by Grok.
+
+- First run: 36 of 48. Hidden crises were the weak spot: 1 of 6 single-message
+  and 0 of 6 across a conversation were caught. That led to conversation
+  memory for crisis signs and the model screen.
+- Held-out set written after the fixes, nothing tuned on it: 38 of 40,
+  including 10 of 10 hidden crises. Ten cases is a small set. The two misses (a
+  7-digit student number that survived redaction, since fixed, and one reply
+  flagged as advice) are written up in `results/redteam/README.md`.
+- Everyday false alarms: 0 of 100 ordinary student messages escalated.
+
+**Speed** (`results/speed_eval.json`): median reply 2.4 s with the draft model
+in use, against 8.4 s for the larger model, with no more drift on 40 messages.
+
+## Team
+
+Abraham Irabor, Fnu Soh Tah Fon, Chinonso Egeolu.
