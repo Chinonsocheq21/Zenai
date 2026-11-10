@@ -39,11 +39,11 @@ const RESULTS = [
 ];
 
 const SCREENS = [
-  ["checkin-first.jpg", "It starts by asking how heavy today is."],
-  ["02-chat.jpg", "Then it listens and reflects back what it heard."],
-  ["03-resources.jpg", "Ask where to get help: verified Morgan offices, never invented."],
-  ["07-crisis.jpg", "When it matters most, it stops and hands you to a person."],
-];
+  ["checkin-first.webp", "It starts by asking how heavy today is.", 856],
+  ["02-chat.webp", "Then it listens and reflects back what it heard.", 844],
+  ["03-resources.webp", "Ask where to get help: verified Morgan offices, never invented.", 844],
+  ["07-crisis.webp", "When it matters most, it stops and hands you to a person.", 844],
+] as const;
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange">{children}</p>;
@@ -109,10 +109,10 @@ export default function Home() {
           <Eyebrow>The app</Eyebrow>
           <h2 className="mt-3 font-serif text-3xl md:text-[42px]">On your phone or your laptop.</h2>
           <div className="mt-10 grid grid-cols-2 gap-5 md:grid-cols-4">
-            {SCREENS.map(([img, cap]) => (
+            {SCREENS.map(([img, cap, h]) => (
               <figure key={img}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={`/media/${img}`} alt={cap} loading="lazy" className="w-full rounded-[28px] border-[6px] border-ink shadow-xl shadow-ink/15" />
+                <img src={`/media/${img}`} alt={cap} width={390} height={h} loading="lazy" decoding="async" className="h-auto w-full rounded-[28px] border-[6px] border-ink shadow-xl shadow-ink/15" />
                 <figcaption className="mt-3 text-sm leading-snug text-ink2">{cap}</figcaption>
               </figure>
             ))}
@@ -198,8 +198,16 @@ export default function Home() {
       <section id="film" className="mx-auto max-w-4xl px-5 py-10 text-center">
         <Eyebrow>The film</Eyebrow>
         <h2 className="mt-3 font-serif text-3xl md:text-[42px]">ZenAI in a minute.</h2>
-        <video className="mt-8 w-full rounded-3xl border border-line shadow-2xl shadow-ink/20" src="/media/zenai-film.mp4"
-          poster="/media/film-poster.jpg" controls preload="none" playsInline />
+        <video className="mt-8 h-auto w-full rounded-3xl border border-line shadow-2xl shadow-ink/20" src="/media/zenai-film.mp4"
+          poster="/media/film-poster.webp" width={1280} height={720} controls preload="none" playsInline>
+          <track kind="captions" srcLang="en" label="English" src="/media/zenai-film.en.vtt" default />
+        </video>
+        <p className="mt-4 text-sm text-ink2">
+          Captions are on by default.{" "}
+          <a href="/media/zenai-film-transcript.txt" className="font-semibold text-navy underline underline-offset-4 hover:text-orange">
+            Read the transcript
+          </a>
+        </p>
       </section>
 
       {/* closing call */}
