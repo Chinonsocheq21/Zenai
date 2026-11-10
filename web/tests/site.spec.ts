@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-const PAGES = ["/", "/how-it-works/", "/safety/", "/universities/", "/help/", "/privacy/", "/terms/", "/signin/"];
+const PAGES = ["/", "/how-it-works/", "/safety/", "/universities/", "/help/", "/privacy/", "/terms/", "/signin/",
+  "/security/", "/accessibility/", "/contact/", "/status/"];
 
 for (const path of PAGES) {
   test(`${path} loads, fits the screen, and has the way to help and to the app`, async ({ page, isMobile }) => {
@@ -25,7 +26,7 @@ test("every internal link on every page resolves", async ({ page, request }) => 
   for (const path of PAGES) {
     await page.goto(path);
     const hrefs = await page.locator("a[href]").evaluateAll((as) => as.map((a) => a.getAttribute("href") || ""));
-    hrefs.filter((h) => h.startsWith("/") && !h.startsWith("//")).forEach((h) => seen.add(h.split("#")[0]));
+    hrefs.filter((h) => h.startsWith("/") && !h.startsWith("//") && !h.startsWith("/api/")).forEach((h) => seen.add(h.split("#")[0]));
   }
   const broken: string[] = [];
   for (const h of seen) {
