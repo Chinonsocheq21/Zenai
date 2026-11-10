@@ -1,5 +1,16 @@
 import Link from "next/link";
+import { pageMeta } from "@/components/meta";
 import Orb from "@/components/Orb";
+
+export const metadata = {
+  ...pageMeta(
+    "/",
+    "ZenAI",
+    "A support chat for Morgan State students, grounded in Acceptance and Commitment Therapy. Every reply is checked before a student sees it, and a crisis is handed to a person.",
+    "ZenAI · A place to slow down for a minute",
+  ),
+  title: { absolute: "ZenAI · A place to slow down for a minute" },
+};
 
 const MOVES = [
   { name: "Advice", bad: "Try breaking your notes into 25-minute blocks.", good: "What would a small step look like, for you?" },
@@ -12,14 +23,14 @@ const STAGES = [
   ["Crisis check", "Reads the whole conversation and today's check-in. If there is risk, the turn stops and 988 and the Counseling Center take over."],
   ["Mood", "A distress classifier reads how the message lands."],
   ["Route", "Picks a focus: Academic Stress, Stress-Relief, Wellness Schedule, or Resource and Referral."],
-  ["Memory", "Only notes the student chose to keep, stored on their own device."],
+  ["Memory", "Only notes the student chose to keep, stored on their own device and sent with the message."],
   ["Draft", "The reply is written on the ACT protocol: reflect, notice, values, one open question."],
   ["Fidelity Monitor", "A trained detector, a second opinion, and phrases that can never be sent. A drifting draft is rewritten."],
   ["Send", "Only a reply that passed. If every rewrite drifts, a fixed protocol-safe line goes instead."],
 ];
 
 const RESULTS = [
-  { big: "0 of 79", what: "replies broke the protocol with the Fidelity Monitor on", how: "Experiment E1, rated blind by two independent AI models against the written protocol. Human marking in progress." },
+  { big: "0 of 79", what: "replies flagged as breaking the protocol with the Fidelity Monitor on", how: "Experiment E1: two independent AI raters marked the replies blind against the written protocol. With the monitor off, one rater flagged 6 of 79 and the other 0 of 79, so this test does not yet show how much the monitor adds. Human review is in progress." },
   { big: "10/10", what: "hidden crises caught on a held-out test set", how: "Indirect and multi-message risk. Keyword rules alone caught 1 of 12 before the conversation-aware check." },
   { big: "0/100", what: "false alarms on everyday student messages", how: "Plus 0 of 11 on hyperbole like \"this exam is killing me\"." },
   { big: "38/40", what: "attacks handled on a held-out red-team set", how: "Jailbreaks, \"just tell me I'll pass\", \"do I have ADHD?\", prompt injection, privacy." },
@@ -56,6 +67,10 @@ export default function Home() {
               <a href="/app/" className="rounded-full bg-navy px-6 py-3.5 font-semibold text-white shadow-lg shadow-navy/20 hover:bg-navy2">Try ZenAI</a>
               <Link href="/how-it-works/" className="rounded-full border border-line bg-card px-6 py-3.5 font-semibold text-ink hover:border-navy/40">How it works</Link>
             </div>
+            <p className="mt-5 text-[15px] text-ink2">
+              Work at a counseling center or in student affairs?{" "}
+              <Link href="/universities/" className="font-semibold text-navy underline">See what a pilot looks like</Link>.
+            </p>
             <p className="mt-6 text-sm text-muted">
               Free for students. No sign-up needed to try it. ZenAI is not a counselor. In crisis, call or text{" "}
               <a href="tel:988" className="font-semibold text-crisis underline">988</a>.
@@ -157,8 +172,25 @@ export default function Home() {
         <div className="rounded-3xl border border-line bg-card p-8">
           <Eyebrow>Privacy</Eyebrow>
           <h2 className="mt-3 font-serif text-3xl">Nothing is kept unless you say so.</h2>
-          <p className="mt-4 text-ink2">Memory, check-in history and the conversation are all off by default. What you choose to keep stays on your device, and one tap deletes it. Nothing is shared with the university.</p>
+          <p className="mt-4 text-ink2">Memory, check-in history and the conversation are all off by default. What you choose to keep stays on your device, and one tap deletes it. Your university never sees what you write or who you are. If your campus runs a pilot, it sees weekly totals only, and any number under 10 is hidden.</p>
           <Link href="/privacy/" className="mt-6 inline-block font-semibold text-navy hover:underline">Read the privacy policy →</Link>
+        </div>
+      </section>
+
+      {/* for counseling centers */}
+      <section aria-labelledby="centers" className="mx-auto max-w-6xl px-5 pb-6">
+        <div className="flex flex-col gap-5 rounded-3xl border border-navy/20 bg-card p-8 md:flex-row md:items-center md:justify-between">
+          <div className="max-w-2xl">
+            <Eyebrow>For counseling centers</Eyebrow>
+            <h2 id="centers" className="mt-3 font-serif text-3xl">Support between appointments, handed back to your staff.</h2>
+            <p className="mt-3 text-ink2">
+              ZenAI runs alongside your center, never instead of it. Pilots are free while ZenAI is in development, and your
+              team sees anonymous weekly trends, never a student's words.
+            </p>
+          </div>
+          <Link href="/universities/" className="shrink-0 self-start rounded-full bg-navy px-6 py-3.5 font-semibold text-white hover:bg-navy2 md:self-center">
+            For counseling centers
+          </Link>
         </div>
       </section>
 
@@ -176,7 +208,7 @@ export default function Home() {
           <Orb size={72} />
           <h2 className="font-serif text-3xl md:text-5xl">Take a minute for yourself.</h2>
           <p className="max-w-xl text-white/75">Free, private by default, and on any phone or laptop. Add it to your home screen and it opens like an app.</p>
-          <a href="/app/" className="rounded-full bg-orange px-7 py-3.5 font-semibold text-white hover:brightness-110">Try ZenAI</a>
+          <a href="/app/" className="rounded-full bg-orangefill px-7 py-3.5 font-semibold text-ink hover:brightness-110">Try ZenAI</a>
         </div>
       </section>
     </>

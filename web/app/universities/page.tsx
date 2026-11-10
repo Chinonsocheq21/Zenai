@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
+import { pageMeta } from "@/components/meta";
 import PilotForm from "./PilotForm";
 
-export const metadata: Metadata = {
-  title: "For universities",
-  description: "A between-appointments support chat that hands students to your counseling center, with a safety rail you can audit.",
-};
+export const metadata = pageMeta(
+  "/universities/",
+  "For universities",
+  "A between-appointments support chat that hands students to your counseling center, with a safety rail you can audit. Pilots are free while ZenAI is in development.",
+  "ZenAI for counseling centers and universities",
+);
 
 const GIVES = [
   ["A first step at 2 a.m.", "Students can put what they're carrying into words any time, in a calm voice that never diagnoses, advises or promises it will be fine."],
@@ -36,7 +38,8 @@ export default function Universities() {
         <h1 className="mt-3 max-w-3xl font-serif text-4xl leading-tight md:text-6xl">Support between appointments, with a safety rail you can audit.</h1>
         <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink2">
           ZenAI gives students somewhere calm to turn when the counseling center is closed or booked, and it knows when to
-          stop and send them to you. It was built and tested at Morgan State University.
+          stop and send them to you. It was built by Morgan State computer science students as a senior capstone, and
+          tested with Morgan's verified resources.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
           <a href="#pilot" className="rounded-full bg-navy px-6 py-3.5 font-semibold text-white hover:bg-navy2">Request a pilot</a>
@@ -67,9 +70,10 @@ export default function Universities() {
         <div className="rounded-3xl bg-ink p-7 text-white">
           <h2 className="font-serif text-3xl">The evidence, in the open</h2>
           <p className="mt-3 text-white/75">
-            0 of 79 replies broke the protocol with the checks on, rated blind by two independent AI models. 10 of 10
-            hidden crises caught on a held-out set, with 0 false alarms on 100 everyday messages. Human review is in
-            progress.
+            In a blind test, two independent AI raters found no protocol breaks in 79 replies with the Fidelity Monitor
+            on. With it off, one rater flagged 6 of 79 and the other none, so the test does not yet show how much the
+            monitor adds. Human review of the same replies is in progress, and we will publish it whatever it shows. 10
+            of 10 hidden crises were caught on a held-out set, with 0 false alarms on 100 everyday messages.
           </p>
           <a href="https://github.com/Chinonsocheq21/Zenai/tree/main/results" className="mt-5 inline-block font-semibold text-[#f6b48a] hover:underline">Read the results and the misses →</a>
         </div>
@@ -87,6 +91,11 @@ export default function Universities() {
           ))}
         </ol>
         <p className="mt-5 text-ink2">Pilots are free while ZenAI is in development. ZenAI is not a clinical service, and a pilot runs alongside your center, never instead of it.</p>
+        <p className="mt-3 text-ink2">
+          For your IT and accessibility reviewers: <Link href="/security/" className="font-semibold text-navy underline">Security and subprocessors</Link>,{" "}
+          <Link href="/privacy/" className="font-semibold text-navy underline">Privacy</Link> and the{" "}
+          <Link href="/accessibility/" className="font-semibold text-navy underline">Accessibility statement</Link>.
+        </p>
       </section>
 
       <section id="pilot" className="mx-auto max-w-3xl scroll-mt-24 px-5 pt-14">

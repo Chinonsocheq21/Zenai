@@ -7,14 +7,17 @@
   --color-card: #fffdf9;
   --color-ink: #14203a;
   --color-ink2: #46516a;
-  --color-muted: #7c8599;
+  --color-muted: #5f6878;
   --color-line: #e5ddcf;
   --color-navy: #1b3d6f;
   --color-navy2: #2b5a9a;
-  --color-orange: #e8742e;
+  /* orange is the darker shade, safe for text and for white text on it (WCAG AA);
+     orangefill is the bright brand orange, for fills with ink text and decoration only */
+  --color-orange: #b4541a;
+  --color-orangefill: #e8742e;
   --color-crisis: #b23a2a;
   --color-crisisbg: #fbece8;
-  --color-calm: #2f7d62;
+  --color-calm: #27694f;
   --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
   --font-serif: "New York", "Iowan Old Style", Georgia, serif;
 }

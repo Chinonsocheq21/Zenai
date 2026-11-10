@@ -1,0 +1,7 @@
+# How to report a security problem in ZenAI.
+# Please do not include any student's personal information in a report.
+Contact: https://zenai-app.vercel.app/contact/
+Policy: https://zenai-app.vercel.app/security/
+Canonical: https://zenai-app.vercel.app/.well-known/security.txt
+Preferred-Languages: en
+Expires: 2027-11-01T00:00:00.000Z
