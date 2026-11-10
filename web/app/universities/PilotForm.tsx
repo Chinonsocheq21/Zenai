@@ -9,6 +9,8 @@ const FIELDS = [
   { id: "role", label: "Your role", type: "text", auto: "organization-title", required: false },
 ] as const;
 
+const CALM = "Something went wrong on our side and your request didn't go through. Please try again later; your details are still in the form.";
+
 export default function PilotForm() {
   const [state, setState] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState("");
@@ -21,10 +23,10 @@ export default function PilotForm() {
       const r = await fetch("/api/pilot", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
       if (r.ok) return setState("sent");
       const d = await r.json().catch(() => ({}));
-      setError(d.detail?.message || (r.status === 422 ? "Please check the fields and try again." : "That didn't work. Try again in a minute."));
+      setError(r.status === 422 || r.status === 429 ? d.detail?.message || "Please check the fields and try again." : CALM);
       setState("error");
     } catch {
-      setError("That didn't work. Check your connection and try again.");
+      setError("We couldn't reach our server. Please check your connection and try again later. Nothing you typed was lost, it's still in the form.");
       setState("error");
     }
   }
@@ -33,7 +35,8 @@ export default function PilotForm() {
     return (
       <div role="status" className="rounded-3xl border border-line bg-card p-8 text-center">
         <p className="font-serif text-2xl">Thank you.</p>
-        <p className="mt-2 text-ink2">We've received your request and will reply to the email you gave.</p>
+        <p className="mt-2 text-ink2">We've received your request.</p>
+        <p className="mt-4 text-ink2">What happens next: we'll reply within two business days to the email you gave.</p>
       </div>
     );
   }
