@@ -129,7 +129,7 @@ def score_risk(text: str) -> float:
 
 
 def assess(text: str, earlier: list[str] | None = None, checkin: str | None = None,
-           screen: bool = True) -> dict:
+           screen: bool = True, after_crisis: bool = False) -> dict:
     """Risk for this message, READ IN CONTEXT. Everything here only RAISES risk.
 
     earlier: the student's own previous messages in this conversation (redacted),
@@ -144,6 +144,10 @@ def assess(text: str, earlier: list[str] | None = None, checkin: str | None = No
       4. if none of that escalated, a fast model screens the conversation for
          indirect risk (crisis_screen.py). Skipped for anything already caught,
          so an explicit crisis message never reaches a model.
+
+    after_crisis: the student was handed off earlier in this session and chose
+    "I'm safe, take me back". They aren't trapped in the crisis screen, but for the
+    rest of the session any warning sign at all hands off again.
     """
     from zenai.config import settings
 
@@ -162,6 +166,8 @@ def assess(text: str, earlier: list[str] | None = None, checkin: str | None = No
         why = "message alone" + (f" (context: {'; '.join(signals)})" if signals else "")
     elif any(p >= th for p in prior):
         risk, why = 0.6, "an earlier message in this conversation was a crisis sign"
+    elif risk >= WARNING_SCORE and after_crisis:
+        risk, why = 0.5, "warning sign soon after a crisis hand-off in this session"
     elif risk >= WARNING_SCORE and signals:
         risk, why = 0.5, "indirect warning sign, escalated by context: " + "; ".join(signals)
     elif risk >= WARNING_SCORE:
@@ -179,3 +185,55 @@ def assess(text: str, earlier: list[str] | None = None, checkin: str | None = No
         else:
             why += " · model screen unavailable, patterns only"
     return {"risk": risk, "why": why, "by": by, "context_signals": signals, "screen": sc}
+
+
+def js_rules() -> str:
+    """The app's own copy of the explicit-crisis rules (src/zenai/student/crisis-rules.js),
+    generated from HIGH_RISK so the two can't drift: tests/test_crisis_context.py
+    fails if the file is out of date. Regenerate with:
+        python -c "from zenai.models.crisis import js_rules; print(js_rules(), end='')" > src/zenai/student/crisis-rules.js
+    """
+    import json
+
+    pattern = json.dumps(HIGH_RISK.pattern)
+    return f"""// GENERATED from src/zenai/models/crisis.py (HIGH_RISK). Do not edit by hand.
+//
+// The app checks explicit crisis language itself, before anything is sent, so the
+// hand-off works with no network, no server and no model. And for the rest of the
+// session after a hand-off (once the student chose "I'm safe, take me back") every
+// message tells the server so, and any warning sign hands off again.
+(function () {{
+  const HIGH_RISK = new RegExp({pattern}, "i");
+  const QUOTES = {{"\\u2019": "'", "\\u2018": "'", "\\u02bc": "'", "\\u201c": '"', "\\u201d": '"', "\\uff07": "'"}};
+  const normalize = t => String(t || "").replace(/[\\u2019\\u2018\\u02bc\\u201c\\u201d\\uff07]/g, c => QUOTES[c]).replace(/\\s+/g, " ").trim();
+  window.zenaiCrisisRules = {{high: t => HIGH_RISK.test(normalize(t))}};
+
+  const KEY = "zenai.afterCrisis";
+  const show = window.crisis;
+  if (typeof show === "function") {{
+    window.crisis = function () {{
+      try {{ sessionStorage.setItem(KEY, "1"); }} catch (e) {{}}
+      return show.apply(this, arguments);
+    }};
+  }}
+
+  const ask = window.ask;
+  if (typeof ask === "function") {{
+    window.ask = function (text) {{
+      if (window.zenaiCrisisRules.high(text)) {{ window.crisis(); return Promise.resolve(null); }}
+      return ask.apply(this, arguments);
+    }};
+  }}
+
+  const send = window.fetch.bind(window);
+  window.fetch = function (url, opts) {{
+    try {{
+      const after = sessionStorage.getItem(KEY) === "1";
+      if (after && opts && opts.method === "POST" && /\\/chat$/.test(String(url)) && typeof opts.body === "string") {{
+        const b = JSON.parse(opts.body); b.after_crisis = true; opts = Object.assign({{}}, opts, {{body: JSON.stringify(b)}});
+      }}
+    }} catch (e) {{}}
+    return send(url, opts);
+  }};
+}})();
+"""

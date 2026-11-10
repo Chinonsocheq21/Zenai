@@ -133,3 +133,57 @@ def test_ordinary_language_stays_clear(text):
     from zenai.models.crisis import assess
 
     assert assess(text, [], None, screen=False)["risk"] < 0.35, text
+
+
+# ---------------------------------------------------------------- every failure path (engineering review C2, C3)
+def _client():
+    from fastapi.testclient import TestClient
+
+    from zenai.api.main import app
+    return TestClient(app)
+
+
+def test_crisis_beats_the_class_code(monkeypatch):
+    monkeypatch.setattr(settings, "ACCESS_CODE", "ZEN-1234")
+    c = _client()
+    assert c.post("/chat", json={"text": "long day"}).status_code == 401            # code still required
+    r = c.post("/chat", json={"text": "I want to end my life"})                     # but never for a crisis
+    assert r.status_code == 200 and r.json()["escalate"] is True
+
+
+def test_long_messages_are_cut_not_refused_and_still_checked(monkeypatch):
+    from zenai import llm
+    from zenai.agents import turn
+
+    seen = {}
+    monkeypatch.setattr(llm, "available", lambda: True)
+    monkeypatch.setattr(turn, "run", lambda text, *a, **k: seen.update(n=len(text)) or
+                        {"escalate": False, "reply": "ok", "redacted_text": text})
+    c = _client()
+    r = c.post("/chat", json={"text": "word " * 2000 + " I want to end my life"})   # 10,000+ characters
+    assert r.status_code == 200 and r.json()["escalate"] is True
+    assert c.post("/chat", json={"text": "word " * 2000}).status_code == 200
+    assert seen["n"] <= 4000
+
+
+def test_after_a_crisis_any_warning_sign_hands_off_again():
+    from zenai.models.crisis import assess
+
+    t = "what's the point"
+    assert assess(t, [], None, screen=False)["risk"] < 0.35                          # alone: a warning
+    assert assess(t, [], None, screen=False, after_crisis=True)["risk"] >= 0.35     # after a hand-off: escalate
+    assert assess("ok thanks, that helped", [], None, screen=False, after_crisis=True)["risk"] < 0.35
+
+
+def test_after_crisis_flag_reaches_the_rules():
+    r = _client().post("/chat", json={"text": "what's the point", "after_crisis": True})
+    assert r.status_code == 200 and r.json()["escalate"] is True
+
+
+def test_the_app_copy_of_the_rules_is_current():
+    from pathlib import Path
+
+    from zenai.models.crisis import js_rules
+
+    f = Path(__file__).resolve().parents[1] / "src" / "zenai" / "student" / "crisis-rules.js"
+    assert f.read_text() == js_rules(), "regenerate src/zenai/student/crisis-rules.js (see crisis.js_rules)"

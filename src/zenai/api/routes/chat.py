@@ -18,7 +18,9 @@ class Msg(BaseModel):
 
 
 class ChatIn(BaseModel):
-    text: str = Field(..., min_length=1, max_length=4000)
+    # Long messages are cut to 4,000 characters for the model, never refused: a
+    # 422 would skip the crisis check (it runs on the whole message first).
+    text: str = Field(..., min_length=1, max_length=20000)
     history: list[Msg] = []
     monitor: bool = True  # False only for experiment E1's baseline
     # Notes the student explicitly chose to let ZenAI remember. Kept on the
@@ -29,6 +31,9 @@ class ChatIn(BaseModel):
     # today's check-in from the app, if the student did one (it never leaves
     # the phone otherwise). Read by the crisis check and the Conversation Agent.
     checkin: Literal["Light", "A bit much", "Heavy", "Very heavy", "I'm not okay"] | None = None
+    # set by the app for the rest of a session after a crisis hand-off, once the
+    # student chose "I'm safe, take me back": any warning sign hands off again
+    after_crisis: bool = False
 
 
 def _crisis_only(body: ChatIn, note: str) -> dict | None:
@@ -42,7 +47,7 @@ def _crisis_only(body: ChatIn, note: str) -> dict | None:
 
     redacted = redact(body.text)
     earlier = [m.content for m in body.history if m.role == "user"]
-    a = assess(redacted, earlier, body.checkin, screen=False)
+    a = assess(redacted, earlier, body.checkin, screen=False, after_crisis=body.after_crisis)
     if a["risk"] >= settings.CRISIS_THRESHOLD:
         return {"escalate": True, "crisis_risk": a["risk"], "redacted_text": redacted, "reply": None, "attempts": [],
                 "trace": [], "escalation": {"hotline": settings.CRISIS_HOTLINE, "campus": settings.CAMPUS_COUNSELING_NAME,
@@ -80,6 +85,12 @@ def _chat(body: ChatIn, req: Request) -> dict:
     from zenai import llm
     from zenai.agents import turn
 
+    # Crisis first, before the class code, the usage limit or anything else that
+    # could refuse the request. Rules only: fast, and needs nothing to be up.
+    hand = _crisis_only(body, "Crisis check ran before anything else.")
+    if hand:
+        return hand
+    body.text = body.text[:4000]
     limits.check_code(req)
     if not _local_tool(req) and not limits.allow(req, "chat"):
         return _limited_turn(body)
