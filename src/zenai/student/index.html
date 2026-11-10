@@ -17,15 +17,15 @@
 <style>
   :root{
     --bg:#F5F1EA; --bg2:#EFE8DD; --surface:rgba(255,255,255,.78); --solid:#FFFFFF;
-    --ink:#14233D; --ink2:#3C4A61; --muted:#76808F; --line:rgba(20,35,61,.09); --line2:rgba(20,35,61,.14);
-    --blue:#1B3D6F; --blue2:#2E5A99; --orange:#E8792F; --peach:#F6B48A; --cream:#FFE9D2;
+    --ink:#14233D; --ink2:#3C4A61; --muted:#5F6878; --line:rgba(20,35,61,.09); --line2:rgba(20,35,61,.14);
+    --blue:#1B3D6F; --blue2:#2E5A99; --orange:#E8792F; --orangeInk:#B4541A; --ring:#2E5A99; --peach:#F6B48A; --cream:#FFE9D2;
     --accent:var(--blue); --accentInk:#fff;
     --me1:#1B3D6F; --me2:#2B5592;
     --zen:rgba(255,255,255,.86);
     --shadow:0 1px 2px rgba(20,35,61,.04), 0 8px 24px -10px rgba(20,35,61,.16);
     --shadow2:0 2px 4px rgba(20,35,61,.05), 0 18px 40px -16px rgba(20,35,61,.26);
     --ok:#2F7A5E;
-    --red:#B3321F; --redInk:#7A2416; --redbg:#FBF3EF; --redcard:#FFFFFF; --redline:rgba(179,50,31,.20);
+    --red:#B3321F; --redInk:#7A2416; --redbg:#F7F3EC; --redsoft:#FBECE8; --redtext:#9E2A1A; --chip:#F2EDE4; --redcard:#FFFFFF; --redline:rgba(179,50,31,.20);
     --orbA:#FFD8B4; --orbB:#F08A4B; --orbC:#7FA6E0; --orbD:#1B3D6F;
     --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     --serif:"New York","Iowan Old Style","Apple Garamond",Georgia,"Times New Roman",serif;
@@ -36,13 +36,13 @@
     :root{
       --bg:#0A1426; --bg2:#0E1B33; --surface:rgba(24,38,66,.72); --solid:#15233F;
       --ink:#EEF1F7; --ink2:#C3CCDB; --muted:#8E9AB0; --line:rgba(200,214,240,.09); --line2:rgba(200,214,240,.16);
-      --accent:#F2A46E; --accentInk:#1A1208;
+      --accent:#F2A46E; --accentInk:#1A1208; --orangeInk:#F2A46E; --ring:#9BBDF0;
       --me1:#2B5592; --me2:#3B6CB3;
       --zen:rgba(27,43,74,.85);
       --shadow:0 1px 2px rgba(0,0,0,.25), 0 10px 28px -12px rgba(0,0,0,.6);
       --shadow2:0 2px 6px rgba(0,0,0,.3), 0 20px 44px -16px rgba(0,0,0,.7);
       --ok:#7FD0B0;
-      --red:#FF8A73; --redInk:#FFD4CA; --redbg:#170E14; --redcard:#24161C; --redline:rgba(255,138,115,.28);
+      --red:#FF8A73; --redInk:#FFD4CA; --redbg:#0A1426; --redsoft:rgba(255,138,115,.12); --redtext:#FF8A73; --chip:rgba(200,214,240,.10); --redcard:#24161C; --redline:rgba(255,138,115,.28);
       --orbA:#FFC79A; --orbB:#E8792F; --orbC:#4C7CC4; --orbD:#22477D;
     }
   }
@@ -52,6 +52,8 @@
   button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
   a{color:inherit}
   .hidden{display:none !important}
+  :focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+  .composer textarea:focus-visible{outline:none}
   .press{transition:transform .18s var(--ease), box-shadow .2s, background .2s, opacity .2s}
   .press:active{transform:scale(.97)}
 
@@ -71,11 +73,17 @@
   header .hlink{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink2);flex:none}
   header .hlink:active{background:var(--surface)}
   header .hlink svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-  header .pill{margin-left:8px;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);
-               background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 11px;
-               backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-  header .pill svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2}
-  .app.bare header{display:none}
+  header .helpnow{margin-left:6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 13px;
+               border-radius:999px;border:1px solid rgba(178,58,42,.3);background:var(--redsoft);color:var(--redtext);
+               font-size:13.5px;font-weight:650;white-space:nowrap;flex:none}
+  @media (prefers-color-scheme: dark){header .helpnow{border-color:rgba(255,138,115,.4)}}
+  @media (max-width:379px){header .helpnow svg{display:none} header .helpnow{padding:0 11px}}
+  header .helpnow svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  header .helpnow:hover{background:color-mix(in srgb, var(--red) 16%, var(--redsoft))}
+  /* welcome: only the help pill shows, the welcome screen has its own orb */
+  .app.bare header{justify-content:flex-end}
+  .app.bare header .mini,.app.bare header h1,.app.bare header .hlinks{display:none}
+  .app.bare .welcome{padding-top:4px !important}
 
   main{flex:1;overflow-y:auto;min-height:0;position:relative;-webkit-overflow-scrolling:touch}
   .screen{display:none;padding:12px 20px 32px}
@@ -110,7 +118,7 @@
   .callout{display:flex;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;
            box-shadow:var(--shadow);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
   .callout .ic{width:38px;height:38px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
-               background:color-mix(in srgb, var(--orbB) 16%, transparent);color:var(--orbB)}
+               background:color-mix(in srgb, var(--orbB) 16%, transparent);color:var(--orangeInk)}
   .callout .ic.b{background:color-mix(in srgb, var(--orbC) 22%, transparent);color:var(--blue2)}
   @media (prefers-color-scheme: dark){.callout .ic.b{color:#9BBDF0}}
   .callout svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -154,16 +162,23 @@
        backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);white-space:pre-wrap;word-wrap:break-word}
   .refs{margin:10px 0 8px 36px;display:flex;flex-direction:column;gap:9px}
   .reflabel{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-left:2px}
-  .ref{display:flex;gap:13px;align-items:flex-start;background:var(--solid);border:1px solid var(--line);border-radius:18px;padding:14px;
-       text-decoration:none;color:inherit;box-shadow:var(--shadow)}
-  .ref .ph{width:40px;height:40px;border-radius:13px;flex:0 0 auto;display:grid;place-items:center;
-           background:linear-gradient(135deg, color-mix(in srgb, var(--orbB) 22%, transparent), color-mix(in srgb, var(--orbC) 22%, transparent));color:var(--orbB)}
-  .ref .ph svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-  .ref .n{font-weight:600;font-size:15px;line-height:1.3}
-  .ref .w{font-size:13.5px;color:var(--ink2);margin:4px 0 8px;line-height:1.45}
-  .ref .p{display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:15px;font-size:13px;font-weight:600;
-          background:color-mix(in srgb, var(--accent) 12%, transparent);color:var(--accent)}
-  .ref .d{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.4}
+  .ref{background:var(--solid);border:1px solid var(--line);border-radius:18px;padding:16px;color:inherit;box-shadow:var(--shadow)}
+  .ref .n{font-weight:650;font-size:16px;line-height:1.3}
+  .ref .w{font-size:13.5px;color:var(--ink2);margin:3px 0 10px;line-height:1.45}
+  .ref .d{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.45}
+  .ref .lk{display:inline-block;margin-top:10px;font-size:13.5px;font-weight:600;color:var(--accent);text-decoration:underline;text-underline-offset:3px}
+  /* open-now status and one button per number (shared by resource cards and the crisis screen) */
+  .st{display:flex;align-items:flex-start;gap:8px;font-size:13.5px;color:var(--ink2);line-height:1.45;margin-bottom:4px}
+  .st i{width:8px;height:8px;border-radius:50%;background:#7A8494;flex:none;margin-top:6px}
+  .st.open i{background:var(--ok)}
+  .nb{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:48px;border-radius:12px;padding:0 14px;margin-top:8px;
+      font-weight:600;font-size:15px;text-decoration:none;white-space:nowrap;background:var(--chip);color:var(--ink)}
+  .nb small{font-weight:500;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;opacity:.9}
+  .nb.p{background:var(--blue);color:#fff}
+  @media (prefers-color-scheme: dark){.nb.p{background:#8FB3E8;color:#0A1426}}
+  .nb svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .nb span{display:flex;align-items:center;gap:9px;min-width:0;white-space:normal;line-height:1.25}
+  .ref .nb{padding:0 12px;font-size:14.5px}
 
   .thinking{display:flex;align-items:center;gap:12px;margin:16px 0 8px}
   .thinking .orb{width:34px;height:34px}
@@ -175,7 +190,7 @@
   .composer{padding:10px 14px 12px;position:relative}
   .composer .box{display:flex;align-items:flex-end;gap:8px;background:var(--surface);border:1px solid var(--line2);border-radius:28px;padding:5px 5px 5px 18px;
                  box-shadow:var(--shadow2);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transition:border-color .2s, box-shadow .2s}
-  .composer .box:focus-within{border-color:color-mix(in srgb, var(--accent) 45%, transparent)}
+  .composer .box:focus-within{border-color:var(--ring);box-shadow:0 0 0 1px var(--ring), var(--shadow2)}
   .composer textarea{flex:1;resize:none;height:46px;max-height:120px;border:0;padding:12px 0;font:16px/1.4 var(--sans);outline:none;background:transparent;color:var(--ink)}
   .composer textarea::placeholder{color:var(--muted)}
   .send{width:46px;height:46px;border-radius:23px;background:linear-gradient(135deg, var(--blue), var(--blue2));color:#fff;flex:0 0 auto;display:grid;place-items:center}
@@ -184,24 +199,31 @@
   .send:disabled{opacity:.35}
   .err{color:var(--red);font-size:13.5px;line-height:1.5;text-align:center;margin:4px 24px 0}
 
-  /* ---------- crisis: legibility first ---------- */
+  /* ---------- crisis: one clear action first, calm everywhere else ---------- */
   .crisis{position:absolute;inset:0;background:var(--redbg);z-index:40;overflow-y:auto;padding:24px 22px;
           padding-top:calc(22px + var(--top));padding-bottom:calc(20px + var(--bot));animation:fade .3s var(--ease)}
-  .crisis .tag{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;color:var(--red)}
+  .crisis .tag{display:inline-flex;align-items:center;gap:7px;font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;color:var(--redtext)}
   .crisis .tag i{width:8px;height:8px;border-radius:50%;background:var(--red)}
-  .crisis h2{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.2;margin:12px 0 10px;color:var(--ink)}
-  .crisis p{font-size:16px;line-height:1.55;color:var(--ink2);margin-bottom:18px}
-  .rescue{display:block;background:var(--redcard);border:1px solid var(--redline);border-radius:20px;padding:16px 18px;margin-bottom:12px;text-decoration:none;color:inherit}
-  .rescue .who{font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:6px}
-  .rescue .what{font-size:20px;font-weight:650;line-height:1.3;color:var(--ink)}
-  .rescue .how{font-size:14px;color:var(--ink2);margin-top:4px;line-height:1.5}
-  .call{display:flex;align-items:center;justify-content:center;gap:10px;height:58px;border-radius:29px;background:#B3321F;color:#fff;
-        font-size:17.5px;font-weight:650;text-decoration:none;margin:20px 0 10px;box-shadow:0 14px 30px -14px rgba(179,50,31,.8)}
-  .call svg,.txt svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  .txt{display:flex;align-items:center;justify-content:center;gap:10px;height:54px;border-radius:27px;border:1.5px solid var(--redline);
-       background:var(--redcard);color:var(--ink);font-size:16.5px;font-weight:600;text-decoration:none}
-  .halt{border-top:1px solid var(--redline);padding-top:14px;margin-top:18px;font-size:14px;color:var(--ink2);line-height:1.6}
-  .back{display:block;margin:6px auto 0;min-height:44px;padding:0 18px;font-size:15px;font-weight:600;color:var(--red);text-decoration:underline;text-underline-offset:3px}
+  .crisis h2{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.22;margin:10px 0 8px;color:var(--ink);outline:none}
+  .crisis h2:focus-visible{outline:3px solid var(--ring);outline-offset:4px;border-radius:6px}
+  .crisis .lede{font-size:15.5px;line-height:1.5;color:var(--ink2);margin-bottom:18px}
+  .acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .call{grid-column:1 / -1;display:flex;align-items:center;justify-content:center;gap:10px;min-height:58px;border-radius:29px;background:#B3321F;color:#fff;
+        font-size:17.5px;font-weight:650;text-decoration:none;box-shadow:0 14px 30px -14px rgba(179,50,31,.8)}
+  .ob{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border-radius:26px;border:1.5px solid var(--redline);
+      background:var(--solid);color:var(--ink);font-size:15.5px;font-weight:600;text-decoration:none;padding:0 10px;text-align:center}
+  .call svg,.ob svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .crisis .sub{font-size:12.5px;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5}
+  .crisis .desk{display:none}
+  .ccard{background:var(--solid);border:1px solid var(--line2);border-radius:20px;padding:16px;margin-top:20px}
+  .ccard .who{font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .ccard .nm{font-size:18px;font-weight:650;margin:4px 0 6px;color:var(--ink)}
+  .ccard .st{margin-bottom:6px}
+  .danger{margin-top:16px;font-size:15px;color:var(--ink2);text-align:center}
+  .danger a{color:var(--redtext);font-weight:700;text-decoration:underline;text-underline-offset:3px;white-space:nowrap;display:inline-block;min-height:32px;line-height:32px;padding:0 4px}
+  .halt{border-top:1px solid var(--line2);padding-top:12px;margin-top:14px;font-size:13.5px;color:var(--muted);line-height:1.55}
+  .back{display:flex;align-items:center;justify-content:center;width:100%;min-height:46px;margin-top:12px;border-radius:23px;
+        border:1px solid var(--line2);background:transparent;font-size:15px;font-weight:600;color:var(--ink2)}
 
   /* ---------- shared headings ---------- */
   .q{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.2;margin:10px 0 8px;letter-spacing:-.2px}
@@ -221,7 +243,11 @@
   .tile small{font-size:12.5px;line-height:1.35;opacity:.78;margin-top:4px;position:relative}
   .tile.on{border-color:var(--ink);box-shadow:var(--shadow2);transform:translateY(-2px)}
   .tile.on .blob{transform:scale(1.35)}
-  .scale.picked .tile:not(.on){opacity:.55}
+  .tile .ck{position:absolute;top:12px;left:12px;width:26px;height:26px;border-radius:50%;background:#14233D;color:#fff;display:none;place-items:center}
+  .tile .ck svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .tile.on .ck{display:grid}
+  .tile.wide.on{border-color:#fff}
+  .tile.wide .ck{background:#fff;color:#1B3D6F;top:50%;left:auto;right:64px;transform:translateY(-50%)}
   .tile.wide{grid-column:1 / -1;min-height:84px;flex-direction:row;align-items:center;justify-content:space-between;color:#fff}
   .tile.wide .t{display:flex;flex-direction:column}
   .tile.wide .go{position:relative;width:40px;height:40px;border-radius:20px;background:rgba(255,255,255,.16);display:grid;place-items:center}
@@ -347,7 +373,7 @@
   .gate p,.acct p{color:var(--ink2);font-size:15px;line-height:1.55;margin-bottom:18px}
   .gate input{height:56px;border-radius:16px;border:1px solid var(--line2);background:var(--surface);font:600 22px var(--mono, monospace);letter-spacing:.14em;text-align:center;text-transform:uppercase;color:var(--ink)}
   .gate button,.acct button{margin-top:12px;height:52px;border-radius:26px;background:var(--accent);color:var(--accentInk, #fff);font-weight:600;font-size:16px}
-  .gate .bad{color:var(--red, #B23A2A);font-size:13.5px;margin-top:10px;min-height:18px}
+  .gate .bad{color:var(--red);font-size:13.5px;margin-top:10px;min-height:18px}
   .acct .alt{display:flex;align-items:center;justify-content:center;margin-top:10px;height:48px;border-radius:24px;
              border:1px solid var(--line2);background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;text-decoration:none}
   .acct .close{display:block;margin:16px auto 0;min-height:44px;padding:0 18px;font-size:15px;font-weight:600;
@@ -367,11 +393,11 @@
   .donebar{display:flex;justify-content:center;padding:2px 14px 0}
   .donebar button{font-size:13px;color:var(--ink2);min-height:36px;padding:0 14px;border-radius:18px;border:1px solid var(--line2);background:var(--surface)}
   .closing{text-align:center;margin:8px auto 18px;max-width:330px}
-  .closing button{margin-top:12px;min-height:44px;padding:0 18px;border-radius:22px;background:var(--accent);color:#fff;font-weight:600;font-size:14.5px}
+  .closing button{margin-top:12px;min-height:44px;padding:0 18px;border-radius:22px;background:var(--accent);color:var(--accentInk);font-weight:600;font-size:14.5px}
   /* after the crisis screen: help stays one tap away */
-  .safebar{display:flex;align-items:center;justify-content:center;gap:10px;font-size:12.5px;padding:8px 12px;margin:6px 14px 0;border-radius:14px;
-           background:color-mix(in srgb, #B23A2A 9%, var(--surface));color:var(--ink);border:1px solid color-mix(in srgb, #B23A2A 25%, transparent)}
-  .safebar a{color:#B23A2A;font-weight:700;text-decoration:none;white-space:nowrap}
+  .safebar{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 12px;font-size:13px;padding:8px 12px;margin:6px 14px 0;border-radius:14px;
+           background:color-mix(in srgb, var(--red) 9%, var(--surface));color:var(--ink);border:1px solid color-mix(in srgb, var(--red) 25%, transparent)}
+  .safebar a{color:var(--redtext);font-weight:700;text-decoration:none;white-space:nowrap}
 
   /* ---------- laptop: sidebar + a wide, centred conversation ---------- */
   .sidefoot{display:none}
@@ -382,7 +408,10 @@
     .app > header{grid-area:head;padding:26px 22px 18px}
     .app > header h1{font-size:24px}
     .app > header .mini{width:34px;height:34px}
-    .app > header .pill{display:none}
+    .app > header{flex-wrap:wrap;row-gap:14px}
+    .app > header .helpnow{order:9;flex:1 0 100%;margin-left:0;min-height:42px;font-size:14.5px}
+    .app.bare > header{padding:18px 22px 0}
+    .app.bare > header .helpnow{flex:0 0 auto}
     .app > main{grid-area:main;border-left:1px solid var(--line);
          background:radial-gradient(70% 55% at 85% 0%, color-mix(in srgb, var(--peach) 22%, transparent), transparent 70%)}
     nav{grid-area:nav;align-self:start;flex-direction:column;gap:4px;margin:6px 14px;padding:8px;border-radius:22px}
@@ -391,7 +420,7 @@
     nav button svg{width:20px;height:20px}
     .sidefoot{grid-area:foot;display:block;margin:0 22px 24px;font-size:12.5px;line-height:1.6;color:var(--muted)}
     .sidefoot b{display:block;color:var(--ink2);font-size:13px;margin-bottom:4px}
-    .sidefoot a{color:#B23A2A;font-weight:700;text-decoration:none}
+    .sidefoot a{color:var(--redtext);font-weight:700;text-decoration:none}
     .screen{max-width:760px;margin:0 auto;padding:36px 40px 48px}
     .welcome{max-width:560px;padding-top:7vh !important}
     #talk{max-width:820px;margin:0 auto}
@@ -403,6 +432,13 @@
     .safebar,.donebar{margin-left:40px;margin-right:40px}
     .voice,.gate,.acct{left:260px}
     .crisis{padding:48px max(40px, calc((100% - 640px) / 2))}   /* full window: the sidebar is covered too */
+    /* a laptop can't dial: chat online is the primary action, and the number is big enough to dial from a phone */
+    .crisis .chat{grid-column:1 / -1;order:-1;min-height:58px;border:0;border-radius:29px;background:#B3321F;color:#fff;font-size:17.5px;font-weight:650;
+                  box-shadow:0 14px 30px -14px rgba(179,50,31,.8)}
+    .crisis .call{grid-column:auto;min-height:52px;border-radius:26px;border:1.5px solid var(--redline);background:var(--solid);color:var(--ink);
+                  font-size:15.5px;font-weight:600;box-shadow:none}
+    .crisis .desk{display:block;text-align:center;margin-top:16px;font-size:15px;color:var(--ink2)}
+    .crisis .desk b{display:block;font-family:var(--serif);font-weight:500;font-size:28px;color:var(--ink);letter-spacing:.5px}
   }
 </style>
 </head>
@@ -417,7 +453,7 @@
         <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>
       </button>
     </div>
-    <span class="pill"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Private</span>
+    <button class="helpnow press" id="helpBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Get help now</button>
   </header>
 
   <main>
@@ -442,7 +478,7 @@
     <!-- TALK -->
     <section class="screen" id="talk">
       <div class="safebar hidden" id="safebar">Help, any time:
-        <a href="tel:988">Call or text 988</a><a href="#" id="safecampus">Counseling Center</a></div>
+        <a href="tel:988">Call or text 988</a><a href="https://988lifeline.org/chat" target="_blank" rel="noopener noreferrer">Chat online</a><a href="tel:18004220009" id="safecampus">Campus 24/7 line</a></div>
       <div class="log" id="log" aria-live="polite"></div>
       <div class="donebar hidden" id="donebar"><button class="press" id="done">I'm done for now</button></div>
       <div class="err hidden" id="err"></div>
@@ -524,16 +560,26 @@
     <button class="close press" id="acctClose">Close</button>
   </section>
 
-  <section class="crisis hidden" id="crisis" role="dialog" aria-modal="true" aria-labelledby="c-title">
-    <div class="tag"><i></i>Pausing to get you support</div>
-    <h2 id="c-title">I'm stopping here, and I want to hand you to a person.</h2>
-    <p>What you said is more than I should carry on my own. I'm not a counselor, and this is the moment that matters most to get right.</p>
-    <a class="rescue" href="tel:988"><div class="who">Right now, 24 hours</div><div class="what" id="c-hot">Call or text 988</div><div class="how">Suicide and Crisis Lifeline. Free and confidential.</div></a>
-    <a class="rescue" id="c-campus-link"><div class="who">At Morgan State</div><div class="what" id="c-campus">Counseling Center</div><div class="how" id="c-phone"></div></a>
-    <a class="call press" href="tel:988"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Call 988</a>
-    <a class="txt press" href="sms:988"><svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z"/></svg>Text 988 instead</a>
-    <div class="halt">ZenAI has paused this conversation. There's no text box here on purpose. Nothing you said or wrote has been shared with anyone.</div>
-    <button class="back" id="leave">I'm safe, take me back</button>
+  <section class="crisis hidden" id="crisis" role="dialog" aria-modal="true" aria-labelledby="c-title" aria-describedby="c-lede">
+    <div class="tag" id="c-tag"><i></i>Pausing to get you support</div>
+    <h2 id="c-title" tabindex="-1">I'm stopping here so a person can help you.</h2>
+    <p class="lede" id="c-lede">What you said matters too much for me to handle alone. These people are free, confidential and awake right now.</p>
+    <div class="acts">
+      <a class="call press" id="c-call" href="tel:988"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><span id="c-hot">Call 988 now</span></a>
+      <a class="ob press" id="c-text" href="sms:988"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z"/></svg>Text 988</a>
+      <a class="ob chat press" id="c-chat" href="https://988lifeline.org/chat" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Chat online</a>
+    </div>
+    <div class="desk">On your phone, call or text<b>988</b></div>
+    <div class="sub">988 Suicide and Crisis Lifeline, 24 hours. Free and confidential.</div>
+    <div class="ccard" id="c-campus-card">
+      <div class="who">At Morgan State</div>
+      <div class="nm" id="c-campus">Counseling Center</div>
+      <div class="st" id="c-status"><i></i><span></span></div>
+      <div id="c-phone"></div>
+    </div>
+    <div class="danger">In immediate danger? <a href="tel:911">Call 911</a></div>
+    <div class="halt" id="c-halt">This conversation is paused, and nothing you wrote has been shared with anyone. There's no text box here on purpose.</div>
+    <button class="back press" id="leave">I'm safe, take me back</button>
   </section>
 </div>
 
@@ -608,28 +654,122 @@ $("acctBtn").onclick = () => toggleAcct(true);
 $("acctClose").onclick = () => toggleAcct(false);
 $("acctPrivacy").onclick = () => { toggleAcct(false); go("privacy"); };
 
-// ---------- crisis ----------
-let RES = {hotline: "988", campus: "Morgan State University Counseling Center", phone: ""};
-fetch(API + "/resources").then(r => r.json()).then(d => { RES = d; }).catch(() => {});
-function crisis() {
+// ---------- crisis, and "Get help now" ----------
+// The defaults match config.py, so the hand-off shows real numbers with no server at all.
+let RES = {hotline: "988", campus: "Morgan State University Counseling Center",
+           phone: "443-885-3130 (weekdays 8:30 to 5), 24/7: 1-800-422-0009"};
+fetch(API + "/resources").then(r => r.json()).then(d => {
+  if (d && d.hotline) RES = {...RES, ...d, phone: /\d{3}[-. ]\d{3}[-. ]\d{4}/.test(String(d.phone)) ? d.phone : RES.phone};
+}).catch(() => {});
+const PHONE_RE = /(?:1-)?\d{3}[-. ]\d{3}[-. ]\d{4}/g;
+// "443-885-3130 (weekdays 8:30 to 5), 24/7: 1-800-422-0009" -> the office, the 24/7 line and the office hours
+function campusLines(text) {
+  const t = tidy(text || "");
+  const all = t.match(PHONE_RE) || [];
+  const m = t.match(/24\s*\/\s*7[^0-9]*((?:1-)?\d{3}[-. ]\d{3}[-. ]\d{4})/);
+  const line = m ? m[1] : null;
+  const h = t.match(/weekdays?\s+(\d{1,2})(?::(\d{2}))?\s*(?:to|-)\s*(\d{1,2})(?::(\d{2}))?/i);
+  let hrs = {open: 8 * 60 + 30, close: 17 * 60};
+  if (h) { hrs = {open: +h[1] * 60 + +(h[2] || 0), close: +h[3] * 60 + +(h[4] || 0)}; if (hrs.close <= hrs.open) hrs.close += 12 * 60; }
+  return {office: all.find(n => n !== line) || null, line, hrs};
+}
+// the campus keeps Baltimore time, wherever the student's laptop thinks it is
+function campusNow(d = new Date()) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", {timeZone: "America/New_York", weekday: "short", hour: "numeric", minute: "numeric", hourCycle: "h23"})
+    .formatToParts(d).map(x => [x.type, x.value]));
+  return {day: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(p.weekday), min: (+p.hour % 24) * 60 + +p.minute};
+}
+const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const clock = m => { const h = Math.floor(m / 60), mm = m % 60; return (h % 12 || 12) + (mm ? ":" + String(mm).padStart(2, "0") : "") + (h < 12 ? " a.m." : " p.m."); };
+function officeState(hrs, now = campusNow()) {
+  const wk = d => d >= 1 && d <= 5;
+  if (wk(now.day) && now.min >= hrs.open && now.min < hrs.close) return {open: true, text: `Office open now until ${clock(hrs.close)}`};
+  let when = "today";
+  if (!wk(now.day) || now.min >= hrs.close) {
+    const next = [1, 2, 3, 4, 5, 6, 7].map(k => (now.day + k) % 7).find(wk);
+    when = next === (now.day + 1) % 7 ? "tomorrow" : DAYS[next];
+  }
+  return {open: false, text: `Office closed now, opens ${when} at ${clock(hrs.open)}`};
+}
+// one button per number; the number that works right now comes first, in navy
+function numberButtons(c, name, short) {
+  const st = officeState(c.hrs);
+  const btn = (label, num, primary, aria) => `<a class="nb press ${primary ? "p" : ""}" href="tel:${num.replace(/\D/g, "")}" aria-label="${esc(aria)}"><span>${PHONE_IC.replace("<svg", '<svg aria-hidden="true"')}${label}</span><small>${esc(num)}</small></a>`;
+  const line = c.line ? btn(short ? "Call 24/7 line" : "Call the 24/7 line", c.line, !st.open, `Call the ${name} 24/7 line, ${c.line}`) : "";
+  const office = c.office ? btn(short ? "Call office" : "Call the office", c.office, st.open || !c.line, `Call the ${name} office, ${c.office}, weekdays ${clock(c.hrs.open)} to ${clock(c.hrs.close)}`) : "";
+  const text = st.text.replace(/\.?$/, ".") + (c.line ? (st.open ? " The 24/7 line is there any time." : " The 24/7 line is open.") : "");
+  return {open: st.open, status: `<i></i><span>${esc(text)}</span>`, html: st.open ? office + line : line + office};
+}
+
+// One dialog for both: the crisis hand-off (the conversation pauses) and "Get help now"
+// from the header (the conversation stays exactly where it was).
+let helpMode = null, helpFrom = null;
+const backdrop = () => [...$("app").children].filter(el => el.id !== "crisis");
+function showHelp(mode) {
+  const hand = mode === "crisis";
   if (typeof V !== "undefined" && V.on) voiceOff();
-  $("c-hot").textContent = "Call or text " + RES.hotline;
-  $("c-campus").textContent = RES.campus;
-  $("c-phone").innerHTML = esc(tidy(RES.phone)).replace(/(\d[\d-]{6,}\d)/g, '<span style="white-space:nowrap">$1</span>');
-  const num = (String(RES.phone).match(/\d{3}[-. ]?\d{3}[-. ]?\d{4}/) || [""])[0].replace(/\D/g, "");
-  num ? $("c-campus-link").setAttribute("href", "tel:" + num) : $("c-campus-link").removeAttribute("href");
+  if (helpMode === "crisis" && !hand) return;
+  if (!$("acct").classList.contains("hidden")) toggleAcct(false);
+  if (!helpMode) helpFrom = document.activeElement;
+  helpMode = mode;
+  const hot = String(RES.hotline || "988");
+  $("c-tag").innerHTML = "<i></i>" + (hand ? "Pausing to get you support" : "Help, any time");
+  $("c-title").textContent = hand ? "I'm stopping here so a person can help you." : "Talk to a person now";
+  $("c-lede").textContent = hand ? "What you said matters too much for me to handle alone. These people are free, confidential and awake right now."
+    : "These people are free, confidential and awake right now. Your conversation with ZenAI stays right where it is.";
+  $("c-halt").textContent = hand ? "This conversation is paused, and nothing you wrote has been shared with anyone. There's no text box here on purpose."
+    : "Nothing you wrote has been shared with anyone.";
+  $("leave").textContent = hand ? "I'm safe, take me back" : "Back to the conversation";
+  $("c-hot").textContent = "Call " + hot + " now";
+  $("c-call").setAttribute("href", "tel:" + hot.replace(/\D/g, ""));
+  $("c-text").setAttribute("href", "sms:" + hot.replace(/\D/g, ""));
+  $("crisis").querySelector(".desk b").textContent = hot;
+  $("c-campus").textContent = tidy(RES.campus).replace(/^Morgan State University\s+/i, "");
+  const c = campusLines(RES.phone), nb = numberButtons(c, tidy(RES.campus));
+  $("c-status").className = "st" + (nb.open ? " open" : "");
+  $("c-status").innerHTML = nb.status;
+  $("c-phone").innerHTML = nb.html;
+  $("c-campus-card").classList.toggle("hidden", !c.office && !c.line);
+  // on a laptop, Chat online is the primary action, so it comes first for the keyboard too
+  const acts = $("c-call").parentNode;
+  matchMedia("(min-width:960px)").matches ? acts.insertBefore($("c-chat"), $("c-call")) : acts.appendChild($("c-chat"));
+  backdrop().forEach(el => { el.inert = true; });
   $("crisis").classList.remove("hidden");
   $("crisis").scrollTop = 0;
+  $("c-title").focus({preventScroll: true});
 }
-$("leave").onclick = () => {
+function hideHelp() {
+  const was = helpMode; helpMode = null;
   $("crisis").classList.add("hidden");
+  backdrop().forEach(el => { el.inert = false; });
+  return was;
+}
+function crisis() { showHelp("crisis"); }
+$("helpBtn").onclick = () => showHelp("help");
+// keyboard: focus stays inside; Escape closes "Get help now" but never the crisis hand-off
+$("crisis").addEventListener("keydown", e => {
+  if (e.key === "Escape" && helpMode === "help") { e.preventDefault(); $("leave").click(); return; }
+  if (e.key !== "Tab") return;
+  const f = [...$("crisis").querySelectorAll("a[href], button:not([disabled])")].filter(x => x.offsetParent !== null);
+  if (!f.length) return;
+  const first = f[0], last = f[f.length - 1], at = document.activeElement;
+  if (e.shiftKey && (at === first || at === $("c-title"))) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && (at === last || !$("crisis").contains(at))) { e.preventDefault(); first.focus(); }
+});
+document.addEventListener("focusin", e => { if (helpMode && !$("crisis").contains(e.target)) $("c-title").focus({preventScroll: true}); });
+$("leave").onclick = () => {
+  const was = hideHelp(), from = helpFrom; helpFrom = null;
+  if (was !== "crisis") { (from && from.isConnected && from !== document.body ? from : $("helpBtn")).focus(); return; }
   // help stays pinned for the rest of this visit, and ZenAI says so plainly
   $("safebar").classList.remove("hidden");
-  const num = (String(RES.phone).match(/\d{3}[-. ]?\d{3}[-. ]?\d{4}/) || [""])[0].replace(/\D/g, "");
-  if (num) $("safecampus").setAttribute("href", "tel:" + num);
+  const c = campusLines(RES.phone), open = officeState(c.hrs).open;
+  const num = open ? (c.office || c.line) : (c.line || c.office);
+  if (num) $("safecampus").setAttribute("href", "tel:" + num.replace(/\D/g, ""));
+  $("safecampus").textContent = num && num === c.line ? "Campus 24/7 line" : "Counseling Center";
   go("talk");
   addZen("Thank you for letting me know. I'm still here, and those numbers stay at the top while we talk. What would feel okay to talk about right now?");
-  document.querySelectorAll(".tile").forEach(x => x.classList.remove("on")); $("scale").classList.remove("picked");
+  document.querySelectorAll(".tile").forEach(x => { x.classList.remove("on"); x.setAttribute("aria-pressed", "false"); }); $("scale").classList.remove("picked");
+  $("msg").focus({preventScroll: true});
 };
 
 // ---------- talk ----------
@@ -709,10 +849,18 @@ function addHelped(d) {
 }
 const PHONE_IC = `<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>`;
 function addCards(list) {
-  $("log").insertAdjacentHTML("beforeend", `<div class="refs msg"><div class="reflabel">At Morgan State</div>` + list.map(r =>
-    `<a class="ref press" href="tel:${esc(String(r.phone || "").replace(/[^0-9]/g, ""))}"><div class="ph">${PHONE_IC}</div><div>
-       <div class="n">${esc(tidy(r.name))}</div><div class="w">${esc(tidy(r.what))}</div>
-       ${r.phone ? `<div class="p">Call ${esc(r.phone)}</div>` : ""}${r.detail ? `<div class="d">${esc(tidy(r.detail))}</div>` : ""}</div></a>`).join("") + `</div>`);
+  $("log").insertAdjacentHTML("beforeend", `<div class="refs msg"><div class="reflabel">At Morgan State</div>` + list.map(r => {
+    const name = tidy(r.name), c = campusLines([r.phone, r.detail].filter(Boolean).join(", "));
+    let status = "", btns = "", detail = r.detail ? tidy(r.detail) : "";
+    if (c.line && c.office) {                          // an office with hours and a 24/7 line: open-now aware
+      const nb = numberButtons(c, name, true);
+      status = `<div class="st ${nb.open ? "open" : ""}">${nb.status}</div>`; btns = nb.html; detail = "";
+    } else if (r.phone) {
+      btns = `<a class="nb p press" href="tel:${esc(String(r.phone).replace(/\D/g, ""))}" aria-label="${esc(`Call ${name}, ${r.phone}`)}"><span>${PHONE_IC.replace("<svg", '<svg aria-hidden="true"')}Call</span><small>${esc(r.phone)}</small></a>`;
+    }
+    const link = /^https:\/\//.test(r.url || "") ? `<a class="lk" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Website and location</a>` : "";
+    return `<div class="ref"><div class="n">${esc(name)}</div><div class="w">${esc(tidy(r.what))}</div>${status}${btns}${detail ? `<div class="d">${esc(detail)}</div>` : ""}${link}</div>`;
+  }).join("") + `</div>`);
   scrollDown();
 }
 // ---------- voice ----------
@@ -1036,8 +1184,8 @@ const LEVELS = [
 const ARROW = `<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>`;
 $("ciDate").textContent = new Date().toLocaleDateString(undefined, {weekday: "long", month: "long", day: "numeric"});
 $("scale").innerHTML = LEVELS.map((l, i) => i === 4
-  ? `<button class="tile wide" data-i="${i}" style="background:${l.g}"><span class="blob"></span><span class="t"><b>${l.t}</b><small>${l.s}</small></span><span class="go">${ARROW}</span></button>`
-  : `<button class="tile" data-i="${i}" style="background:${l.g}"><span class="blob"></span><span class="blob2"></span><b>${l.t}</b><small>${l.s}</small></button>`).join("");
+  ? `<button class="tile wide" data-i="${i}" aria-pressed="false" style="background:${l.g}"><span class="blob"></span><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="t"><b>${l.t}</b><small>${l.s}</small></span><span class="go">${ARROW}</span></button>`
+  : `<button class="tile" data-i="${i}" aria-pressed="false" style="background:${l.g}"><span class="blob"></span><span class="blob2"></span><span class="ck" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><b>${l.t}</b><small>${l.s}</small></button>`).join("");
 // one place a check-in is recorded, from the Check in tab or the strip before talking
 function recordCheckin(i) {
   CHECKIN = {level: i, at: Date.now()}; forceAsk = false;
@@ -1050,7 +1198,7 @@ function recordCheckin(i) {
 }
 document.querySelectorAll(".tile").forEach(b => b.onclick = () => {
   const i = +b.dataset.i;
-  document.querySelectorAll(".tile").forEach(x => x.classList.toggle("on", x === b));
+  document.querySelectorAll(".tile").forEach(x => { x.classList.toggle("on", x === b); x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
   $("scale").classList.add("picked");
   if (!recordCheckin(i)) return;
   $("thanks").innerHTML = ORB() + "<div>" + (consent().moods
