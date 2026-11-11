@@ -27,8 +27,6 @@ class SpeakIn(BaseModel):
 
 @router.post("/tts")
 async def tts(body: SpeakIn, req: Request) -> Response:
-    import edge_tts
-
     from zenai.api import limits
     from zenai.api.routes.auth import require_signin
     from zenai.config import settings
@@ -37,6 +35,7 @@ async def tts(body: SpeakIn, req: Request) -> Response:
     require_signin(req)
     if not limits.allow(req, "tts"):
         raise HTTPException(429, {"limited": True, "message": limits.PAUSE})
+    import edge_tts                     # only once the request is allowed: refusals stay cheap
 
     key = hashlib.sha1(f"{settings.TTS_VOICE}|{settings.TTS_RATE}|{body.text}".encode()).hexdigest()
     if key in _CACHE:
