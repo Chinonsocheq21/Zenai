@@ -8,7 +8,7 @@ export const metadata = pageMeta(
 );
 
 const IPHONE_STEPS = [
-  ["Open ZenAI in Safari.", "It has to be Safari. Chrome and other browsers on iPhone can't add it to your home screen."],
+  ["Open ZenAI in Safari.", "Safari works best. On iOS 16.4 or later, Chrome and Edge can do it too, from their own Share menu."],
   ["Tap the Share icon.", "The square with an arrow pointing up, in the bar at the bottom of the screen."],
   ["Tap \"Add to Home Screen.\"", "Scroll down the share sheet if you don't see it right away."],
   ["Tap \"Add.\"", "The ZenAI icon lands on your home screen, ready to open like any other app."],
