@@ -173,9 +173,14 @@
   .chips.calm{margin-top:12px}
   .chip.br{display:inline-flex;align-items:center;gap:9px;padding:0 16px 0 10px}
   .chip.br .orb{width:24px;height:24px;margin:0}
+  .chip.br svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+  .chip.br[aria-pressed="true"]{background:color-mix(in srgb, var(--accent) 14%, var(--surface));color:var(--accent);border-color:color-mix(in srgb, var(--accent) 40%, transparent)}
   .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
   .chip{min-height:44px;padding:0 16px;border-radius:22px;background:var(--surface);border:1px solid var(--line2);font-size:14.5px;color:var(--ink);
         box-shadow:var(--shadow);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .chip.on{background:var(--accent);color:var(--accentInk);border-color:transparent;font-weight:600}
+  .catchips{justify-content:flex-start}
+  .catchips .chip{min-height:38px;padding:0 14px;font-size:13.5px}
 
   .msg{animation:rise .5s var(--ease) both}
   @keyframes rise{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
@@ -297,6 +302,7 @@
   .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:4px 0 14px}
   .card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:14px;box-shadow:var(--shadow);
         backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .weeksentence{font-size:15.5px;color:var(--ink2);line-height:1.55;margin:2px 2px 16px}
   .card .n{font-family:var(--serif);font-size:32px;line-height:1}
   .card .k{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.35}
   .chart{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:18px 16px 14px;box-shadow:var(--shadow);
@@ -351,7 +357,7 @@
   .backbtn{width:36px;height:36px;border-radius:18px;display:grid;place-items:center;color:var(--ink2);flex:none}
   .backbtn:active{background:var(--surface)}
   .backbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  .gatechips{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin:4px 0 20px}
+  .gatechips{display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;gap:8px 10px;margin:4px 0 20px}
   .gatechips span{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:20px;background:var(--surface);
                   border:1px solid var(--line2);font-size:14px;color:var(--ink2);box-shadow:var(--shadow)}
   .sw{width:52px;height:32px;border-radius:16px;background:var(--line2);position:relative;flex:0 0 auto;transition:background .3s var(--ease)}
@@ -366,6 +372,25 @@
          background:var(--surface);color:var(--red);border-radius:18px;font-weight:600;font-size:15.5px}
   .erase svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   .fine{font-size:13px;color:var(--muted);line-height:1.6;margin-top:16px;padding:0 4px}
+
+  /* ---------- listen: three guided audio sessions, with a transcript for accessibility ---------- */
+  .listenrow .s{font-variant-numeric:tabular-nums}
+  .listenrow.playing{color:var(--accent)}
+  .listenrow .rowic{position:relative}
+  .listenrow .rowic svg{fill:currentColor;stroke:none}
+  .listenrow.playing .rowic{color:var(--accent)}
+  .player{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px;margin-top:16px;box-shadow:var(--shadow);
+          backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .ptitle{font-family:var(--serif);font-size:18px;margin-bottom:10px}
+  .prow{display:flex;align-items:center;gap:12px}
+  .pplay{width:46px;height:46px;border-radius:23px;background:var(--accent);color:var(--accentInk);flex:0 0 auto;display:grid;place-items:center}
+  .pplay svg{width:20px;height:20px;stroke:currentColor;fill:currentColor}
+  .pseek{flex:1;appearance:none;height:6px;border-radius:3px;background:var(--line2);outline:none}
+  .pseek::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);border:2px solid var(--solid);box-shadow:var(--shadow)}
+  .pseek::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);border:2px solid var(--solid)}
+  .ptime{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .pwords{margin-top:12px;min-height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--line2);background:transparent;font-size:14px;font-weight:600;color:var(--ink2)}
+  .ptranscript{margin-top:12px;font-size:14.5px;line-height:1.65;color:var(--ink2);border-top:1px solid var(--line);padding-top:12px}
 
   /* ---------- journal (You tab): on-device only, never sent, one-tap delete ---------- */
   .jbox{width:100%;border:1px solid var(--line2);border-radius:16px;background:var(--surface);color:var(--ink);
@@ -453,6 +478,11 @@
   .helped .ok{display:none}
   .helped.done .ok{display:inline}
   .pause{margin:10px 0 12px 36px;padding:12px 14px;border-radius:16px;background:var(--surface);border:1px dashed var(--line2);font-size:14px;color:var(--ink2);line-height:1.5}
+  /* ---------- the Checked mark: only on replies the Fidelity Monitor actually ran on ---------- */
+  .checkrow{display:flex;margin:2px 0 8px 36px}
+  .checkmark{display:inline-flex;align-items:center;gap:5px;min-height:28px;padding:2px 8px 2px 2px;border-radius:14px;font-size:12px;color:var(--muted)}
+  .checkmark svg{width:14px;height:14px;stroke:var(--ok);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .checkmark:hover{color:var(--ink2)}
   /* class code */
   .gate,.acct{position:absolute;inset:0;z-index:18;display:flex;flex-direction:column;justify-content:center;padding:0 30px;background:var(--bg)}
   .gate h2,.acct h2{font-family:var(--serif);font-weight:400;font-size:30px;margin:18px 0 8px}
@@ -547,7 +577,7 @@
     .app.bare{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr;grid-template-areas:"head" "main"}
     .app.bare > header{padding:18px 24px 0;flex-wrap:nowrap}
     .app.bare > header .helpnow{flex:0 0 auto}
-    .app.bare > main{border-left:0}
+    .app.bare > main{border-left:0;background:none}
     .app.bare nav,.app.bare .sidefoot{display:none !important}
     .welcome{max-width:560px;min-height:0;padding-top:5vh !important}
     .welcome .spacer{flex:0 0 12px;min-height:0}
@@ -647,6 +677,7 @@
       <h2 class="q">Find a resource</h2>
       <p class="help">Every verified Morgan State office in one place, with a way to call or visit its website.</p>
       <div class="finderSearch"><input id="finderQ" type="search" placeholder="Try housing, tutoring, health..." aria-label="Search campus resources"></div>
+      <div class="chips catchips" id="finderCats" role="group" aria-label="Filter by category"></div>
       <div class="findcards" id="finderList"></div>
     </section>
 
@@ -669,6 +700,11 @@
         <button type="button" class="row rowlink press" id="youValues">
           <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span>
           <span style="flex:1"><div class="t">What matters to you</div><div class="s">Your values exercise</div></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="row rowlink press" id="youListen">
+          <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="7" rx="2"/><rect x="17" y="13" width="4" height="7" rx="2"/></svg></span>
+          <span style="flex:1"><div class="t">Listen</div><div class="s">Three short guided sessions, in ZenAI's voice</div></span>
           <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
         </button>
       </div>
@@ -715,6 +751,23 @@
       <textarea class="jbox" id="jtext" rows="3" maxlength="2000" placeholder="Write anything, just for you" aria-label="New journal entry"></textarea>
       <button class="soft press jsave" id="jsave">Save entry</button>
       <div id="jlist" style="margin-top:14px"></div>
+    </section>
+
+    <!-- LISTEN: opened from You, three short guided audio sessions in ZenAI's voice -->
+    <section class="screen" id="listen">
+      <div class="subhead"><button class="backbtn press" aria-label="Back to You"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><h2 class="q">Listen</h2></div>
+      <p class="help">A few minutes, guided. Plays right here, and you can always read the words instead.</p>
+      <div class="group" id="listenList"></div>
+      <div class="player hidden" id="player">
+        <div class="ptitle" id="pTitle"></div>
+        <div class="prow">
+          <button class="pplay press" id="pPlay" type="button" aria-label="Play"><svg viewBox="0 0 24 24" id="pPlayIc"><path d="M7 5l12 7-12 7z"/></svg></button>
+          <input class="pseek" id="pSeek" type="range" min="0" max="1000" value="0" aria-label="Seek">
+          <div class="ptime" id="pTime">0:00 / 0:00</div>
+        </div>
+        <button class="pwords press" id="pWords" type="button" aria-expanded="false">Show words</button>
+        <div class="ptranscript hidden" id="pTranscript"></div>
+      </div>
     </section>
 
     <!-- APPEARANCE: opened from You -->
@@ -837,6 +890,15 @@
     <button class="close press" id="acctClose">Close</button>
   </section>
 
+  <!-- CHECKED: shown only on replies the Fidelity Monitor actually ran on -->
+  <section class="acct hidden" id="checkSheet" role="dialog" aria-modal="true" aria-label="About the Checked mark">
+    <div class="orb" style="width:64px;height:64px" aria-hidden="true"><i></i></div>
+    <h2>Checked</h2>
+    <p>Before you saw this, ZenAI checked it for advice, false reassurance and diagnosis. If it had drifted, it would have been rewritten.</p>
+    <a class="alt press" href="/safety/" target="_blank" rel="noopener noreferrer">Read about how ZenAI stays safe</a>
+    <button class="close press" id="checkClose">Close</button>
+  </section>
+
   <section class="crisis hidden" id="crisis" role="dialog" aria-modal="true" aria-labelledby="c-title" aria-describedby="c-lede">
     <div class="tag" id="c-tag"><i></i>Pausing to get you support</div>
     <h2 id="c-title" tabindex="-1">I'm stopping here so a person can help you.</h2>
@@ -920,7 +982,7 @@ function askCode(wrong) {
 // ---------- navigation ----------
 // Progress, Journal, Privacy, Appearance and Add to home screen are reached only
 // from You; they keep the You tab highlighted and get a back button of their own.
-const YOU_SUBS = ["progress", "journal", "privacy", "appearance", "addhome"];
+const YOU_SUBS = ["progress", "journal", "privacy", "appearance", "addhome", "listen"];
 function go(name) {
   document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === name));
   const navName = YOU_SUBS.includes(name) ? "you" : name;
@@ -932,6 +994,7 @@ function go(name) {
   if (name === "privacy") drawPrivacy();
   if (name === "appearance") drawTheme();
   if (name === "addhome") drawAddHome();
+  if (name === "listen") drawListen();
   if (name === "you") drawYou();
   if (name === "finder") drawFinder();
   if (name !== "talk") document.querySelector("main").scrollTop = 0;
@@ -952,6 +1015,7 @@ document.querySelectorAll(".backbtn").forEach(b => b.onclick = backToYou);
 $("youProgress").onclick = () => openYouScreen("progress");
 $("youJournal").onclick = () => openYouScreen("journal");
 $("youValues").onclick = () => openValues();
+$("youListen").onclick = () => openYouScreen("listen");
 $("youPrivacy").onclick = () => openYouScreen("privacy");
 $("youAppearance").onclick = () => openYouScreen("appearance");
 $("youAddHome").onclick = () => openYouScreen("addhome");
@@ -983,6 +1047,10 @@ function toggleAcct(open) {
 }
 $("acctClose").onclick = () => toggleAcct(false);
 $("acctPrivacy").onclick = () => { toggleAcct(false); go("privacy"); };
+
+// ---------- the Checked mark: a quiet note on replies the Fidelity Monitor ran on ----------
+function toggleCheckSheet(open) { $("checkSheet").classList.toggle("hidden", !open); }
+$("checkClose").onclick = () => toggleCheckSheet(false);
 
 // ---------- sign-in gate: shown instead of talk when the campus requires sign-in ----------
 async function authCall(method, path, body) {
@@ -1191,6 +1259,8 @@ function ciCard(q, attr, skip) {
     <button class="notok press" ${attr}="4"><span>Not okay right now?</span><b>Talk to a person &rarr;</b></button></div>`;
 }
 const BREATHE_CHIP = `<button class="chip br press" data-breathe>${ORB()}Breathe with me</button>`;
+const LISTEN_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="7" rx="2"/><rect x="17" y="13" width="4" height="7" rx="2"/></svg>`;
+const LISTEN_CHIP = `<button class="chip br press" id="listenAlong" type="button" data-listen aria-pressed="false">${LISTEN_ICON}<span id="listenAlongLbl">Listen along</span></button>`;
 let skipCI = false;
 function drawHello() {
   const [g, sub] = greeting();
@@ -1203,11 +1273,12 @@ function drawHello() {
     : `<h2>What's on your mind?</h2><p class="say">${sub} Say it however it comes out.</p>`;
   $("log").innerHTML = `<div class="hello">${ORB()}<div class="eyebrow">${g}</div>${head}${strip}${inExamSeason() ? examCardHtml() : ""}
     <div class="chips">${STARTERS.map(s => `<button class="chip press">${s}</button>`).join("")}</div>
-    <div class="chips calm">${BREATHE_CHIP}</div></div>`;
-  $("log").querySelectorAll(".chip:not([data-breathe])").forEach(c => c.onclick = () => { $("msg").value = c.textContent; $("msg").focus(); });
+    <div class="chips calm">${BREATHE_CHIP}${LISTEN_CHIP}</div></div>`;
+  $("log").querySelectorAll(".chip:not([data-breathe]):not([data-listen])").forEach(c => c.onclick = () => { $("msg").value = c.textContent; $("msg").focus(); });
   $("log").querySelectorAll("[data-breathe]").forEach(b => b.onclick = () => breathe(b));
   $("log").querySelectorAll("[data-ci]").forEach(b => b.onclick = () => recordCheckin(+b.dataset.ci));
-  if ($("ciskip")) $("ciskip").onclick = () => { skipCI = true; drawHello(); };
+  if ($("listenAlong")) { $("listenAlong").onclick = () => toggleListenAlong(); refreshListenAlong(); }
+  if ($("ciskip")) { $("ciskip").onclick = () => { skipCI = true; drawHello(); }; }
   if ($("cichange")) $("cichange").onclick = e => { e.preventDefault(); CHECKIN = null; skipCI = false; forceAsk = true; drawHello(); };
   if ($("examFind")) $("examFind").onclick = () => go("finder");
 }
@@ -1229,12 +1300,18 @@ function addMine(text) {
 }
 // a blank line starts a new paragraph; a single line break is just a space
 const paras = text => tidy(text).trim().split(/\n\s*\n/).map(p => `<p>${esc(p.replace(/\s*\n\s*/g, " "))}</p>`).join("");
-function addZen(text) {
+const CHECK_IC = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+// checked = true only for a reply whose /chat JSON shows the Fidelity Monitor
+// actually ran on it (d.monitor, and never on a crisis hand-off or an error)
+function addZen(text, checked) {
   $("log").querySelector(".hello")?.remove();
   $("log").querySelectorAll(".zenrow.live").forEach(r => r.classList.remove("live"));
-  $("log").insertAdjacentHTML("beforeend", `<div class="zenrow live msg">${ORB()}<div class="zen">${paras(text)}</div></div>`);
+  $("log").insertAdjacentHTML("beforeend", `<div class="zenrow live msg">${ORB()}<div class="zen">${paras(text)}</div></div>` +
+    (checked ? `<div class="checkrow msg"><button type="button" class="checkmark press" aria-haspopup="dialog">${CHECK_IC}Checked</button></div>` : ""));
   scrollDown();
 }
+// one listener for every checkmark, present or future
+$("log").addEventListener("click", e => { if (e.target.closest(".checkmark")) toggleCheckSheet(true); });
 // "Did this help?" once, when the student closes the conversation. Kept on this
 // phone; sent only if the student turned on "Share whether replies helped" in
 // Privacy, and then only yes/no, which specialist answered last, and ZenAI's own
@@ -1307,13 +1384,30 @@ const DEFAULT_RESOURCES = [
    phone: "443-885-4033", detail: "Earl S. Richardson Library, Suite 212, international.affairs@morgan.edu", url: "https://www.morgan.edu/oisfs", verified: "2026-11-11"},
 ];
 let RESOURCES = DEFAULT_RESOURCES.slice();
+// categories for the Find help chips, mapped from campuses.json's own resource ids
+const FINDER_CATS = ["All", "Health", "Money", "Housing", "Academics", "Safety"];
+const RESOURCE_CAT = {
+  counseling: "Health", health: "Health",
+  basic_needs: "Money", financial_aid: "Money",
+  housing: "Housing",
+  tutoring: "Academics", disability: "Academics", career: "Academics",
+  support: "Safety", title_ix: "Safety", veterans: "Safety", international: "Safety",
+};
+let finderCat = "All";
+function drawFinderCats() {
+  const el = $("finderCats"); if (!el) return;
+  el.innerHTML = FINDER_CATS.map(c => `<button type="button" class="chip press ${c === finderCat ? "on" : ""}" data-cat="${c}" aria-pressed="${c === finderCat}">${c}</button>`).join("");
+  el.querySelectorAll(".chip").forEach(b => b.onclick = () => { finderCat = b.dataset.cat; drawFinder(); drawFinderCats(); });
+}
 function drawFinder() {
   const q = ($("finderQ")?.value || "").trim().toLowerCase();
-  const list = !q ? RESOURCES : RESOURCES.filter(r => `${r.name} ${r.what} ${r.detail || ""}`.toLowerCase().includes(q));
+  let list = !q ? RESOURCES : RESOURCES.filter(r => `${r.name} ${r.what} ${r.detail || ""}`.toLowerCase().includes(q));
+  if (finderCat !== "All") list = list.filter(r => RESOURCE_CAT[r.id] === finderCat);
   $("finderList").innerHTML = list.length ? list.map(resourceCardHtml).join("")
     : `<p class="help">Nothing matches "${esc(q)}". Try a different word, or see S.O.S. below for anything you're not sure where to take.</p>`;
 }
 $("finderQ").addEventListener("input", drawFinder);
+drawFinderCats();
 
 // ---------- exam season: a gentle card on Talk home ----------
 // The client checks this itself, so it works before any message is sent: bundled
@@ -1627,6 +1721,81 @@ function stopBreath(quiet) {
 }
 $("bstop").onclick = () => stopBreath();
 $("breath").addEventListener("keydown", e => { if (e.key === "Escape") { e.preventDefault(); stopBreath(); } });
+
+// ---------- listen: three short guided audio sessions, in ZenAI's voice ----------
+// index.json (src/zenai/student/audio/) is the one source for title, file and
+// seconds; this bundled copy is only a fallback so Listen still works offline
+// or if the fetch hasn't landed yet. Only breathe-1min is precached by sw.js;
+// the others are cached on first play (see sw.js's own fetch handler).
+const DEFAULT_AUDIO_SESSIONS = [
+  {id: "breathe-1min", title: "One minute of breathing", file: "breathe-1min.mp3", seconds: 65,
+   transcript: "This is one minute, just for you. There's no right way to do it. If it feels okay, let your shoulders drop a little. Breathe in slowly. And let it out, a little longer than it came in. Again. In. And out. If your mind wanders, that's what minds do. Notice where it went, and come back. In. And out. Whatever you're carrying is still here, and so are you. That's enough for one minute. If things feel like too much, Get help now is at the top of the screen, any time."},
+  {id: "notice-3min", title: "Notice five things", file: "notice-3min.mp3", seconds: 173,
+   transcript: "This is a few minutes to land where you are. You can keep your eyes open. Look around, and find five things you can see. Just name them to yourself. A color. A shape. Something small you didn't notice before. Now four things you can feel. Your feet on the floor. The weight of your hands. The air on your skin. Three things you can hear. Near, or far away. You don't have to like them, only notice them. Two things you can smell, or just the air as you breathe in. And one slow breath. Your mind may still be busy. If a thought shows up, you might quietly say to yourself, there's a thought. Then come back to what's here. Notice that you can carry a hard thought and still be in this room, in this moment. One more look around. What's one thing here you'd like to remember? That's it. You can come back to this any time you need to land. If things feel like too much, Get help now is at the top of the screen, any time."},
+  {id: "sleep-4min", title: "Setting the day down", file: "sleep-4min.mp3", seconds: 243,
+   transcript: "This is a few minutes to set the day down before you sleep. Get comfortable, however that looks for you. Let your breath find its own pace. You don't need to change it. Notice where your body meets the bed, or the chair. Let it hold a little more of your weight. Bring your attention to your feet, and let them be heavy. Your legs. Your back, and your shoulders. Your hands, and your jaw. If they're tight, that's okay. Just notice. Thoughts about today, or tomorrow, may come up. That's what a busy mind does at night. When one shows up, you might name it gently. Planning. Worrying. Remembering. And let it sit at the edge, like a phone on the other side of the room. You don't have to solve anything tonight. Think of one thing from today that mattered to you, even a small one. A conversation. Something you tried. Something you got through. Let that be the last thing you hold before you rest. Breathe in. And out, slowly. Sleep well. And if tonight feels like too much, Get help now is at the top of the screen, any time."},
+];
+let AUDIO_SESSIONS = DEFAULT_AUDIO_SESSIONS.slice();
+fetch("audio/index.json").then(r => r.ok ? r.json() : null).then(d => {
+  if (d && Array.isArray(d.sessions) && d.sessions.length) AUDIO_SESSIONS = d.sessions;
+  if ($("listen").classList.contains("on")) drawListen();
+}).catch(() => {});
+const fmtTime = s => { s = Math.max(0, Math.round(s || 0)); const m = Math.floor(s / 60); return m + ":" + String(s % 60).padStart(2, "0"); };
+const AUDIO = {el: new Audio(), cur: null, wordsOpen: false};
+AUDIO.el.preload = "none";
+function audioSession(id) { return AUDIO_SESSIONS.find(s => s.id === id) || null; }
+function loadAudio(id) {
+  const s = audioSession(id); if (!s) return null;
+  if (AUDIO.cur !== id) { AUDIO.el.src = "audio/" + s.file; AUDIO.cur = id; AUDIO.wordsOpen = false; }
+  return s;
+}
+function toggleAudio(id) {
+  const s = loadAudio(id); if (!s) return;
+  if (AUDIO.cur === id && !AUDIO.el.paused) { AUDIO.el.pause(); return; }
+  AUDIO.el.play().catch(() => {});
+}
+function refreshListenAlong() {
+  const b = $("listenAlong"); if (!b) return;
+  const playing = AUDIO.cur === "breathe-1min" && !AUDIO.el.paused;
+  b.setAttribute("aria-pressed", String(playing));
+  const lbl = $("listenAlongLbl"); if (lbl) lbl.textContent = playing ? "Pause" : "Listen along";
+}
+function toggleListenAlong() { toggleAudio("breathe-1min"); }
+function drawListen() {
+  const list = $("listenList"); if (!list) return;
+  list.innerHTML = AUDIO_SESSIONS.map(s => `<button type="button" class="row rowlink press listenrow" data-play="${esc(s.id)}" aria-label="Play ${esc(s.title)}, ${fmtTime(s.seconds)}">
+    <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg></span>
+    <span style="flex:1"><div class="t">${esc(s.title)}</div><div class="s">${fmtTime(s.seconds)}</div></span>
+    <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span></button>`).join("");
+  list.querySelectorAll("[data-play]").forEach(b => b.onclick = () => { toggleAudio(b.dataset.play); drawPlayer(); });
+  drawPlayer();
+}
+function drawPlayer() {
+  const s = audioSession(AUDIO.cur);
+  $("listenList").querySelectorAll(".listenrow").forEach(r => r.classList.toggle("playing", r.dataset.play === AUDIO.cur && !AUDIO.el.paused));
+  if (!s) { $("player").classList.add("hidden"); return; }
+  $("player").classList.remove("hidden");
+  $("pTitle").textContent = s.title;
+  $("pPlayIc").innerHTML = AUDIO.el.paused ? `<path d="M7 5l12 7-12 7z"/>` : `<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>`;
+  $("pPlay").setAttribute("aria-label", AUDIO.el.paused ? "Play" : "Pause");
+  const dur = AUDIO.el.duration || s.seconds || 0;
+  $("pSeek").value = dur ? Math.round((AUDIO.el.currentTime / dur) * 1000) : 0;
+  $("pTime").textContent = fmtTime(AUDIO.el.currentTime) + " / " + fmtTime(dur);
+  $("pWords").setAttribute("aria-expanded", String(AUDIO.wordsOpen));
+  $("pWords").textContent = AUDIO.wordsOpen ? "Hide words" : "Show words";
+  $("pTranscript").classList.toggle("hidden", !AUDIO.wordsOpen);
+  $("pTranscript").textContent = s.transcript || "";
+}
+$("pPlay").onclick = () => { if (AUDIO.cur) toggleAudio(AUDIO.cur); };
+$("pWords").onclick = () => { AUDIO.wordsOpen = !AUDIO.wordsOpen; drawPlayer(); };
+$("pSeek").addEventListener("input", () => {
+  const s = audioSession(AUDIO.cur); const dur = AUDIO.el.duration || (s && s.seconds) || 0;
+  if (dur) AUDIO.el.currentTime = (+$("pSeek").value / 1000) * dur;
+});
+["play", "pause", "ended", "timeupdate", "loadedmetadata"].forEach(ev => AUDIO.el.addEventListener(ev, () => {
+  if ($("listen").classList.contains("on")) drawPlayer();
+  refreshListenAlong();
+}));
 function remember(text) {
   const mem = S.get("memory", []);
   mem.unshift(text.slice(0, 200));
@@ -1689,7 +1858,7 @@ async function ask(text) {
     const d = await r.json();
     if (d.season) SERVER_SEASON = d.season;   // "exams" turns on the Talk home card next time
     if (d.escalate) { crisis(); return d; }
-    addZen(d.reply);
+    addZen(d.reply, d.monitor === true);
     lastReply = d;
     if (d.resources && d.resources.length) addCards(d.resources);
     HISTORY.push({role: "user", content: d.redacted_text}, {role: "assistant", content: d.reply});
@@ -1764,7 +1933,17 @@ function smooth(pts, lo, hi) {
 }
 function drawProgress() {
   const moods = S.get("moods", []), mem = S.get("memory", []);
-  const recent = moods.filter(m => Date.now() - new Date(m.at) < 7 * 864e5).length;
+  const weekMoods = moods.filter(m => Date.now() - new Date(m.at) < 7 * 864e5);
+  const recent = weekMoods.length;
+  // a plain weekly sentence, computed on this device only: the most common
+  // level among this week's check-ins (ties favor the lighter level)
+  let weekSentence = "";
+  if (weekMoods.length) {
+    const counts = {};
+    weekMoods.forEach(m => { counts[m.level] = (counts[m.level] || 0) + 1; });
+    const modeLevel = Object.keys(counts).map(Number).sort((a, b) => counts[b] - counts[a] || a - b)[0];
+    weekSentence = `<p class="weeksentence">Most of this week felt ${esc(LEVELS[modeLevel].t)}.</p>`;
+  }
   // no scores: how often you checked in, and the notes you chose to keep
   const stats = `<div class="stats"><div class="card"><div class="n">${recent}</div><div class="k">${recent === 1 ? "check-in" : "check-ins"} this week</div></div>` +
     (mem.length ? `<div class="card"><div class="n">${mem.length}</div><div class="k">${mem.length === 1 ? "note" : "notes"} you saved</div></div>` : "") + `</div>`;
@@ -1802,7 +1981,7 @@ function drawProgress() {
     ${pts.map((p, k) => `<circle class="dot" cx="${p[0]}" cy="${p[1]}" r="6" fill="${col(p[2])}" style="animation-delay:${.4 + k * .06}s"/>`).join("")}
     ${days.map((d, k) => (k % 4 === 1 || k === 13) ? `<text class="lbl" x="${x(k)}" y="${H - 4}" text-anchor="middle">${k === 13 ? "Today" : d.toLocaleDateString(undefined, {month: "short", day: "numeric"})}</text>` : "").join("")}
   </svg>`;
-  $("prog").innerHTML = stats + `<div class="chart"><h3>How heavy things felt</h3><div class="sub">Last 14 days. Lighter days sit higher.</div>${svg}
+  $("prog").innerHTML = stats + weekSentence + `<div class="chart"><h3>How heavy things felt</h3><div class="sub">Last 14 days. Lighter days sit higher.</div>${svg}
     ${pts.length ? "" : `<p class="chartmsg">No check-ins in the last two weeks yet. <a href="#" id="toCi" style="color:var(--accent);font-weight:600">Check in now</a></p>`}</div>` + notes;
   $("toCi") && ($("toCi").onclick = e => { e.preventDefault(); go("checkin"); });
 }
@@ -1897,8 +2076,8 @@ function drawValues() {
     <p class="help">There's no wrong answer. Write as much or as little as feels right, or skip it.</p>
     <textarea id="valuesInput" rows="5" placeholder="Write here, just for you">${esc(valuesAnswers[d.k] || "")}</textarea>
     <div style="display:flex;gap:10px;margin-top:14px">
-      <button class="back press" id="valuesSkip" style="flex:1">Skip</button>
-      <button class="cta press" id="valuesNext" style="flex:1">${valuesStep === ACT_DOMAINS.length - 1 ? "Finish" : "Next"}</button>
+      <button class="back press" id="valuesSkip" style="flex:1;height:52px;min-height:52px;margin-top:0">Skip</button>
+      <button class="cta press" id="valuesNext" style="flex:1;height:52px;min-height:52px">${valuesStep === ACT_DOMAINS.length - 1 ? "Finish" : "Next"}</button>
     </div>`;
   $("valuesNext").onclick = () => {
     const v = $("valuesInput").value.trim();
