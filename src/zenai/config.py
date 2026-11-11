@@ -49,6 +49,10 @@ class Settings(BaseSettings):
     # class demo: when set, the student app asks for this code before it will talk
     ACCESS_CODE: str = ""
     PUBLIC_URL: str = ""               # the hosted address, once there is one; used by the QR page
+    # on when hosted (set to 1 on Vercel): a turn needs a signed-in session. The
+    # crisis check always runs first regardless, so a crisis from a signed-out
+    # device still gets the full hand-off, never a 401.
+    REQUIRE_SIGNIN: bool = False
 
     CRISIS_HOTLINE: str = "988"
     # Defaults come from the default campus in campuses.json (Morgan, verified there);

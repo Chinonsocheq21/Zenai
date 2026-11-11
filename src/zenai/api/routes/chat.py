@@ -92,6 +92,9 @@ def _chat(body: ChatIn, req: Request) -> dict:
         return hand
     body.text = body.text[:4000]
     limits.check_code(req)
+    from zenai.api.routes.auth import require_signin
+
+    require_signin(req)
     if not _local_tool(req) and not limits.allow(req, "chat"):
         return _limited_turn(body)
     if not llm.available():

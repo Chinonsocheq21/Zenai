@@ -30,9 +30,11 @@ async def tts(body: SpeakIn, req: Request) -> Response:
     import edge_tts
 
     from zenai.api import limits
+    from zenai.api.routes.auth import require_signin
     from zenai.config import settings
 
     limits.check_code(req)
+    require_signin(req)
     if not limits.allow(req, "tts"):
         raise HTTPException(429, {"limited": True, "message": limits.PAUSE})
 
@@ -62,9 +64,11 @@ async def tts_stream(req: Request, text: str = Query(..., min_length=1, max_leng
     import edge_tts
 
     from zenai.api import limits
+    from zenai.api.routes.auth import require_signin
     from zenai.config import settings
 
     limits.check_code(req)
+    require_signin(req)
     if not limits.allow(req, "tts"):
         raise HTTPException(429, {"limited": True, "message": limits.PAUSE})
 

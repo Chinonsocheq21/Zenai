@@ -18,6 +18,7 @@ from the Host header, so a forged Host can't send a student's token elsewhere.
 
 from __future__ import annotations
 
+import hmac
 import html
 import os
 import re
@@ -55,6 +56,27 @@ def allowed(email: str) -> bool:
     return any(dom == d or dom.endswith("." + d) for d in domains())
 
 
+def invite_codes() -> dict[str, str]:
+    """INVITE_CODES="label:code,label2:code2" -> {code: label}, like PILOT_CODES
+    in aggregate.py. A code under 12 characters is ignored."""
+    out = {}
+    for pair in os.environ.get("INVITE_CODES", "").split(","):
+        label, _, code = pair.strip().partition(":")
+        if label and len(code) >= 12:
+            out[code] = label
+    return out
+
+
+def _invite_label(code: str) -> str | None:
+    """Constant-time: every configured code is checked, rather than stopping at
+    the first match, so timing can't reveal which code (or how many) exist."""
+    found = None
+    for candidate, label in invite_codes().items():
+        if hmac.compare_digest(candidate.encode(), code.encode()):
+            found = label
+    return found
+
+
 @lru_cache(maxsize=1)
 def _migrated() -> bool:
     store.migrate()
@@ -70,6 +92,26 @@ def _db():
         _migrated.cache_clear()
         raise HTTPException(503, {"unavailable": True, "message": "Accounts aren't available right now. "
                                   "You can keep using ZenAI without signing in."}) from e
+
+
+def require_signin(req: Request) -> None:
+    """When settings.REQUIRE_SIGNIN is on, a turn needs a valid session. Callers
+    (chat.py, tts.py) always run the crisis check first, so a crisis from a
+    signed-out device still gets the full hand-off, never a 401 from here.
+
+    The store is always reached first, even with no cookie at all: if it is
+    down nobody can be confirmed signed in (signing in needs it too), so every
+    caller gets the same calm 503 from _db() rather than a misleading
+    "sign in" that would fail the same way."""
+    from zenai.config import settings
+
+    if not settings.REQUIRE_SIGNIN:
+        return
+    sid = _sid(req)
+    with _db() as conn:
+        u = store.user_for_session(conn, sid) if sid else None
+    if not u:
+        raise HTTPException(401, {"code": "signin_required", "message": "Sign in to use ZenAI."})
 
 
 def _send(to: str, link: str) -> None:
@@ -219,18 +261,43 @@ def _sign_in(req: Request, token: str) -> Response:
     return r
 
 
+class InviteIn(BaseModel):
+    code: str = Field(..., max_length=200)
+
+
+@router.post("/invite")
+def invite(body: InviteIn, req: Request, response: Response) -> dict:
+    """Redeem an invite code: no email, an anonymous member with the default
+    campus, signed in the same way an emailed link would. Rate limited like any
+    other bucket so a code can't be brute forced."""
+    if not limits.allow(req, "invite"):
+        raise HTTPException(429, {"message": "Too many tries. Wait a bit and try again."})
+    if not _invite_label(body.code.strip()):
+        raise HTTPException(403, {"message": "That invite code isn't recognized."})
+    campus = campuses.default()["domains"][0]
+    with _db() as conn:
+        uid = store.create_invite_user(conn, campus)
+        sid = store.create_session(conn, uid)
+    response.set_cookie(COOKIE, sid, max_age=int(store.SESSION_TTL.total_seconds()), httponly=True,
+                        secure=_secure(req), samesite="lax", path="/")
+    return {"signed_in": True, "campus": campus}
+
+
 @router.get("/me")
 def me(req: Request) -> dict:
+    from zenai.config import settings
+
+    required = settings.REQUIRE_SIGNIN
     if not _sid(req):
-        return {"signed_in": False}
+        return {"signed_in": False, "required": required}
     try:
         with _db() as conn:
             u = store.user_for_session(conn, _sid(req))
     except HTTPException:
-        return {"signed_in": False, "available": False}
+        return {"signed_in": False, "available": False, "required": required}
     if not u:
-        return {"signed_in": False}
-    return {"signed_in": True, "campus": u["campus"], "sync_checkins": u["sync_checkins"]}
+        return {"signed_in": False, "required": required}
+    return {"signed_in": True, "campus": u["campus"], "sync_checkins": u["sync_checkins"], "required": required}
 
 
 @router.post("/signout")

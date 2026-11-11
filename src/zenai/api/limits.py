@@ -120,6 +120,8 @@ IP_PER_10MIN = 60                     # chat messages per IP in any 10 minutes
 IP_PER_DAY = 400                      # chat messages per IP per day
 PILOT_PER_HOUR = 5                    # pilot requests per device AND per IP per hour
 PILOT_WINDOW = 3600
+INVITE_PER_HOUR = 5                   # invite-code redemptions per device AND per IP per hour
+INVITE_WINDOW = 3600
 
 
 def _rules(bucket: str) -> list[tuple[str, int, int]]:
@@ -131,6 +133,8 @@ def _rules(bucket: str) -> list[tuple[str, int, int]]:
                 ("ip", 600, IP_PER_10MIN), ("ip", 86400, IP_PER_DAY)]
     if bucket == "pilot":
         return [("dev", PILOT_WINDOW, PILOT_PER_HOUR), ("ip", PILOT_WINDOW, PILOT_PER_HOUR)]
+    if bucket == "invite":
+        return [("dev", INVITE_WINDOW, INVITE_PER_HOUR), ("ip", INVITE_WINDOW, INVITE_PER_HOUR)]
     return [("dev", 600, settings.LIMIT_TTS_PER_10MIN)]
 
 
