@@ -102,9 +102,10 @@ export default function HowItWorks() {
       </section>
 
       <div className="mt-16 flex flex-wrap gap-3">
-        <a href="/app/" className="rounded-full bg-navy px-6 py-3.5 font-semibold text-white hover:bg-navy2">Try ZenAI</a>
+        <a href="/app/" className="rounded-full bg-navy px-6 py-3.5 font-semibold text-white hover:bg-navy2">Open ZenAI</a>
         <Link href="/safety/" className="rounded-full border border-line bg-card px-6 py-3.5 font-semibold hover:border-navy/40">Read about safety</Link>
       </div>
+      <p className="mt-3 text-sm text-ink2">Sign in with your Morgan email or an invite code.</p>
     </div>
   );
 }

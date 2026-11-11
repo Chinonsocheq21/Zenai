@@ -14,8 +14,8 @@ export default function SignIn() {
       <div className="flex justify-center"><Orb size={72} /></div>
       <h1 className="mt-6 text-center font-serif text-4xl">Sign in</h1>
       <p className="mt-3 text-center text-ink2">
-        Optional. Signing in lets your check-ins follow you between your phone and laptop. You never need an account to
-        talk to ZenAI.
+        Sign in with your Morgan email, or an invite code if you have one. Your check-ins follow you between your phone
+        and laptop.
       </p>
       <div className="mt-8"><SignInForm /></div>
       <ul className="mt-6 space-y-2 text-sm text-ink2">
@@ -24,7 +24,7 @@ export default function SignIn() {
         <li>Delete your account any time from the app.</li>
       </ul>
       <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm">
-        <a href="/app/" className="font-semibold text-navy hover:underline">Go to ZenAI without signing in</a>
+        <a href="/app/" className="font-semibold text-navy hover:underline">Open ZenAI</a>
         <Link href="/privacy/" className="text-ink2 hover:underline">Privacy</Link>
       </div>
     </div>

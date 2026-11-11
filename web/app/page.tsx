@@ -64,15 +64,16 @@ export default function Home() {
               protocol before you see it, and the moment a conversation needs a person, ZenAI stops and hands you to one.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href="/app/" className="rounded-full bg-navy px-6 py-3.5 font-semibold text-white shadow-lg shadow-navy/20 hover:bg-navy2">Try ZenAI</a>
+              <a href="/app/" className="rounded-full bg-navy px-6 py-3.5 font-semibold text-white shadow-lg shadow-navy/20 hover:bg-navy2">Open ZenAI</a>
               <Link href="/how-it-works/" className="rounded-full border border-line bg-card px-6 py-3.5 font-semibold text-ink hover:border-navy/40">How it works</Link>
             </div>
+            <p className="mt-4 text-[15px] text-ink2">Sign in with your Morgan email or an invite code.</p>
             <p className="mt-5 text-[15px] text-ink2">
               Work at a counseling center or in student affairs?{" "}
               <Link href="/universities/" className="font-semibold text-navy underline">See what a pilot looks like</Link>.
             </p>
             <p className="mt-6 text-sm text-muted">
-              Free for students. No sign-up needed to try it. ZenAI is not a counselor. In crisis, call or text{" "}
+              Free for Morgan students. ZenAI is not a counselor. In crisis, call or text{" "}
               <a href="tel:988" className="font-semibold text-crisis underline">988</a>.
             </p>
           </div>
@@ -216,7 +217,8 @@ export default function Home() {
           <Orb size={72} />
           <h2 className="font-serif text-3xl md:text-5xl">Take a minute for yourself.</h2>
           <p className="max-w-xl text-white/75">Free, private by default, and on any phone or laptop. Add it to your home screen and it opens like an app.</p>
-          <a href="/app/" className="rounded-full bg-orangefill px-7 py-3.5 font-semibold text-ink hover:brightness-110">Try ZenAI</a>
+          <a href="/app/" className="rounded-full bg-orangefill px-7 py-3.5 font-semibold text-ink hover:brightness-110">Open ZenAI</a>
+          <p className="text-sm text-white/75">Sign in with your Morgan email or an invite code.</p>
         </div>
       </section>
     </>

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-const PAGES = ["/", "/how-it-works/", "/safety/", "/universities/", "/help/", "/privacy/", "/terms/", "/signin/",
-  "/security/", "/accessibility/", "/contact/", "/status/"];
+const PAGES = ["/", "/how-it-works/", "/safety/", "/get-the-app/", "/universities/", "/help/", "/privacy/", "/terms/",
+  "/signin/", "/security/", "/accessibility/", "/contact/", "/status/"];
 
 for (const path of PAGES) {
   test(`${path} loads, fits the screen, and has the way to help and to the app`, async ({ page, isMobile }) => {
@@ -60,4 +60,41 @@ test("an unknown page shows the 404 with a way home", async ({ page }) => {
   const res = await page.goto("/no-such-page/");
   expect(res?.status()).toBe(404);
   await expect(page.locator('header a[href="/"]').first()).toBeVisible();
+});
+
+test("the theme switch defaults to Light and persists Dark across a reload", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  expect(await page.evaluate(() => localStorage.getItem("zenai-theme"))).toBeNull();
+
+  await page.getByRole("radio", { name: "Dark" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  expect(await page.evaluate(() => localStorage.getItem("zenai-theme"))).toBe("dark");
+
+  // A fresh load reads the saved choice from localStorage before paint, so a reload and
+  // a visit to another page both come up dark without a flash of light first.
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.goto("/help/");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+
+  await page.getByRole("radio", { name: "Match my phone" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
+  expect(await page.evaluate(() => localStorage.getItem("zenai-theme"))).toBe("system");
+
+  await page.getByRole("radio", { name: "Light" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  expect(await page.evaluate(() => localStorage.getItem("zenai-theme"))).toBe("light");
+});
+
+test("the manifest installs the app, not the site", async ({ request }) => {
+  const res = await request.get("/manifest.webmanifest");
+  expect(res.status()).toBe(200);
+  const manifest = await res.json();
+  expect(manifest.start_url).toBe("/app/");
+  expect(manifest.scope).toBe("/");
+  expect(manifest.icons.length).toBeGreaterThanOrEqual(2);
+  for (const icon of manifest.icons) {
+    expect((await request.get(icon.src)).status()).toBe(200);
+  }
 });
