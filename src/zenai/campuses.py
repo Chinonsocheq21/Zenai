@@ -142,9 +142,12 @@ def by_domain(email_domain: str) -> dict | None:
 
 
 def public(campus: dict) -> dict:
-    """The student-facing part: names, numbers, hours, 24/7 line, timezone."""
+    """The student-facing part: names, numbers, hours, 24/7 line, timezone,
+    the verified resource cards (for the resource finder) and exam windows
+    (for the client-side exam-season check), if the campus has them."""
     c = campus["counseling"]
-    return {
+    res, verified = campus["resources"], campus["resources_verified"]
+    out = {
         "id": campus["id"],
         "name": campus["name"],
         "timezone": campus["timezone"],
@@ -155,4 +158,8 @@ def public(campus: dict) -> dict:
             "line_24_7": c["line_24_7"],
             "url": c["url"],
         },
+        "resources": [{"id": k, **res[k], "verified": res[k].get("verified", verified)} for k in res],
     }
+    if campus.get("exam_windows"):
+        out["exam_windows"] = [dict(w) for w in campus["exam_windows"]]
+    return out
