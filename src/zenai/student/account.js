@@ -20,6 +20,10 @@
   async function refresh() {
     try { state.me = (await call("GET", "/auth/me")).d || {signed_in: false}; }
     catch (e) { state.me = {signed_in: false, available: false}; }
+    // Cache whether sign-in is required here, so the next visit can show the
+    // one-screen sign-in before this fetch even returns, with no flash of the
+    // old welcome behind it.
+    try { if (typeof S !== "undefined" && typeof state.me.required === "boolean") S.set("signinRequired", state.me.required); } catch (e) {}
     draw();
     document.dispatchEvent(new CustomEvent("zenai:account", {detail: state.me}));
     return state.me;

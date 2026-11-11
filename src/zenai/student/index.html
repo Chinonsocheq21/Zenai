@@ -95,12 +95,8 @@
          position:relative;z-index:5}
   header .mini{width:28px;height:28px}
   header h1{font-family:var(--serif);font-weight:500;font-size:20px;letter-spacing:.2px}
-  header .hlinks{margin-left:auto;display:flex;align-items:center;gap:2px}
-  header .hlink{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink2);flex:none}
-  header .hlink:active{background:var(--surface)}
-  header .hlink svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   /* the help pill: unscoped so it looks the same in the header and on the sign-in gate */
-  .helpnow{margin-left:6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 13px;
+  .helpnow{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 13px;
                border-radius:999px;border:1px solid rgba(178,58,42,.3);background:var(--redsoft);color:var(--redtext);
                font-size:13.5px;font-weight:650;white-space:nowrap;flex:none}
   html[data-theme="dark"] .helpnow{border-color:rgba(255,138,115,.4)}
@@ -110,7 +106,7 @@
   .helpnow:hover{background:color-mix(in srgb, var(--red) 16%, var(--redsoft))}
   /* welcome: only the help pill shows, the welcome screen has its own orb */
   .app.bare header{justify-content:flex-end}
-  .app.bare header .mini,.app.bare header h1,.app.bare header .hlinks{display:none}
+  .app.bare header .mini,.app.bare header h1{display:none}
   .app.bare .welcome{padding-top:4px !important}
 
   main{flex:1;overflow-y:auto;min-height:0;position:relative;-webkit-overflow-scrolling:touch}
@@ -340,6 +336,24 @@
   .row:last-child{border-bottom:0}
   .row .t{font-size:16px;font-weight:600;margin-bottom:3px}
   .row .s{font-size:13.5px;color:var(--muted);line-height:1.5}
+
+  /* ---------- You: a row that opens a sub-screen ---------- */
+  .rowlink{width:100%;text-align:left}
+  .rowic{width:38px;height:38px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
+         background:color-mix(in srgb, var(--orbC) 18%, transparent);color:var(--blue2)}
+  html[data-theme="dark"] .rowic{color:#9BBDF0}
+  @media (prefers-color-scheme: dark){html[data-theme="system"] .rowic{color:#9BBDF0}}
+  .rowic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .chev{margin-left:auto;color:var(--muted);flex:none;display:flex}
+  .chev svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .subhead{display:flex;align-items:center;gap:8px;margin:10px 0 8px}
+  .subhead .q{margin:0}
+  .backbtn{width:36px;height:36px;border-radius:18px;display:grid;place-items:center;color:var(--ink2);flex:none}
+  .backbtn:active{background:var(--surface)}
+  .backbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .gatechips{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin:4px 0 20px}
+  .gatechips span{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border-radius:20px;background:var(--surface);
+                  border:1px solid var(--line2);font-size:14px;color:var(--ink2);box-shadow:var(--shadow)}
   .sw{width:52px;height:32px;border-radius:16px;background:var(--line2);position:relative;flex:0 0 auto;transition:background .3s var(--ease)}
   .sw::after{content:"";position:absolute;inset:-6px}
   .sw i{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.22);
@@ -353,7 +367,7 @@
   .erase svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   .fine{font-size:13px;color:var(--muted);line-height:1.6;margin-top:16px;padding:0 4px}
 
-  /* ---------- journal (Progress tab): on-device only, never sent, one-tap delete ---------- */
+  /* ---------- journal (You tab): on-device only, never sent, one-tap delete ---------- */
   .jbox{width:100%;border:1px solid var(--line2);border-radius:16px;background:var(--surface);color:var(--ink);
         font:15px/1.5 var(--sans);padding:12px 14px;resize:vertical}
   .jbox::placeholder{color:var(--muted)}
@@ -376,7 +390,7 @@
   .safeplan{margin-top:16px;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.5}
   .safeplan a{display:inline-block;color:var(--ink2);font-weight:650;text-decoration:underline;text-underline-offset:3px;margin-bottom:3px}
 
-  /* ---------- values: a short ACT exercise, reachable from Talk home, device only ---------- */
+  /* ---------- values: a short ACT exercise, reachable from You, device only ---------- */
   .values{position:absolute;inset:0;z-index:19;overflow-y:auto;padding:18px 22px;padding-top:calc(18px + var(--top));
           padding-bottom:calc(20px + var(--bot));background:var(--bg)}
   .values .vhead{display:flex;justify-content:flex-end}
@@ -580,13 +594,6 @@
 <div class="app" id="app">
   <header>
     <div class="orb mini" aria-hidden="true"><i></i></div><h1>ZenAI</h1>
-    <div class="hlinks">
-      <a class="hlink press" href="/" aria-label="Home"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg></a>
-      <a class="hlink press" href="/help" aria-label="Help"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.5 2.5 0 1 1 3.4 2.3c-.8.35-1.4 1-1.4 2"/><path d="M12 17h.01"/></svg></a>
-      <button class="hlink press" id="acctBtn" aria-label="Account" aria-haspopup="dialog" aria-expanded="false">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>
-      </button>
-    </div>
     <button class="helpnow press" id="helpBtn" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Get help now</button>
   </header>
 
@@ -635,18 +642,6 @@
       <div class="thanks hidden" id="thanks"></div>
     </section>
 
-    <!-- PROGRESS -->
-    <section class="screen" id="progress">
-      <h2 class="q">Your last few weeks</h2>
-      <p class="help">Only you can see this. It lives on this device.</p>
-      <div id="prog"></div>
-      <div class="sec">Journal</div>
-      <p class="help" style="margin-top:-6px">A private place to write what's on your mind, in your own words. It is never sent anywhere and never added to a conversation, and you can delete any entry with one tap.</p>
-      <textarea class="jbox" id="jtext" rows="3" maxlength="2000" placeholder="Write anything, just for you" aria-label="New journal entry"></textarea>
-      <button class="soft press jsave" id="jsave">Save entry</button>
-      <div id="jlist" style="margin-top:14px"></div>
-    </section>
-
     <!-- RESOURCE FINDER -->
     <section class="screen" id="finder">
       <h2 class="q">Find a resource</h2>
@@ -655,11 +650,76 @@
       <div class="findcards" id="finderList"></div>
     </section>
 
-    <!-- PRIVACY -->
-    <section class="screen" id="privacy">
-      <h2 class="q">What ZenAI keeps</h2>
-      <p class="help">Everything is off until you turn it on. It stays on this device unless you turn on sync, and nothing you write is ever shared with the university.</p>
-      <div class="sec" style="margin-top:0">Appearance</div>
+    <!-- YOU: everything personal in one tab, two groups of rows that each open a sub-screen -->
+    <section class="screen" id="you">
+      <h2 class="q">You</h2>
+      <p class="help">Only you can see this. It lives on this phone.</p>
+      <div class="sec" style="margin-top:0">Your space</div>
+      <div class="group" id="youSpace">
+        <button type="button" class="row rowlink press" id="youProgress">
+          <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17c3 0 4-7 7-7s3 5 6 5 3-6 5-8"/></svg></span>
+          <span style="flex:1"><div class="t">Progress</div><div class="s">The shape of your weeks</div></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="row rowlink press" id="youJournal">
+          <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 1 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
+          <span style="flex:1"><div class="t">Journal</div><div class="s">Private, never leaves this phone</div></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="row rowlink press" id="youValues">
+          <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></svg></span>
+          <span style="flex:1"><div class="t">What matters to you</div><div class="s">Your values exercise</div></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+      </div>
+      <div class="sec">Settings</div>
+      <div class="group" id="youSettings">
+        <button type="button" class="row rowlink press" id="youPrivacy">
+          <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+          <span style="flex:1"><div class="t">Privacy and data</div><div class="s">Everything is off until you turn it on</div></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="row rowlink press" id="youAppearance">
+          <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg></span>
+          <span style="flex:1"><div class="t">Appearance</div><div class="s" id="youApDesc">Light</div></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="row rowlink press" id="youAddHome">
+          <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><path d="M12 8v8M8 12h8"/></svg></span>
+          <span style="flex:1"><div class="t">Add to home screen</div></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+        <button type="button" class="row rowlink press" id="youAccount">
+          <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg></span>
+          <span style="flex:1"><div class="t">Account</div><div class="s" id="youAcctDesc">Not signed in</div></span>
+          <span class="chev" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span>
+        </button>
+        <a class="row rowlink press" id="youWebsite" href="/" target="_blank" rel="noopener noreferrer">
+          <span class="rowic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg></span>
+          <span style="flex:1"><div class="t">ZenAI website</div></span>
+        </a>
+      </div>
+    </section>
+
+    <!-- PROGRESS: opened from You -->
+    <section class="screen" id="progress">
+      <div class="subhead"><button class="backbtn press" aria-label="Back to You"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><h2 class="q">Your last few weeks</h2></div>
+      <p class="help">Only you can see this. It lives on this device.</p>
+      <div id="prog"></div>
+    </section>
+
+    <!-- JOURNAL: opened from You, on-device only, never sent, one-tap delete -->
+    <section class="screen" id="journal">
+      <div class="subhead"><button class="backbtn press" aria-label="Back to You"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><h2 class="q">Journal</h2></div>
+      <p class="help">A private place to write what's on your mind, in your own words. It is never sent anywhere and never added to a conversation, and you can delete any entry with one tap.</p>
+      <textarea class="jbox" id="jtext" rows="3" maxlength="2000" placeholder="Write anything, just for you" aria-label="New journal entry"></textarea>
+      <button class="soft press jsave" id="jsave">Save entry</button>
+      <div id="jlist" style="margin-top:14px"></div>
+    </section>
+
+    <!-- APPEARANCE: opened from You -->
+    <section class="screen" id="appearance">
+      <div class="subhead"><button class="backbtn press" aria-label="Back to You"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><h2 class="q">Appearance</h2></div>
       <div class="group" style="padding:14px 16px 16px">
         <div class="t" style="margin-bottom:2px">Theme</div>
         <div class="s" style="margin-bottom:10px">Light is ZenAI's original look. Match my phone follows your device.</div>
@@ -669,10 +729,23 @@
           <button type="button" data-theme="system" role="radio">Match my phone</button>
         </div>
       </div>
+    </section>
+
+    <!-- ADD TO HOME SCREEN: opened from You -->
+    <section class="screen" id="addhome">
+      <div class="subhead"><button class="backbtn press" aria-label="Back to You"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><h2 class="q">Add to home screen</h2></div>
+      <p class="help">Open ZenAI like any other app, right from your phone.</p>
+      <div class="group" id="addhomeBody" style="padding:0 16px"></div>
+    </section>
+
+    <!-- PRIVACY: opened from You -->
+    <section class="screen" id="privacy">
+      <div class="subhead"><button class="backbtn press" aria-label="Back to You"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><h2 class="q">Privacy and data</h2></div>
+      <p class="help">Everything is off until you turn it on. It stays on this device unless you turn on sync, and nothing you write is ever shared with the university.</p>
       <div class="group" id="switches"></div>
       <div class="group" style="padding:14px 16px 16px;margin-top:14px">
         <div class="t" style="margin-bottom:2px">Your journal and values answers</div>
-        <div class="s">What you write in Progress &rarr; Journal, and in "What matters to you" from Talk, stays on this device only. ZenAI never reads it and never sends it anywhere. Delete a journal entry any time with one tap, or erase everything below.</div>
+        <div class="s">What you write in Journal, and in "What matters to you", stays on this device only. ZenAI never reads it and never sends it anywhere. Delete a journal entry any time with one tap, or erase everything below.</div>
       </div>
       <div id="memlist"></div>
       <button class="erase press" id="erase"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Delete everything ZenAI remembers</button>
@@ -683,9 +756,8 @@
   <nav id="nav">
     <button data-go="talk" class="on press"><svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z"/></svg>Talk</button>
     <button data-go="checkin" class="press"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 13.5s1.3 2 3.5 2 3.5-2 3.5-2"/><path d="M9.5 9.5h.01M14.5 9.5h.01"/></svg>Check in</button>
-    <button data-go="progress" class="press"><svg viewBox="0 0 24 24"><path d="M3 17c3 0 4-7 7-7s3 5 6 5 3-6 5-8"/></svg>Progress</button>
     <button data-go="finder" class="press"><svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21s7-7.6 7-12a7 7 0 0 0-14 0c0 4.4 7 12 7 12z"/></svg>Find help</button>
-    <button data-go="privacy" class="press"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/></svg>Privacy</button>
+    <button data-go="you" class="press"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"/></svg>You</button>
   </nav>
 
   <div class="sidefoot"><b>Not a counselor.</b>In crisis, call or text <a href="tel:988">988</a>, any time.<br>Nothing you type is shared with the university.</div>
@@ -731,9 +803,14 @@
 
   <section class="gate hidden" id="signinGate" role="dialog" aria-modal="true" aria-label="Sign in to talk">
     <button class="helpnow press" id="sgHelp" style="position:absolute;top:calc(14px + var(--top));right:16px" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Get help now</button>
-    <div class="orb" style="width:72px;height:72px" aria-hidden="true"><i></i></div>
-    <h2 tabindex="-1" id="sgTitle">Sign in to talk</h2>
-    <p>This pilot is open to signed-in Morgan State students. It only takes a minute, and ZenAI never stores your email address itself.</p>
+    <div class="orb" style="width:110px;height:110px;margin:0 auto 4px" aria-hidden="true"><i></i></div>
+    <h2 tabindex="-1" id="sgTitle">A place to slow down for a minute.</h2>
+    <p>Sign in once with your Morgan email. After that, ZenAI opens straight to Talk.</p>
+    <div class="gatechips">
+      <span>Not a counselor</span>
+      <span>Nothing kept unless you choose</span>
+      <span>988 any time</span>
+    </div>
     <form id="sgForm" novalidate>
       <label for="sgEmail" style="display:block;font-size:13px;color:var(--muted);margin-bottom:6px">Your Morgan email</label>
       <input id="sgEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" autocorrect="off" placeholder="you@morgan.edu" required
@@ -841,13 +918,21 @@ function askCode(wrong) {
 }
 
 // ---------- navigation ----------
+// Progress, Journal, Privacy, Appearance and Add to home screen are reached only
+// from You; they keep the You tab highlighted and get a back button of their own.
+const YOU_SUBS = ["progress", "journal", "privacy", "appearance", "addhome"];
 function go(name) {
   document.querySelectorAll(".screen").forEach(s => s.classList.toggle("on", s.id === name));
-  document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.go === name));
+  const navName = YOU_SUBS.includes(name) ? "you" : name;
+  document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.go === navName));
   $("nav").classList.toggle("hidden", name === "welcome");
   $("app").classList.toggle("bare", name === "welcome");
-  if (name === "progress") { drawProgress(); drawJournal(); }
+  if (name === "progress") drawProgress();
+  if (name === "journal") drawJournal();
   if (name === "privacy") drawPrivacy();
+  if (name === "appearance") drawTheme();
+  if (name === "addhome") drawAddHome();
+  if (name === "you") drawYou();
   if (name === "finder") drawFinder();
   if (name !== "talk") document.querySelector("main").scrollTop = 0;
 }
@@ -859,12 +944,43 @@ $("start").onclick = async () => {
   go("talk");
 };
 
+// ---------- the You tab: rows that open a sub-screen, and the hooks future work uses ----------
+function openYouScreen(id) { go(id); }
+function backToYou() { go("you"); }
+window.zenaiYou = {open: openYouScreen, back: backToYou};
+document.querySelectorAll(".backbtn").forEach(b => b.onclick = backToYou);
+$("youProgress").onclick = () => openYouScreen("progress");
+$("youJournal").onclick = () => openYouScreen("journal");
+$("youValues").onclick = () => openValues();
+$("youPrivacy").onclick = () => openYouScreen("privacy");
+$("youAppearance").onclick = () => openYouScreen("appearance");
+$("youAddHome").onclick = () => openYouScreen("addhome");
+$("youAccount").onclick = () => toggleAcct(true);
+function drawYou() {
+  const acctDesc = $("youAcctDesc");
+  if (acctDesc) {
+    const me = window.zenaiAccount ? window.zenaiAccount.me() : {signed_in: false};
+    acctDesc.textContent = me.signed_in ? "Signed in with your Morgan email" : "Not signed in";
+  }
+  const apDesc = $("youApDesc");
+  if (apDesc) {
+    const t = (window.zenaiTheme && window.zenaiTheme.get) ? window.zenaiTheme.get() : "light";
+    apDesc.textContent = t === "dark" ? "Dark" : t === "system" ? "Match my phone" : "Light";
+  }
+}
+// ---------- add to home screen: opened from You, shares install.js with the Account panel ----------
+function drawAddHome() {
+  const body = $("addhomeBody");
+  if (!body) return;
+  const html = window.zenaiInstall ? window.zenaiInstall.row() : "";
+  body.innerHTML = html || `<p class="help" style="margin:16px 0">Already installed, or this browser doesn't offer it here.</p>`;
+  if (window.zenaiInstall) window.zenaiInstall.wire(body);
+}
+
 // ---------- account menu ----------
 function toggleAcct(open) {
   $("acct").classList.toggle("hidden", !open);
-  $("acctBtn").setAttribute("aria-expanded", open ? "true" : "false");
 }
-$("acctBtn").onclick = () => toggleAcct(true);
 $("acctClose").onclick = () => toggleAcct(false);
 $("acctPrivacy").onclick = () => { toggleAcct(false); go("privacy"); };
 
@@ -914,11 +1030,21 @@ $("sgInviteForm").onsubmit = async e => {
   $("sgNote").textContent = r.status === 429 ? "Too many tries. Wait a minute and try again."
     : (r.d.detail?.message || "That code didn't work. Check it and try again.");
 };
-// Returning with "welcomed" already set skips straight to Talk; catch a required,
-// signed-out visit here too, from account.js's own refresh on load.
+// Returning with "welcomed" already set skips straight to Talk. A signed-out,
+// required visit shows the one-screen sign-in instead, whenever account.js's own
+// refresh (on load, or later) says so; a signed-in required visit lands on Talk
+// and is remembered as "welcomed" so the next visit skips the check entirely.
+let bootAccountHandled = false;
 document.addEventListener("zenai:account", e => {
   const me = e.detail || {};
+  if (!bootAccountHandled) {
+    bootAccountHandled = true;
+    if (me.required && !me.signed_in) { openSigninGate(); return; }
+    if (me.required && me.signed_in) { S.set("welcomed", true); if (!$("talk").classList.contains("on")) go("talk"); }
+    return;
+  }
   if (me.required && !me.signed_in && $("talk").classList.contains("on")) openSigninGate();
+  if (me.required && me.signed_in && $("signinGate").classList.contains("hidden") === false) { closeSigninGate(); go("talk"); }
 });
 
 // ---------- crisis, and "Get help now" ----------
@@ -1065,7 +1191,6 @@ function ciCard(q, attr, skip) {
     <button class="notok press" ${attr}="4"><span>Not okay right now?</span><b>Talk to a person &rarr;</b></button></div>`;
 }
 const BREATHE_CHIP = `<button class="chip br press" data-breathe>${ORB()}Breathe with me</button>`;
-const VALUES_CHIP = `<button class="chip br press" data-values>${ORB()}What matters to you</button>`;
 let skipCI = false;
 function drawHello() {
   const [g, sub] = greeting();
@@ -1078,10 +1203,9 @@ function drawHello() {
     : `<h2>What's on your mind?</h2><p class="say">${sub} Say it however it comes out.</p>`;
   $("log").innerHTML = `<div class="hello">${ORB()}<div class="eyebrow">${g}</div>${head}${strip}${inExamSeason() ? examCardHtml() : ""}
     <div class="chips">${STARTERS.map(s => `<button class="chip press">${s}</button>`).join("")}</div>
-    <div class="chips calm">${BREATHE_CHIP}${VALUES_CHIP}</div></div>`;
-  $("log").querySelectorAll(".chip:not([data-breathe]):not([data-values])").forEach(c => c.onclick = () => { $("msg").value = c.textContent; $("msg").focus(); });
+    <div class="chips calm">${BREATHE_CHIP}</div></div>`;
+  $("log").querySelectorAll(".chip:not([data-breathe])").forEach(c => c.onclick = () => { $("msg").value = c.textContent; $("msg").focus(); });
   $("log").querySelectorAll("[data-breathe]").forEach(b => b.onclick = () => breathe(b));
-  $("log").querySelectorAll("[data-values]").forEach(b => b.onclick = () => openValues());
   $("log").querySelectorAll("[data-ci]").forEach(b => b.onclick = () => recordCheckin(+b.dataset.ci));
   if ($("ciskip")) $("ciskip").onclick = () => { skipCI = true; drawHello(); };
   if ($("cichange")) $("cichange").onclick = e => { e.preventDefault(); CHECKIN = null; skipCI = false; forceAsk = true; drawHello(); };
@@ -1730,7 +1854,7 @@ $("erase").onclick = () => {
   HISTORY = []; location.reload();
 };
 
-// ---------- journal (Progress tab): on-device only, never sent, one-tap delete ----------
+// ---------- journal (You tab): on-device only, never sent, one-tap delete ----------
 function drawJournal() {
   const list = S.get("journal", []);
   $("jlist").innerHTML = list.length ? `<div class="sec" style="margin-top:0">Your entries</div>` +
@@ -1750,7 +1874,7 @@ $("jsave").onclick = () => {
   drawJournal();
 };
 
-// ---------- values: a short, guided ACT values exercise, reachable from Talk home ----------
+// ---------- values: a short, guided ACT values exercise, reachable from You ----------
 // Answers are never sent to the server and are never added to a conversation.
 const ACT_DOMAINS = [
   {k: "school", q: "Underneath the stress, what matters to you about school?"},
@@ -1804,7 +1928,14 @@ function closeValues() {
 $("valuesClose").onclick = closeValues;
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("values").classList.contains("hidden")) closeValues(); });
 
-go(S.get("welcomed", false) ? "talk" : "welcome");
+// First paint, before account.js's own fetch can answer: a returning student who
+// has signed in before goes straight to Talk. Everyone else sees the old welcome
+// for a moment, unless this same browser already knows sign-in is required here
+// (cached from an earlier visit), in which case the one-screen sign-in shows
+// right away instead, with no flash of the welcome behind it.
+const welcomed = S.get("welcomed", false);
+go(welcomed ? "talk" : "welcome");
+if (!welcomed && S.get("signinRequired", false)) openSigninGate();
 
 // restore a kept conversation, or greet (last: it needs LEVELS)
 if (HISTORY.length) { for (const h of HISTORY) h.role === "user" ? addMine(h.content) : addZen(h.content); showDone(); }
