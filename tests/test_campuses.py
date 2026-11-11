@@ -175,5 +175,11 @@ def test_campus_endpoint_returns_morgan_numbers():
         assert b["counseling"]["phone"] == "443-885-3130"
         assert b["counseling"]["line_24_7"] == "1-800-422-0009"
         assert b["counseling"]["hours"]["label"] == "Weekdays 8:30 to 5"
-        assert "resources" not in b and "domains" not in b
+        assert "domains" not in b
+        # the resource finder and the client-side exam-season check both read GET
+        # /campus, so public() carries the verified resource cards and exam windows
+        assert any(r["id"] == "tutoring" and r["url"] == "https://www.morgan.edu/tutoring" for r in b["resources"])
+        assert all({"name", "what", "phone", "url"} <= r.keys() for r in b["resources"])
+        labels = [w["label"] for w in b["exam_windows"]]
+        assert "Fall 2026 final exams" in labels
     assert c.get("/campus", params={"id": "nowhere"}).status_code == 404

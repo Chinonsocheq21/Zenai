@@ -99,14 +99,15 @@
   header .hlink{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink2);flex:none}
   header .hlink:active{background:var(--surface)}
   header .hlink svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-  header .helpnow{margin-left:6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 13px;
+  /* the help pill: unscoped so it looks the same in the header and on the sign-in gate */
+  .helpnow{margin-left:6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 13px;
                border-radius:999px;border:1px solid rgba(178,58,42,.3);background:var(--redsoft);color:var(--redtext);
                font-size:13.5px;font-weight:650;white-space:nowrap;flex:none}
-  html[data-theme="dark"] header .helpnow{border-color:rgba(255,138,115,.4)}
-  @media (prefers-color-scheme: dark){html[data-theme="system"] header .helpnow{border-color:rgba(255,138,115,.4)}}
-  @media (max-width:379px){header .helpnow svg{display:none} header .helpnow{padding:0 11px}}
-  header .helpnow svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  header .helpnow:hover{background:color-mix(in srgb, var(--red) 16%, var(--redsoft))}
+  html[data-theme="dark"] .helpnow{border-color:rgba(255,138,115,.4)}
+  @media (prefers-color-scheme: dark){html[data-theme="system"] .helpnow{border-color:rgba(255,138,115,.4)}}
+  @media (max-width:379px){.helpnow svg{display:none} .helpnow{padding:0 11px}}
+  .helpnow svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .helpnow:hover{background:color-mix(in srgb, var(--red) 16%, var(--redsoft))}
   /* welcome: only the help pill shows, the welcome screen has its own orb */
   .app.bare header{justify-content:flex-end}
   .app.bare header .mini,.app.bare header h1,.app.bare header .hlinks{display:none}
@@ -352,6 +353,39 @@
   .erase svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   .fine{font-size:13px;color:var(--muted);line-height:1.6;margin-top:16px;padding:0 4px}
 
+  /* ---------- journal (Progress tab): on-device only, never sent, one-tap delete ---------- */
+  .jbox{width:100%;border:1px solid var(--line2);border-radius:16px;background:var(--surface);color:var(--ink);
+        font:15px/1.5 var(--sans);padding:12px 14px;resize:vertical}
+  .jbox::placeholder{color:var(--muted)}
+  .jsave{margin-top:10px}
+
+  /* ---------- resource finder ---------- */
+  .finderSearch{margin-bottom:14px}
+  .finderSearch input{width:100%;height:50px;border-radius:16px;border:1px solid var(--line2);background:var(--surface);
+                      color:var(--ink);font:16px var(--sans);padding:0 16px}
+  .finderSearch input::placeholder{color:var(--muted)}
+  .findcards{display:flex;flex-direction:column;gap:10px}
+
+  /* ---------- exam-season card on Talk home ---------- */
+  .examcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 18px;margin:14px 10px 2px;
+            box-shadow:var(--shadow);text-align:center;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+  .examcard .et{font-family:var(--serif);font-size:18px;color:var(--ink);margin-bottom:6px}
+  .examcard p{font-size:14px;color:var(--ink2);line-height:1.5;margin-bottom:12px}
+
+  /* ---------- crisis hand-off: a quiet link to a free safety plan, no text box ---------- */
+  .safeplan{margin-top:16px;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.5}
+  .safeplan a{display:inline-block;color:var(--ink2);font-weight:650;text-decoration:underline;text-underline-offset:3px;margin-bottom:3px}
+
+  /* ---------- values: a short ACT exercise, reachable from Talk home, device only ---------- */
+  .values{position:absolute;inset:0;z-index:19;overflow-y:auto;padding:18px 22px;padding-top:calc(18px + var(--top));
+          padding-bottom:calc(20px + var(--bot));background:var(--bg)}
+  .values .vhead{display:flex;justify-content:flex-end}
+  .values .vclose{width:36px;height:36px;border-radius:18px;font-size:22px;line-height:1;color:var(--ink2);display:grid;place-items:center}
+  .values .vclose:active{background:var(--surface)}
+  .values textarea{width:100%;border:1px solid var(--line2);border-radius:16px;background:var(--surface);color:var(--ink);
+                   font:16px/1.5 var(--sans);padding:12px 14px;resize:vertical}
+  .values textarea::placeholder{color:var(--muted)}
+
   /* ---------- frosted tab bar ---------- */
   nav{display:flex;margin:0 12px calc(8px + var(--bot));padding:6px;border-radius:26px;position:relative;z-index:6;
       background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow2);
@@ -409,11 +443,19 @@
   .gate,.acct{position:absolute;inset:0;z-index:18;display:flex;flex-direction:column;justify-content:center;padding:0 30px;background:var(--bg)}
   .gate h2,.acct h2{font-family:var(--serif);font-weight:400;font-size:30px;margin:18px 0 8px}
   .gate p,.acct p{color:var(--ink2);font-size:15px;line-height:1.55;margin-bottom:18px}
-  .gate input{height:56px;border-radius:16px;border:1px solid var(--line2);background:var(--surface);font:600 22px var(--mono, monospace);letter-spacing:.14em;text-align:center;text-transform:uppercase;color:var(--ink)}
-  .gate button,.acct button{margin-top:12px;height:52px;border-radius:26px;background:var(--accent);color:var(--accentInk, #fff);font-weight:600;font-size:16px}
+  /* the class-code gate only: a short, uppercase, letter-spaced code */
+  #gate input{height:56px;border-radius:16px;border:1px solid var(--line2);background:var(--surface);font:600 22px var(--mono, monospace);letter-spacing:.14em;text-align:center;text-transform:uppercase;color:var(--ink)}
+  #gate button,.acct button{margin-top:12px;height:52px;border-radius:26px;background:var(--accent);color:var(--accentInk, #fff);font-weight:600;font-size:16px}
   .gate .bad{color:var(--red);font-size:13.5px;margin-top:10px;min-height:18px}
   .acct .alt,.gate .alt{display:flex;align-items:center;justify-content:center;margin-top:10px;height:48px;border-radius:24px;
              border:1px solid var(--line2);background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;text-decoration:none}
+  /* the sign-in gate: a normal email field, left-aligned, and its own submit buttons
+     (its "Get help now" keeps the header's .helpnow pill untouched by .gate button) */
+  #signinGate input{height:52px;border-radius:16px;border:1.5px solid var(--line2);background:var(--surface);color:var(--ink);
+                    font:17px var(--sans);padding:0 16px;text-align:left}
+  #signinGate #sgCode{font:600 18px var(--mono, monospace);letter-spacing:.1em;text-align:center;text-transform:uppercase;padding:0}
+  #signinGate form button[type="submit"]{margin-top:12px;height:52px;border-radius:26px;background:var(--accent);color:var(--accentInk, #fff);font-weight:600;font-size:16px}
+  #sgTitle{outline:none}
   .acct .close{display:block;margin:16px auto 0;min-height:44px;padding:0 18px;font-size:15px;font-weight:600;
                color:var(--ink2);text-decoration:underline;text-underline-offset:3px;background:none}
 
@@ -598,6 +640,19 @@
       <h2 class="q">Your last few weeks</h2>
       <p class="help">Only you can see this. It lives on this device.</p>
       <div id="prog"></div>
+      <div class="sec">Journal</div>
+      <p class="help" style="margin-top:-6px">A private place to write what's on your mind, in your own words. It is never sent anywhere and never added to a conversation, and you can delete any entry with one tap.</p>
+      <textarea class="jbox" id="jtext" rows="3" maxlength="2000" placeholder="Write anything, just for you" aria-label="New journal entry"></textarea>
+      <button class="soft press jsave" id="jsave">Save entry</button>
+      <div id="jlist" style="margin-top:14px"></div>
+    </section>
+
+    <!-- RESOURCE FINDER -->
+    <section class="screen" id="finder">
+      <h2 class="q">Find a resource</h2>
+      <p class="help">Every verified Morgan State office in one place, with a way to call or visit its website.</p>
+      <div class="finderSearch"><input id="finderQ" type="search" placeholder="Try housing, tutoring, health..." aria-label="Search campus resources"></div>
+      <div class="findcards" id="finderList"></div>
     </section>
 
     <!-- PRIVACY -->
@@ -615,9 +670,13 @@
         </div>
       </div>
       <div class="group" id="switches"></div>
+      <div class="group" style="padding:14px 16px 16px;margin-top:14px">
+        <div class="t" style="margin-bottom:2px">Your journal and values answers</div>
+        <div class="s">What you write in Progress &rarr; Journal, and in "What matters to you" from Talk, stays on this device only. ZenAI never reads it and never sends it anywhere. Delete a journal entry any time with one tap, or erase everything below.</div>
+      </div>
       <div id="memlist"></div>
       <button class="erase press" id="erase"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Delete everything ZenAI remembers</button>
-      <p class="fine">What you type is sent to ZenAI to write a reply. Names, emails, phone numbers and student IDs are removed before anything reads it. Conversations aren't saved on this device unless "Keep this conversation" is on. If you talk out loud, your browser's speech service (Apple or Google) turns your voice into text; ZenAI only ever receives the text and never keeps audio.</p>
+      <p class="fine">What you type is sent to ZenAI to write a reply. Names, emails, phone numbers and student IDs are removed before anything reads it. Conversations aren't saved on this device unless "Keep this conversation" is on. If you talk out loud, your browser's speech service (Apple or Google) turns your voice into text; ZenAI only ever receives the text and never keeps audio. Your journal and values answers are never sent to ZenAI at all.</p>
     </section>
   </main>
 
@@ -625,6 +684,7 @@
     <button data-go="talk" class="on press"><svg viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z"/></svg>Talk</button>
     <button data-go="checkin" class="press"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 13.5s1.3 2 3.5 2 3.5-2 3.5-2"/><path d="M9.5 9.5h.01M14.5 9.5h.01"/></svg>Check in</button>
     <button data-go="progress" class="press"><svg viewBox="0 0 24 24"><path d="M3 17c3 0 4-7 7-7s3 5 6 5 3-6 5-8"/></svg>Progress</button>
+    <button data-go="finder" class="press"><svg viewBox="0 0 24 24"><circle cx="12" cy="10" r="3"/><path d="M12 21s7-7.6 7-12a7 7 0 0 0-14 0c0 4.4 7 12 7 12z"/></svg>Find help</button>
     <button data-go="privacy" class="press"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"/></svg>Privacy</button>
   </nav>
 
@@ -654,6 +714,13 @@
     <button class="vend press" id="bstop">Stop</button>
   </section>
 
+  <!-- VALUES: a short, guided ACT values exercise. Answers stay on this device and are
+       never added to a conversation or sent anywhere. -->
+  <section class="values hidden" id="values" role="dialog" aria-modal="true" aria-label="What matters to you">
+    <div class="vhead"><button class="vclose press" id="valuesClose" aria-label="Close">&times;</button></div>
+    <div id="valuesBody"></div>
+  </section>
+
   <section class="gate hidden" id="gate" aria-label="Class code">
     <div class="orb" style="width:72px;height:72px" aria-hidden="true"><i></i></div>
     <h2>Enter the class code</h2>
@@ -669,15 +736,15 @@
     <p>This pilot is open to signed-in Morgan State students. It only takes a minute, and ZenAI never stores your email address itself.</p>
     <form id="sgForm" novalidate>
       <label for="sgEmail" style="display:block;font-size:13px;color:var(--muted);margin-bottom:6px">Your Morgan email</label>
-      <input id="sgEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@morgan.edu" required
-        style="width:100%;height:52px;border-radius:16px;border:1.5px solid var(--line2);background:var(--surface);color:var(--ink);font:16px var(--sans);padding:0 16px">
+      <input id="sgEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" autocorrect="off" placeholder="you@morgan.edu" required
+        style="width:100%">
       <button class="press" type="submit" id="sgSend" style="width:100%">Email me a sign-in link</button>
     </form>
     <button class="alt press" type="button" id="sgInviteToggle">Have an invite code?</button>
     <form id="sgInviteForm" class="hidden" novalidate>
       <label for="sgCode" style="display:block;font-size:13px;color:var(--muted);margin:14px 0 6px">Invite code</label>
-      <input id="sgCode" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Invite code"
-        style="width:100%;height:52px;border-radius:16px;border:1.5px solid var(--line2);background:var(--surface);font:600 18px var(--mono, monospace);letter-spacing:.1em;text-align:center;text-transform:uppercase;color:var(--ink)">
+      <input id="sgCode" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" aria-label="Invite code"
+        style="width:100%">
       <button class="press" type="submit" id="sgCodeGo" style="width:100%">Continue</button>
     </form>
     <div class="bad" id="sgNote" role="status"></div>
@@ -702,6 +769,7 @@
       <a class="ob press" id="c-text" href="sms:988"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z"/></svg>Text 988</a>
       <a class="ob chat press" id="c-chat" href="https://988lifeline.org/chat" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>Chat online</a>
     </div>
+    <div class="safeplan"><a href="https://suicidesafetyplan.com/" target="_blank" rel="noopener noreferrer">Make a free safety plan</a><br>A short worksheet, from the Stanley-Brown method clinicians use, for noticing warning signs early and what helps.</div>
     <div class="desk">On your phone, call or text<b>988</b></div>
     <div class="sub">988 Suicide and Crisis Lifeline, 24 hours. Free and confidential.</div>
     <div class="ccard" id="c-campus-card">
@@ -778,8 +846,9 @@ function go(name) {
   document.querySelectorAll("#nav button").forEach(b => b.classList.toggle("on", b.dataset.go === name));
   $("nav").classList.toggle("hidden", name === "welcome");
   $("app").classList.toggle("bare", name === "welcome");
-  if (name === "progress") drawProgress();
+  if (name === "progress") { drawProgress(); drawJournal(); }
   if (name === "privacy") drawPrivacy();
+  if (name === "finder") drawFinder();
   if (name !== "talk") document.querySelector("main").scrollTop = 0;
 }
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => go(b.dataset.go));
@@ -996,6 +1065,7 @@ function ciCard(q, attr, skip) {
     <button class="notok press" ${attr}="4"><span>Not okay right now?</span><b>Talk to a person &rarr;</b></button></div>`;
 }
 const BREATHE_CHIP = `<button class="chip br press" data-breathe>${ORB()}Breathe with me</button>`;
+const VALUES_CHIP = `<button class="chip br press" data-values>${ORB()}What matters to you</button>`;
 let skipCI = false;
 function drawHello() {
   const [g, sub] = greeting();
@@ -1006,14 +1076,16 @@ function drawHello() {
   const after = lvl >= 0 && lvl < 4 ? AFTER_CI[lvl] : null;
   const head = after ? `<p class="ack">${after[0]}</p><h2>${after[1]}</h2><p class="say">Say it however it comes out.</p>`
     : `<h2>What's on your mind?</h2><p class="say">${sub} Say it however it comes out.</p>`;
-  $("log").innerHTML = `<div class="hello">${ORB()}<div class="eyebrow">${g}</div>${head}${strip}
+  $("log").innerHTML = `<div class="hello">${ORB()}<div class="eyebrow">${g}</div>${head}${strip}${inExamSeason() ? examCardHtml() : ""}
     <div class="chips">${STARTERS.map(s => `<button class="chip press">${s}</button>`).join("")}</div>
-    <div class="chips calm">${BREATHE_CHIP}</div></div>`;
-  $("log").querySelectorAll(".chip:not([data-breathe])").forEach(c => c.onclick = () => { $("msg").value = c.textContent; $("msg").focus(); });
+    <div class="chips calm">${BREATHE_CHIP}${VALUES_CHIP}</div></div>`;
+  $("log").querySelectorAll(".chip:not([data-breathe]):not([data-values])").forEach(c => c.onclick = () => { $("msg").value = c.textContent; $("msg").focus(); });
   $("log").querySelectorAll("[data-breathe]").forEach(b => b.onclick = () => breathe(b));
+  $("log").querySelectorAll("[data-values]").forEach(b => b.onclick = () => openValues());
   $("log").querySelectorAll("[data-ci]").forEach(b => b.onclick = () => recordCheckin(+b.dataset.ci));
   if ($("ciskip")) $("ciskip").onclick = () => { skipCI = true; drawHello(); };
   if ($("cichange")) $("cichange").onclick = e => { e.preventDefault(); CHECKIN = null; skipCI = false; forceAsk = true; drawHello(); };
+  if ($("examFind")) $("examFind").onclick = () => go("finder");
 }
 let forceAsk = false;
 const scrollDown = () => { const l = $("log"); l.scrollTop = l.scrollHeight; stick = true; };
@@ -1061,20 +1133,96 @@ function wireHelped() {
   });
 }
 const PHONE_IC = `<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>`;
+// one card for one resource: call and website buttons, open-now aware when there's
+// both an office and a 24/7 line. Shared by the chat's reference cards and the finder.
+function resourceCardHtml(r) {
+  const name = tidy(r.name), c = campusLines([r.phone, r.detail].filter(Boolean).join(", "));
+  let status = "", btns = "", detail = r.detail ? tidy(r.detail) : "";
+  if (c.line && c.office) {                          // an office with hours and a 24/7 line: open-now aware
+    const nb = numberButtons(c, name, true);
+    status = `<div class="st ${nb.open ? "open" : ""}">${nb.status}</div>`; btns = nb.html; detail = "";
+  } else if (r.phone) {
+    btns = `<a class="nb p press" href="tel:${esc(String(r.phone).replace(/\D/g, ""))}" aria-label="${esc(`Call ${name}, ${r.phone}`)}"><span>${PHONE_IC.replace("<svg", '<svg aria-hidden="true"')}Call</span><small>${esc(r.phone)}</small></a>`;
+  }
+  const link = /^https:\/\//.test(r.url || "") ? `<a class="lk" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Website and location</a>` : "";
+  return `<div class="ref"><div class="n">${esc(name)}</div><div class="w">${esc(tidy(r.what))}</div>${status}${btns}${detail ? `<div class="d">${esc(detail)}</div>` : ""}${link}</div>`;
+}
 function addCards(list) {
-  $("log").insertAdjacentHTML("beforeend", `<div class="refs msg"><div class="reflabel">At Morgan State</div>` + list.map(r => {
-    const name = tidy(r.name), c = campusLines([r.phone, r.detail].filter(Boolean).join(", "));
-    let status = "", btns = "", detail = r.detail ? tidy(r.detail) : "";
-    if (c.line && c.office) {                          // an office with hours and a 24/7 line: open-now aware
-      const nb = numberButtons(c, name, true);
-      status = `<div class="st ${nb.open ? "open" : ""}">${nb.status}</div>`; btns = nb.html; detail = "";
-    } else if (r.phone) {
-      btns = `<a class="nb p press" href="tel:${esc(String(r.phone).replace(/\D/g, ""))}" aria-label="${esc(`Call ${name}, ${r.phone}`)}"><span>${PHONE_IC.replace("<svg", '<svg aria-hidden="true"')}Call</span><small>${esc(r.phone)}</small></a>`;
-    }
-    const link = /^https:\/\//.test(r.url || "") ? `<a class="lk" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Website and location</a>` : "";
-    return `<div class="ref"><div class="n">${esc(name)}</div><div class="w">${esc(tidy(r.what))}</div>${status}${btns}${detail ? `<div class="d">${esc(detail)}</div>` : ""}${link}</div>`;
-  }).join("") + `</div>`);
+  $("log").insertAdjacentHTML("beforeend", `<div class="refs msg"><div class="reflabel">At Morgan State</div>` + list.map(resourceCardHtml).join("") + `</div>`);
   scrollDown();
+}
+
+// ---------- resource finder: every verified campus resource, searchable ----------
+// Bundled Morgan defaults (campuses.json's own "morgan" entry) so the finder works
+// offline; GET /campus (campuses.public()) replaces them once it answers.
+const DEFAULT_RESOURCES = [
+  {id: "counseling", name: "Counseling Center", what: "Counseling for Morgan students, in person or by phone.",
+   phone: "443-885-3130", detail: "Weekdays 8:30 to 5, 24/7 line: 1-800-422-0009", url: "https://www.morgan.edu/counselingcenter", verified: "2026-10-29"},
+  {id: "tutoring", name: "Center for Academic Success and Achievement (CASA)", what: "Tutoring and academic advising. Book through Navigate 360.",
+   phone: "443-885-3380", detail: "Tyler Hall, Suite 117, CASA@morgan.edu", url: "https://www.morgan.edu/tutoring", verified: "2026-10-29"},
+  {id: "disability", name: "Student Disability Support Services", what: "Academic accommodations and disability support.",
+   phone: "443-885-4767", detail: "Richardson Library, Room 133-A, SDSS@morgan.edu", url: "https://www.morgan.edu/sdss", verified: "2026-10-29"},
+  {id: "basic_needs", name: "Food Resource Center", what: "Free groceries and toiletries with your BEARcard, and help applying for SNAP.",
+   phone: "443-885-2736", detail: "McKeldin Center 208, foodresourcecenter@morgan.edu", url: "https://www.morgan.edu/foodresourcecenter", verified: "2026-10-29"},
+  {id: "support", name: "Student Support and Outreach Services (S.O.S.)",
+   what: "One person who helps you sort out what's getting in the way: money, housing, school or health. Also known as the CARE team, for reporting a concern about a student.",
+   phone: "443-885-4670", detail: "McMechen Hall 634, sos@morgan.edu", url: "https://www.morgan.edu/student-support-and-outreach", verified: "2026-11-11"},
+  {id: "financial_aid", name: "Office of Financial Aid", what: "Financial aid applications, FAFSA questions and your award letter.",
+   phone: "443-885-3170", detail: "Tyler Hall, Suite 206, finaid@morgan.edu", url: "https://www.morgan.edu/financialaid", verified: "2026-11-11"},
+  {id: "health", name: "Harriet A. Woolford University Health Center", what: "Medical care and health services for Morgan students.",
+   phone: "443-885-3236", detail: "1700 E. Cold Spring Lane, healthcenter@morgan.edu", url: "https://www.morgan.edu/healthcenter", verified: "2026-11-11"},
+  {id: "housing", name: "Office of Residence Life and Housing", what: "Housing assignments, room changes and questions about living on campus.",
+   phone: "443-885-3218", detail: "Historic Jenkins Building, Suite 340, reslife@morgan.edu", url: "https://www.morgan.edu/residencelife", verified: "2026-11-11"},
+  {id: "title_ix", name: "Title IX Office", what: "Reports and questions about sex-based discrimination, harassment or assault.",
+   phone: "443-885-3580", detail: "Tyler Hall, Suite 503, titleixcoordinator@morgan.edu", url: "https://www.morgan.edu/titleix", verified: "2026-11-11"},
+  {id: "career", name: "Center for Career Development", what: "Resume help, internships, job searches and career planning.",
+   phone: "443-885-3110", detail: "Tyler Hall, Suite 307, careers@morgan.edu", url: "https://www.morgan.edu/careerdevelopment", verified: "2026-11-11"},
+  {id: "veterans", name: "Veterans Engagement Services", what: "Support for veteran, active-duty and military-connected students.",
+   phone: "443-885-2046", detail: "Weekdays 8 to 5, veterans@morgan.edu", url: "https://www.morgan.edu/veteranservices", verified: "2026-11-11"},
+  {id: "international", name: "Office of International Students and Scholars", what: "Visa guidance, immigration status and support for international students.",
+   phone: "443-885-4033", detail: "Earl S. Richardson Library, Suite 212, international.affairs@morgan.edu", url: "https://www.morgan.edu/oisfs", verified: "2026-11-11"},
+];
+let RESOURCES = DEFAULT_RESOURCES.slice();
+function drawFinder() {
+  const q = ($("finderQ")?.value || "").trim().toLowerCase();
+  const list = !q ? RESOURCES : RESOURCES.filter(r => `${r.name} ${r.what} ${r.detail || ""}`.toLowerCase().includes(q));
+  $("finderList").innerHTML = list.length ? list.map(resourceCardHtml).join("")
+    : `<p class="help">Nothing matches "${esc(q)}". Try a different word, or see S.O.S. below for anything you're not sure where to take.</p>`;
+}
+$("finderQ").addEventListener("input", drawFinder);
+
+// ---------- exam season: a gentle card on Talk home ----------
+// The client checks this itself, so it works before any message is sent: bundled
+// Morgan exam windows (or the ones GET /campus answers with) against today's date
+// in the campus timezone. A "season":"exams" on a /chat reply is honored too.
+const DEFAULT_EXAM_WINDOWS = [
+  {label: "Fall 2026 midterms", start: "2026-10-12", end: "2026-10-17"},
+  {label: "Fall 2026 final exams", start: "2026-12-11", end: "2026-12-18"},
+  {label: "Spring 2027 midterms", start: "2027-03-07", end: "2027-03-13"},
+  {label: "Spring 2027 final exams", start: "2027-05-08", end: "2027-05-14"},
+];
+let CAMPUS = {timezone: "America/New_York", exam_windows: DEFAULT_EXAM_WINDOWS};
+let SERVER_SEASON = null;
+function campusDateKey(tz) {
+  try { return new Intl.DateTimeFormat("en-CA", {timeZone: tz}).format(new Date()); }
+  catch (e) { return new Intl.DateTimeFormat("en-CA").format(new Date()); }
+}
+function inExamSeason() {
+  if (SERVER_SEASON === "exams") return true;
+  const today = campusDateKey(CAMPUS.timezone || "America/New_York");
+  return (CAMPUS.exam_windows || []).some(w => w.start <= today && today <= w.end);
+}
+fetch(API + "/campus").then(r => r.ok ? r.json() : null).then(d => {
+  if (!d) return;
+  CAMPUS = {...CAMPUS, ...d, exam_windows: Array.isArray(d.exam_windows) && d.exam_windows.length ? d.exam_windows : CAMPUS.exam_windows};
+  if (Array.isArray(d.resources) && d.resources.length) RESOURCES = d.resources;
+  if ($("finder").classList.contains("on")) drawFinder();
+  if (!HISTORY.length && $("log").querySelector(".hello")) drawHello();
+}).catch(() => {});
+function examCardHtml() {
+  return `<div class="examcard"><div class="et">It's exam season</div>
+    <p>A lot of students feel the weight right now. If it helps, ZenAI can point you to the right campus resource.</p>
+    <button class="soft press" id="examFind">Find a resource</button></div>`;
 }
 // ---------- voice ----------
 // Listen with the browser's speech recognition, send the words through ask()
@@ -1415,6 +1563,7 @@ async function ask(text) {
     }
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
+    if (d.season) SERVER_SEASON = d.season;   // "exams" turns on the Talk home card next time
     if (d.escalate) { crisis(); return d; }
     addZen(d.reply);
     lastReply = d;
@@ -1577,9 +1726,83 @@ function drawNotes() {
 $("erase").onclick = () => {
   if (!confirm("Delete everything ZenAI has saved on this device? This can't be undone.")) return;
   Object.keys(localStorage).filter(k => k.startsWith("zenai.")).forEach(k => localStorage.removeItem(k));
-  ["consent", "moods", "memory", "history", "talks", "welcomed"].forEach(k => localStorage.removeItem("zenai." + k));
+  ["consent", "moods", "memory", "history", "talks", "welcomed", "journal", "values"].forEach(k => localStorage.removeItem("zenai." + k));
   HISTORY = []; location.reload();
 };
+
+// ---------- journal (Progress tab): on-device only, never sent, one-tap delete ----------
+function drawJournal() {
+  const list = S.get("journal", []);
+  $("jlist").innerHTML = list.length ? `<div class="sec" style="margin-top:0">Your entries</div>` +
+    list.map((e, i) => `<div class="note"><span>${esc(new Date(e.at).toLocaleDateString(undefined, {month: "short", day: "numeric"}))}: ${esc(e.text)}</span><button data-i="${i}" aria-label="Delete this entry">${TRASH}</button></div>`).join("")
+    : `<p class="help">Nothing written yet.</p>`;
+  $("jlist").querySelectorAll("button").forEach(b => b.onclick = () => {
+    const l = S.get("journal", []); l.splice(+b.dataset.i, 1); S.set("journal", l); drawJournal();
+  });
+}
+$("jsave").onclick = () => {
+  const t = $("jtext").value.trim();
+  if (!t) return;
+  const l = S.get("journal", []);
+  l.unshift({at: new Date().toISOString(), text: t.slice(0, 2000)});
+  S.set("journal", l.slice(0, 200));
+  $("jtext").value = "";
+  drawJournal();
+};
+
+// ---------- values: a short, guided ACT values exercise, reachable from Talk home ----------
+// Answers are never sent to the server and are never added to a conversation.
+const ACT_DOMAINS = [
+  {k: "school", q: "Underneath the stress, what matters to you about school?"},
+  {k: "people", q: "Who do you want to show up for this week, and how?"},
+  {k: "self", q: "What would taking care of yourself look like today?"},
+  {k: "future", q: "What kind of person are you trying to become?"},
+];
+let valuesStep = 0, valuesAnswers = {};
+function drawValues() {
+  const d = ACT_DOMAINS[valuesStep];
+  if (!d) {
+    $("valuesBody").innerHTML = `${ORB()}<h2 class="q">Thank you for sitting with that.</h2>
+      <p class="help">These answers stay on this device. Come back to them any time; ZenAI never reads them and never sends them anywhere.</p>
+      <button class="cta press" id="valuesDone">Back to Talk</button>`;
+    $("valuesDone").onclick = closeValues;
+    return;
+  }
+  $("valuesBody").innerHTML = `<div class="eyebrow">Question ${valuesStep + 1} of ${ACT_DOMAINS.length}</div>
+    <h2 class="q">${esc(d.q)}</h2>
+    <p class="help">There's no wrong answer. Write as much or as little as feels right, or skip it.</p>
+    <textarea id="valuesInput" rows="5" placeholder="Write here, just for you">${esc(valuesAnswers[d.k] || "")}</textarea>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="back press" id="valuesSkip" style="flex:1">Skip</button>
+      <button class="cta press" id="valuesNext" style="flex:1">${valuesStep === ACT_DOMAINS.length - 1 ? "Finish" : "Next"}</button>
+    </div>`;
+  $("valuesNext").onclick = () => {
+    const v = $("valuesInput").value.trim();
+    if (v) saveValueAnswer(d.k, d.q, v);
+    valuesStep++; drawValues();
+  };
+  $("valuesSkip").onclick = () => { valuesStep++; drawValues(); };
+  $("valuesInput").focus();
+}
+function saveValueAnswer(k, q, text) {
+  valuesAnswers[k] = text;
+  const list = S.get("values", []);
+  list.unshift({at: new Date().toISOString(), domain: k, question: q, answer: text.slice(0, 500)});
+  S.set("values", list.slice(0, 100));
+}
+function openValues() {
+  valuesStep = 0; valuesAnswers = {};
+  [...$("app").children].forEach(el => { if (el.id !== "values") el.inert = true; });
+  $("values").classList.remove("hidden");
+  drawValues();
+}
+function closeValues() {
+  $("values").classList.add("hidden");
+  [...$("app").children].forEach(el => { el.inert = false; });
+  $("helpBtn").focus({preventScroll: true});
+}
+$("valuesClose").onclick = closeValues;
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("values").classList.contains("hidden")) closeValues(); });
 
 go(S.get("welcomed", false) ? "talk" : "welcome");
 
