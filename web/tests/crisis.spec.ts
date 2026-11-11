@@ -22,9 +22,12 @@ async function openApp(page: Page) {
     expect(r.status(), "the invite code signs in").toBe(200);
   }
   await page.goto("/app/");
-  const start = page.locator("#start");
-  if (await start.isVisible()) await start.click();
-  await expect(page.locator("#msg")).toBeVisible();
+  // A signed-in student is moved to Talk on their own once the account check answers;
+  // only press Start talking if the old welcome is still the screen after that.
+  const msg = page.locator("#msg");
+  await msg.waitFor({ state: "visible", timeout: 6_000 }).catch(() => {});
+  if (!(await msg.isVisible())) await page.locator("#start").click({ timeout: 5_000 });
+  await expect(msg).toBeVisible();
 }
 
 async function send(page: Page, text: string) {
@@ -89,10 +92,8 @@ test("signed out, the sign-in screen still offers help and 988", async ({ browse
   const me = await (await page.request.get("/api/auth/me")).json();
   test.skip(!me.required, "this site does not require sign-in");
   await page.goto("/app/");
-  const start = page.locator("#start");
-  if (await start.isVisible()) await start.click();
-  const gate = page.locator("#signinGate");
-  await expect(gate).toBeVisible();
+  const gate = page.locator("#signinGate");                     // signed out, it is the first screen
+  await expect(gate).toBeVisible({ timeout: 10_000 });
   await expect(gate.locator('a[href^="tel:988"], a[href^="sms:988"]').first()).toBeVisible();
   await gate.getByText(/Get help now/).first().click();
   await expect(page.locator("#crisis").getByText("Call 988 now")).toBeVisible();
