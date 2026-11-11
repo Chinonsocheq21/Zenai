@@ -17,7 +17,8 @@ async function openApp(page: Page) {
   const me = await (await page.request.get("/api/auth/me")).json();
   if (me.required) {
     test.skip(!INVITE, "sign-in is required here: set SMOKE_INVITE to an invite code");
-    const r = await page.request.post("/api/auth/invite", { data: { code: INVITE } });
+    const r = await page.request.post("/api/auth/invite", {
+      data: { code: INVITE }, headers: { "X-ZenAI-Device": "crisis-spec-" + Math.random().toString(36).slice(2, 10) } });
     expect(r.status(), "the invite code signs in").toBe(200);
   }
   await page.goto("/app/");
