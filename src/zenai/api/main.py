@@ -12,6 +12,7 @@ from zenai.api.routes import (
     analyze,
     audit,
     auth,
+    campus,
     chat,
     checkins,
     classroom,
@@ -137,6 +138,7 @@ app.include_router(auth.router)
 app.include_router(checkins.router)
 app.include_router(pilot.router)
 app.include_router(aggregate.router)
+app.include_router(campus.router)
 
 # The console is served by the API itself: one process, no CORS, nothing to
 # configure on demo day. Open http://127.0.0.1:8000/ .

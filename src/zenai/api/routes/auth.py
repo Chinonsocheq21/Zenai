@@ -29,6 +29,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
+from zenai import campuses
 from zenai.api import limits
 from zenai.db import store
 
@@ -42,8 +43,11 @@ OUTBOX: list[dict] = []                # local and tests: links land here instea
 HOSTED_URL = "https://zenai-app.vercel.app"   # used when PUBLIC_URL is unset and the request isn't local
 
 
+_DEFAULT_DOMAINS = ",".join(d for c in campuses.all_campuses() for d in c["domains"])
+
+
 def domains() -> list[str]:
-    return [d.strip().lower() for d in os.environ.get("AUTH_DOMAINS", "morgan.edu").split(",") if d.strip()]
+    return [d.strip().lower() for d in os.environ.get("AUTH_DOMAINS", _DEFAULT_DOMAINS).split(",") if d.strip()]
 
 
 def allowed(email: str) -> bool:
@@ -170,7 +174,7 @@ def start(body: StartIn, req: Request) -> dict:
     if not EMAIL.match(email):
         raise HTTPException(422, {"message": "That doesn't look like an email address."})
     if not allowed(email):
-        raise HTTPException(422, {"message": f"Use your Morgan State email (@{domains()[0]})."})
+        raise HTTPException(422, {"message": f"Use your {(campuses.by_domain(domains()[0]) or campuses.default())['name']} email (@{domains()[0]})."})
     if not limits.allow(req, "tts"):           # per device: the light bucket
         raise HTTPException(429, {"message": "Too many tries. Wait a few minutes and try again."})
     with _db() as conn:

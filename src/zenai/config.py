@@ -2,6 +2,10 @@ import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from zenai import campuses
+
+_CAMPUS = campuses.default()["counseling"]
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -47,11 +51,11 @@ class Settings(BaseSettings):
     PUBLIC_URL: str = ""               # the hosted address, once there is one; used by the QR page
 
     CRISIS_HOTLINE: str = "988"
-    CAMPUS_COUNSELING_NAME: str = "Morgan State University Counseling Center"
-    # Verified 2026-10-15 on morgan.edu/counseling-center/about-us/contact-us.
-    # The office line alone is not enough: the scenario this exists for is 2 a.m.,
-    # when the office is closed, so the 24/7 line is part of the value.
-    CAMPUS_COUNSELING_PHONE: str = "443-885-3130 (weekdays 8:30–5) · 24/7: 1-800-422-0009"
+    # Defaults come from the default campus in campuses.json (Morgan, verified there);
+    # env vars still override. The 24/7 line is part of the value: the scenario this
+    # exists for is 2 a.m., when the office is closed.
+    CAMPUS_COUNSELING_NAME: str = _CAMPUS["name"]
+    CAMPUS_COUNSELING_PHONE: str = f'{_CAMPUS["phone"]} ({_CAMPUS["hours"]["label"]}) · 24/7: {_CAMPUS["line_24_7"]}'
 
 
 settings = Settings()
