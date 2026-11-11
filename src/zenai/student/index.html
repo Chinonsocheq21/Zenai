@@ -3,9 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#F5F1EA" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0A1426" media="(prefers-color-scheme: dark)">
-<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F5F1EA" id="themeColor">
+<meta name="color-scheme" content="light" id="colorScheme">
+<script>
+// Pick the theme and set it on <html> before the first paint, so there is no
+// flash of the wrong palette. 'zenai-theme' is light, dark or system; default light.
+(function () {
+  try {
+    var t = localStorage.getItem("zenai-theme") || "light";
+    if (t !== "light" && t !== "dark" && t !== "system") t = "light";
+    document.documentElement.setAttribute("data-theme", t);
+    var dark = t === "dark" || (t === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+    var tc = document.getElementById("themeColor"), cs = document.getElementById("colorScheme");
+    if (tc) tc.setAttribute("content", dark ? "#0A1426" : "#F5F1EA");
+    if (cs) cs.setAttribute("content", t === "system" ? "light dark" : t);
+  } catch (e) { document.documentElement.setAttribute("data-theme", "light"); }
+})();
+</script>
 <title>ZenAI</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -32,8 +46,20 @@
     --r:22px; --ease:cubic-bezier(.2,.8,.2,1); --spring:cubic-bezier(.34,1.56,.64,1);
     --top:env(safe-area-inset-top,0px); --bot:env(safe-area-inset-bottom,0px);
   }
+  html[data-theme="dark"]{
+    --bg:#0A1426; --bg2:#0E1B33; --surface:rgba(24,38,66,.72); --solid:#15233F;
+    --ink:#EEF1F7; --ink2:#C3CCDB; --muted:#8E9AB0; --line:rgba(200,214,240,.09); --line2:rgba(200,214,240,.16);
+    --accent:#8FB3E8; --accentInk:#0A1426; --orangeInk:#F2A46E; --ring:#9BBDF0;
+    --me1:#2B5592; --me2:#3B6CB3;
+    --zen:rgba(27,43,74,.85);
+    --shadow:0 1px 2px rgba(0,0,0,.25), 0 10px 28px -12px rgba(0,0,0,.6);
+    --shadow2:0 2px 6px rgba(0,0,0,.3), 0 20px 44px -16px rgba(0,0,0,.7);
+    --ok:#7FD0B0;
+    --red:#FF8A73; --redInk:#FFD4CA; --redbg:#0A1426; --redsoft:rgba(255,138,115,.12); --redtext:#FF8A73; --chip:rgba(200,214,240,.10); --redcard:#24161C; --redline:rgba(255,138,115,.28);
+    --orbA:#FFC79A; --orbB:#E8792F; --orbC:#4C7CC4; --orbD:#22477D;
+  }
   @media (prefers-color-scheme: dark){
-    :root{
+    html[data-theme="system"]{
       --bg:#0A1426; --bg2:#0E1B33; --surface:rgba(24,38,66,.72); --solid:#15233F;
       --ink:#EEF1F7; --ink2:#C3CCDB; --muted:#8E9AB0; --line:rgba(200,214,240,.09); --line2:rgba(200,214,240,.16);
       --accent:#8FB3E8; --accentInk:#0A1426; --orangeInk:#F2A46E; --ring:#9BBDF0;
@@ -76,7 +102,8 @@
   header .helpnow{margin-left:6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 13px;
                border-radius:999px;border:1px solid rgba(178,58,42,.3);background:var(--redsoft);color:var(--redtext);
                font-size:13.5px;font-weight:650;white-space:nowrap;flex:none}
-  @media (prefers-color-scheme: dark){header .helpnow{border-color:rgba(255,138,115,.4)}}
+  html[data-theme="dark"] header .helpnow{border-color:rgba(255,138,115,.4)}
+  @media (prefers-color-scheme: dark){html[data-theme="system"] header .helpnow{border-color:rgba(255,138,115,.4)}}
   @media (max-width:379px){header .helpnow svg{display:none} header .helpnow{padding:0 11px}}
   header .helpnow svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   header .helpnow:hover{background:color-mix(in srgb, var(--red) 16%, var(--redsoft))}
@@ -120,7 +147,8 @@
   .callout .ic{width:38px;height:38px;border-radius:12px;flex:0 0 auto;display:grid;place-items:center;
                background:color-mix(in srgb, var(--orbB) 16%, transparent);color:var(--orangeInk)}
   .callout .ic.b{background:color-mix(in srgb, var(--orbC) 22%, transparent);color:var(--blue2)}
-  @media (prefers-color-scheme: dark){.callout .ic.b{color:#9BBDF0}}
+  html[data-theme="dark"] .callout .ic.b{color:#9BBDF0}
+  @media (prefers-color-scheme: dark){html[data-theme="system"] .callout .ic.b{color:#9BBDF0}}
   .callout svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
   .callout b{display:block;font-size:15px;margin-bottom:3px}
   .callout span{font-size:14px;line-height:1.55;color:var(--ink2)}
@@ -128,7 +156,8 @@
   .cta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:56px;border-radius:28px;
        background:var(--accent);color:var(--accentInk);font-size:16.5px;font-weight:600;letter-spacing:.2px;
        box-shadow:0 12px 28px -12px rgba(27,61,111,.7)}
-  @media (prefers-color-scheme: dark){.cta{box-shadow:0 12px 30px -14px rgba(143,179,232,.45)}}
+  html[data-theme="dark"] .cta{box-shadow:0 12px 30px -14px rgba(143,179,232,.45)}
+  @media (prefers-color-scheme: dark){html[data-theme="system"] .cta{box-shadow:0 12px 30px -14px rgba(143,179,232,.45)}}
   .welcome .cta{margin:12px 0 calc(16px + var(--bot))}
 
   /* ---------- talk ---------- */
@@ -183,7 +212,8 @@
       font-weight:600;font-size:15px;text-decoration:none;white-space:nowrap;background:var(--chip);color:var(--ink)}
   .nb small{font-weight:500;font-size:14px;font-variant-numeric:tabular-nums;white-space:nowrap;opacity:.9}
   .nb.p{background:var(--blue);color:#fff}
-  @media (prefers-color-scheme: dark){.nb.p{background:#8FB3E8;color:#0A1426}}
+  html[data-theme="dark"] .nb.p{background:#8FB3E8;color:#0A1426}
+  @media (prefers-color-scheme: dark){html[data-theme="system"] .nb.p{background:#8FB3E8;color:#0A1426}}
   .nb svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
   .nb span{display:flex;align-items:center;gap:9px;min-width:0;white-space:normal;line-height:1.25}
   .ref .nb{padding:0 12px;font-size:14.5px}
@@ -382,7 +412,7 @@
   .gate input{height:56px;border-radius:16px;border:1px solid var(--line2);background:var(--surface);font:600 22px var(--mono, monospace);letter-spacing:.14em;text-align:center;text-transform:uppercase;color:var(--ink)}
   .gate button,.acct button{margin-top:12px;height:52px;border-radius:26px;background:var(--accent);color:var(--accentInk, #fff);font-weight:600;font-size:16px}
   .gate .bad{color:var(--red);font-size:13.5px;margin-top:10px;min-height:18px}
-  .acct .alt{display:flex;align-items:center;justify-content:center;margin-top:10px;height:48px;border-radius:24px;
+  .acct .alt,.gate .alt{display:flex;align-items:center;justify-content:center;margin-top:10px;height:48px;border-radius:24px;
              border:1px solid var(--line2);background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;text-decoration:none}
   .acct .close{display:block;margin:16px auto 0;min-height:44px;padding:0 18px;font-size:15px;font-weight:600;
                color:var(--ink2);text-decoration:underline;text-underline-offset:3px;background:none}
@@ -393,6 +423,8 @@
   .bq{font-size:15px;font-weight:650;color:var(--ink)}
   .before .skip{min-height:44px;min-width:44px;padding:0 6px;font-size:13.5px;color:var(--ink2);text-decoration:underline;text-underline-offset:3px}
   .seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .seg.of3{grid-template-columns:repeat(3,1fr)}
+  .seg.of3 button{min-height:50px}
   .seg button{min-height:58px;border-radius:14px;background:var(--chip);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;
               gap:6px;font-size:12.5px;font-weight:600;color:var(--ink);line-height:1.15;padding:4px 2px;text-align:center}
   .seg button i{width:12px;height:12px;border-radius:50%;flex:none}
@@ -400,7 +432,8 @@
   .notok{width:100%;margin-top:10px;display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:44px;padding:0 12px;border-radius:12px;
          background:var(--redsoft);color:var(--ink2);font-size:13.5px;text-align:left;border:1px solid transparent}
   .notok b{color:var(--redtext);font-weight:650;white-space:nowrap}
-  @media (prefers-color-scheme: dark){.notok{border-color:rgba(255,138,115,.28)}}
+  html[data-theme="dark"] .notok{border-color:rgba(255,138,115,.28)}
+  @media (prefers-color-scheme: dark){html[data-theme="system"] .notok{border-color:rgba(255,138,115,.28)}}
   .ciok{font-size:13.5px;color:var(--ink2);margin:0 0 12px;display:flex;align-items:center;gap:6px;justify-content:center}
   .ciok i{width:10px;height:10px;border-radius:50%;display:inline-block}
   .ciok button{min-height:44px;padding:0 6px;font-size:13.5px;color:var(--ink2);text-decoration:underline;text-underline-offset:3px}
@@ -530,6 +563,7 @@
         <div class="ic b"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
         <div><b>Your privacy</b><span>ZenAI doesn't remember anything unless you turn that on in Privacy, and you can delete everything in one tap. Nothing you write, and nothing that identifies you, is shared with the university.</span></div>
       </div>
+      <div class="group hidden" id="welcomeInstall" style="margin-bottom:14px"></div>
       <div class="spacer"></div>
       <button class="cta press" id="start">Start talking</button>
     </section>
@@ -570,6 +604,16 @@
     <section class="screen" id="privacy">
       <h2 class="q">What ZenAI keeps</h2>
       <p class="help">Everything is off until you turn it on. It stays on this device unless you turn on sync, and nothing you write is ever shared with the university.</p>
+      <div class="sec" style="margin-top:0">Appearance</div>
+      <div class="group" style="padding:14px 16px 16px">
+        <div class="t" style="margin-bottom:2px">Theme</div>
+        <div class="s" style="margin-bottom:10px">Light is ZenAI's original look. Match my phone follows your device.</div>
+        <div class="seg of3" id="themeSeg" role="radiogroup" aria-label="Theme">
+          <button type="button" data-theme="light" role="radio">Light</button>
+          <button type="button" data-theme="dark" role="radio">Dark</button>
+          <button type="button" data-theme="system" role="radio">Match my phone</button>
+        </div>
+      </div>
       <div class="group" id="switches"></div>
       <div id="memlist"></div>
       <button class="erase press" id="erase"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>Delete everything ZenAI remembers</button>
@@ -616,6 +660,28 @@
     <p>This demo of ZenAI is open to the class. The code is on the screen at the front of the room.</p>
     <input id="gcode" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Class code">
     <button class="press" id="gok">Continue</button><div class="bad" id="gbad"></div>
+  </section>
+
+  <section class="gate hidden" id="signinGate" role="dialog" aria-modal="true" aria-label="Sign in to talk">
+    <button class="helpnow press" id="sgHelp" style="position:absolute;top:calc(14px + var(--top));right:16px" aria-haspopup="dialog"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Get help now</button>
+    <div class="orb" style="width:72px;height:72px" aria-hidden="true"><i></i></div>
+    <h2 tabindex="-1" id="sgTitle">Sign in to talk</h2>
+    <p>This pilot is open to signed-in Morgan State students. It only takes a minute, and ZenAI never stores your email address itself.</p>
+    <form id="sgForm" novalidate>
+      <label for="sgEmail" style="display:block;font-size:13px;color:var(--muted);margin-bottom:6px">Your Morgan email</label>
+      <input id="sgEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@morgan.edu" required
+        style="width:100%;height:52px;border-radius:16px;border:1.5px solid var(--line2);background:var(--surface);color:var(--ink);font:16px var(--sans);padding:0 16px">
+      <button class="press" type="submit" id="sgSend" style="width:100%">Email me a sign-in link</button>
+    </form>
+    <button class="alt press" type="button" id="sgInviteToggle">Have an invite code?</button>
+    <form id="sgInviteForm" class="hidden" novalidate>
+      <label for="sgCode" style="display:block;font-size:13px;color:var(--muted);margin:14px 0 6px">Invite code</label>
+      <input id="sgCode" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Invite code"
+        style="width:100%;height:52px;border-radius:16px;border:1.5px solid var(--line2);background:var(--surface);font:600 18px var(--mono, monospace);letter-spacing:.1em;text-align:center;text-transform:uppercase;color:var(--ink)">
+      <button class="press" type="submit" id="sgCodeGo" style="width:100%">Continue</button>
+    </form>
+    <div class="bad" id="sgNote" role="status"></div>
+    <div class="danger" style="margin-top:18px">In crisis, <a href="tel:988">call or text 988</a>, any time.</div>
   </section>
 
   <section class="acct hidden" id="acct" role="dialog" aria-modal="true" aria-label="Account">
@@ -683,7 +749,14 @@ const API = location.pathname.startsWith("/student") ? "" : "/api";
 async function api(url, body) {
   const r = await fetch(API + url, {method: "POST", headers: {"Content-Type": "application/json", "X-ZenAI-Device": deviceId(),
     "X-ZenAI-Code": S.get("code", "")}, body: JSON.stringify(body)});
-  if (r.status === 401) { await askCode(); return api(url, body); }
+  if (r.status === 401) {
+    // Two different 401s share this endpoint: a missing class code (handled here,
+    // the way it always has been) and a missing sign-in (left for the caller, which
+    // shows the sign-in gate instead of asking for a code).
+    const peek = await r.clone().json().catch(() => ({}));
+    if (peek && peek.detail && peek.detail.code === "signin_required") return r;
+    await askCode(); return api(url, body);
+  }
   return r;
 }
 let codeWait = null;
@@ -710,9 +783,14 @@ function go(name) {
   if (name !== "talk") document.querySelector("main").scrollTop = 0;
 }
 document.querySelectorAll("#nav button").forEach(b => b.onclick = () => go(b.dataset.go));
-$("start").onclick = () => { S.set("welcomed", true); go("talk"); };
+$("start").onclick = async () => {
+  S.set("welcomed", true);
+  const me = window.zenaiAccount ? await window.zenaiAccount.refresh().catch(() => window.zenaiAccount.me()) : null;
+  if (me && me.required && !me.signed_in) { openSigninGate(); return; }
+  go("talk");
+};
 
-// ---------- account menu (sign-in itself is a later milestone) ----------
+// ---------- account menu ----------
 function toggleAcct(open) {
   $("acct").classList.toggle("hidden", !open);
   $("acctBtn").setAttribute("aria-expanded", open ? "true" : "false");
@@ -720,6 +798,59 @@ function toggleAcct(open) {
 $("acctBtn").onclick = () => toggleAcct(true);
 $("acctClose").onclick = () => toggleAcct(false);
 $("acctPrivacy").onclick = () => { toggleAcct(false); go("privacy"); };
+
+// ---------- sign-in gate: shown instead of talk when the campus requires sign-in ----------
+async function authCall(method, path, body) {
+  const r = await fetch(API + path, {method, credentials: "same-origin",
+    headers: body ? {"Content-Type": "application/json"} : {}, body: body ? JSON.stringify(body) : undefined});
+  const d = await r.json().catch(() => ({}));
+  return {ok: r.ok, status: r.status, d};
+}
+function openSigninGate() {
+  $("sgNote").textContent = "";
+  $("sgInviteForm").classList.add("hidden");
+  $("sgInviteToggle").textContent = "Have an invite code?";
+  $("signinGate").classList.remove("hidden");
+  setTimeout(() => $("sgTitle").focus({preventScroll: true}), 50);
+}
+function closeSigninGate() { $("signinGate").classList.add("hidden"); }
+$("sgHelp").onclick = () => showHelp("help");
+$("sgInviteToggle").onclick = () => {
+  const show = $("sgInviteForm").classList.toggle("hidden") === false;
+  $("sgInviteToggle").textContent = show ? "Use my email instead" : "Have an invite code?";
+  if (show) setTimeout(() => $("sgCode").focus(), 50);
+};
+$("sgForm").onsubmit = async e => {
+  e.preventDefault();
+  const email = $("sgEmail").value.trim();
+  if (!email) return;
+  $("sgSend").disabled = true; $("sgSend").textContent = "Sending...";
+  const r = await authCall("POST", "/auth/start", {email}).catch(() => ({ok: false, d: {}}));
+  $("sgNote").textContent = r.ok ? r.d.message || "Check your Morgan email for a sign-in link." : (r.d.detail?.message || "That didn't work. Try again in a minute.");
+  $("sgSend").disabled = false; $("sgSend").textContent = "Email me a sign-in link";
+};
+$("sgInviteForm").onsubmit = async e => {
+  e.preventDefault();
+  const code = $("sgCode").value.trim();
+  if (!code) return;
+  $("sgCodeGo").disabled = true; $("sgCodeGo").textContent = "Checking...";
+  const r = await authCall("POST", "/auth/invite", {code}).catch(() => ({ok: false, status: 0, d: {}}));
+  $("sgCodeGo").disabled = false; $("sgCodeGo").textContent = "Continue";
+  if (r.ok && r.d.signed_in) {
+    closeSigninGate();
+    if (window.zenaiAccount) await window.zenaiAccount.refresh();
+    go("talk");
+    return;
+  }
+  $("sgNote").textContent = r.status === 429 ? "Too many tries. Wait a minute and try again."
+    : (r.d.detail?.message || "That code didn't work. Check it and try again.");
+};
+// Returning with "welcomed" already set skips straight to Talk; catch a required,
+// signed-out visit here too, from account.js's own refresh on load.
+document.addEventListener("zenai:account", e => {
+  const me = e.detail || {};
+  if (me.required && !me.signed_in && $("talk").classList.contains("on")) openSigninGate();
+});
 
 // ---------- crisis, and "Get help now" ----------
 // The defaults match config.py, so the hand-off shows real numbers with no server at all.
@@ -1267,6 +1398,14 @@ async function ask(text) {
     const r = await api("/chat", {text, history: HISTORY, memory: consent().helps ? S.get("memory", []) : [], client: "student",
                                   checkin: todaysCheckin()});
     hideThinking();
+    if (r.status === 401) {
+      const b = await r.json().catch(() => ({}));
+      if (b.detail?.code === "signin_required") {
+        openSigninGate();
+        $("log").insertAdjacentHTML("beforeend", `<div class="pause msg">Sign in to keep talking. What you just said hasn't been sent anywhere.</div>`); scrollDown();
+        return null;
+      }
+    }
     if (r.status === 429 || r.status === 502 || r.status === 503) {
       // usage limit, or the model is down: a calm pause, never an error. The server
       // already ran the crisis check, so a crisis still gets the hand-off.
@@ -1412,7 +1551,20 @@ function drawPrivacy() {
     if (b.dataset.k === "convo") S.set("history", c2.convo ? HISTORY : []);
     b.classList.toggle("on", !!c2[b.dataset.k]); b.setAttribute("aria-checked", !!c2[b.dataset.k]);
   });
+  drawTheme();
   drawNotes();
+}
+
+// ---------- theme ----------
+function drawTheme() {
+  const seg = $("themeSeg"); if (!seg) return;
+  const cur = (typeof window.zenaiTheme !== "undefined" && window.zenaiTheme.get) ? window.zenaiTheme.get() : "light";
+  seg.querySelectorAll("button").forEach(b => {
+    const on = b.dataset.theme === cur;
+    b.classList.toggle("on", on);
+    b.setAttribute("aria-checked", on ? "true" : "false");
+    b.onclick = () => { window.zenaiTheme && window.zenaiTheme.set(b.dataset.theme); drawTheme(); };
+  });
 }
 function drawNotes() {
   const mem = S.get("memory", []);
@@ -1435,10 +1587,12 @@ go(S.get("welcomed", false) ? "talk" : "welcome");
 if (HISTORY.length) { for (const h of HISTORY) h.role === "user" ? addMine(h.content) : addZen(h.content); showDone(); }
 else drawHello();
 </script>
+<script src="theme.js"></script>
 <script src="crisis-rules.js"></script>
 <script src="account.js"></script>
 <script src="sync.js"></script>
 <script src="analytics.js"></script>
+<script src="install.js"></script>
 <script src="pwa.js"></script>
 </body>
 </html>

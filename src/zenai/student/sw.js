@@ -3,14 +3,16 @@
    network-first for page loads with the offline page as the fallback.
    Never caches or intercepts API requests: anything not listed below goes
    straight to the network untouched. Bump VERSION to replace the cache. */
-var VERSION = "zenai-shell-v1";
+var VERSION = "zenai-shell-v2";
 var SHELL = [
   "./",
   "index.html",
+  "theme.js",
   "crisis-rules.js",
   "account.js",
   "sync.js",
   "analytics.js",
+  "install.js",
   "pwa.js",
   "manifest.webmanifest",
   "apple-touch-icon.png",

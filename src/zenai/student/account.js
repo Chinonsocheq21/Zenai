@@ -8,7 +8,7 @@
   if (!panel) return;
   const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
   const state = {me: {signed_in: false}, note: ""};
-  window.zenaiAccount = {me: () => state.me, refresh};
+  window.zenaiAccount = {me: () => state.me, refresh, redraw: () => draw()};
 
   async function call(method, path, body) {
     const r = await fetch(base + path, {method, credentials: "same-origin",
@@ -53,7 +53,9 @@
         <button class="alt press" id="acctPrivacy" type="button">Privacy and data</button>
         <button class="close press" id="acctClose">Close</button>`;
     }
+    if (window.zenaiInstall) panel.insertAdjacentHTML("beforeend", window.zenaiInstall.row());
     wire();
+    if (window.zenaiInstall) window.zenaiInstall.wire(panel);
   }
 
   function close() {
