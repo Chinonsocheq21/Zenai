@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { pageMeta } from "@/components/meta";
+import NextStep from "@/components/NextStep";
 
 export const metadata = pageMeta(
   "/accessibility/",
@@ -82,6 +83,7 @@ export default function Accessibility() {
           </p>
         </div>
       </section>
+      <NextStep href="/app/" label="Open ZenAI" />
     </article>
   );
 }

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { pageMeta } from "@/components/meta";
+import NextStep from "@/components/NextStep";
 
 export const metadata = pageMeta(
   "/safety/",
@@ -170,6 +171,7 @@ export default function Safety() {
           <Link href="/help/" className="font-semibold text-crisis underline">Get help now</Link>.
         </p>
       </section>
+      <NextStep href="/universities/" label="For counseling centers" />
     </div>
   );
 }

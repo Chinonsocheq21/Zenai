@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import NextStep from "@/components/NextStep";
 
 export const metadata: Metadata = {
   title: "Get help now",
@@ -63,6 +64,7 @@ export default function Help() {
         ZenAI is not a counselor and can't respond to an emergency. If something serious comes up while you're talking,
         ZenAI stops and shows you these same numbers. Nothing on this page needs an account.
       </p>
+      <NextStep href="/app/" label="Open ZenAI" note="Sign in with your Morgan email or an invite code." />
     </div>
   );
 }

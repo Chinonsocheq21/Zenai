@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-const PAGES = ["/", "/how-it-works/", "/safety/", "/get-the-app/", "/universities/", "/help/", "/privacy/", "/terms/",
-  "/signin/", "/security/", "/accessibility/", "/contact/", "/status/"];
+const PAGES = ["/", "/students/", "/how-it-works/", "/safety/", "/get-the-app/", "/universities/", "/help/", "/privacy/",
+  "/terms/", "/signin/", "/security/", "/accessibility/", "/contact/", "/status/"];
 
 for (const path of PAGES) {
   test(`${path} loads, fits the screen, and has the way to help and to the app`, async ({ page, isMobile }) => {
@@ -15,11 +15,34 @@ for (const path of PAGES) {
     await expect(page.getByRole("link", { name: "Get help now" }).first()).toBeVisible();
     if (isMobile) await page.getByRole("button", { name: "Open menu" }).click();
     await expect(page.locator('header a[href="/app/"]:visible').first()).toBeVisible();
+    await expect(page.locator('header a[href="/signin/"]:visible').first()).toBeVisible();
 
     await expect(page.locator("footer")).toContainText("988");
     await expect(page.locator('footer a[href="/privacy/"]')).toBeVisible();
   });
 }
+
+test("the header splits the audience nav, with Sign in next to Open ZenAI", async ({ page, isMobile }) => {
+  await page.goto("/");
+  if (isMobile) await page.getByRole("button", { name: "Open menu" }).click();
+  const nav = page.getByRole("navigation", { name: "Main" }).first();
+  await expect(nav.getByRole("link", { name: "For students" })).toHaveAttribute("href", "/students/");
+  await expect(nav.getByRole("link", { name: "For counseling centers" })).toHaveAttribute("href", "/universities/");
+  await expect(nav.getByRole("link", { name: "Safety" })).toHaveAttribute("href", "/safety/");
+  await expect(nav.getByRole("link", { name: "Help" })).toHaveAttribute("href", "/help/");
+  await expect(page.locator('header a[href="/signin/"]:visible').first()).toBeVisible();
+  await expect(page.locator('header a[href="/app/"]:visible').first()).toBeVisible();
+});
+
+test("the mobile menu mirrors the audience nav and keeps Sign in", async ({ page }) => {
+  await page.goto("/");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "Open menu" }).click();
+  const mobileNav = page.locator("#mobile-nav");
+  await expect(mobileNav.getByRole("link", { name: "For students" })).toBeVisible();
+  await expect(mobileNav.getByRole("link", { name: "For counseling centers" })).toBeVisible();
+  await expect(mobileNav.getByRole("link", { name: "Sign in" })).toHaveAttribute("href", "/signin/");
+});
 
 test("every internal link on every page resolves", async ({ page, request }) => {
   const seen = new Set<string>();
@@ -53,7 +76,7 @@ test("the help page needs no sign-in and leads with 988", async ({ page }) => {
   await page.goto("/help/");
   await expect(page.getByRole("link", { name: "Call 988" })).toHaveAttribute("href", "tel:988");
   await expect(page.getByRole("link", { name: "Text 988" })).toHaveAttribute("href", "sms:988");
-  await expect(page.getByText("Counseling Center").first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Counseling Center" })).toBeVisible();
 });
 
 test("an unknown page shows the 404 with a way home", async ({ page }) => {

@@ -7,10 +7,9 @@ import Orb from "./Orb";
 
 const LINKS = [
   { href: "/", label: "Home" },
-  { href: "/how-it-works/", label: "How it works" },
+  { href: "/students/", label: "For students" },
+  { href: "/universities/", label: "For counseling centers" },
   { href: "/safety/", label: "Safety" },
-  { href: "/get-the-app/", label: "Get the app" },
-  { href: "/universities/", label: "For universities" },
   { href: "/help/", label: "Help" },
 ];
 
@@ -52,6 +51,9 @@ export default function SiteHeader() {
           <Link href="/help/" className="rounded-full border border-crisis/30 bg-crisisbg px-3.5 py-2 text-sm font-semibold text-crisis hover:bg-crisis hover:text-white">
             Get help now
           </Link>
+          <Link href="/signin/" className="hidden rounded-full px-3 py-2 text-sm font-semibold text-ink hover:bg-paper2 sm:inline-block">
+            Sign in
+          </Link>
           <a href="/app/" className="hidden rounded-full bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy2 sm:inline-block">
             Open ZenAI
           </a>
@@ -72,7 +74,8 @@ export default function SiteHeader() {
               {l.label}
             </Link>
           ))}
-          <a href="/app/" className="mt-3 block rounded-full bg-navy px-4 py-3 text-center font-semibold text-white">Open ZenAI</a>
+          <Link href="/signin/" onClick={() => setOpen(false)} className="mt-3 block rounded-full border border-line px-4 py-3 text-center font-semibold text-ink">Sign in</Link>
+          <a href="/app/" className="mt-2 block rounded-full bg-navy px-4 py-3 text-center font-semibold text-white">Open ZenAI</a>
           <p className="mt-2 text-center text-sm text-ink2">Sign in with your Morgan email or an invite code.</p>
         </nav>
       )}

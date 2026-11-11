@@ -5,8 +5,8 @@ import ThemeSwitch from "./ThemeSwitch";
 export default function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-line bg-paper2/60">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 sm:grid-cols-3 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
-        <div className="sm:col-span-3 md:col-span-1">
+      <div className="mx-auto grid max-w-5xl gap-10 px-5 py-12 sm:grid-cols-2">
+        <div>
           <div className="flex items-center gap-2.5"><Orb size={26} /><span className="font-serif text-xl">ZenAI</span></div>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-ink2">
             A place to slow down for a minute. ZenAI is not a counselor and does not replace one.
@@ -17,35 +17,25 @@ export default function SiteFooter() {
           </p>
           <div className="mt-6"><ThemeSwitch /></div>
         </div>
-        <nav aria-label="Product" className="text-sm">
-          <h2 className="mb-3 font-semibold text-ink">ZenAI</h2>
-          <ul className="space-y-2 text-ink2">
-            <li><a href="/app/" className="hover:text-navy">Open ZenAI</a></li>
-            <li><Link href="/signin/" className="hover:text-navy">Sign in</Link></li>
-            <li><Link href="/get-the-app/" className="hover:text-navy">Get the app</Link></li>
-            <li><Link href="/how-it-works/" className="hover:text-navy">How it works</Link></li>
-            <li><Link href="/safety/" className="hover:text-navy">Safety</Link></li>
-            <li><Link href="/help/" className="hover:text-navy">Get help now</Link></li>
-          </ul>
-        </nav>
-        <nav aria-label="About" className="text-sm">
-          <h2 className="mb-3 font-semibold text-ink">About</h2>
-          <ul className="space-y-2 text-ink2">
-            <li><Link href="/universities/" className="hover:text-navy">For universities</Link></li>
-            <li><Link href="/privacy/" className="hover:text-navy">Privacy</Link></li>
-            <li><Link href="/terms/" className="hover:text-navy">Terms</Link></li>
-            <li><a href="https://github.com/Chinonsocheq21/Zenai" className="hover:text-navy">Source on GitHub</a></li>
-          </ul>
-        </nav>
-        <nav aria-label="Trust" className="text-sm">
-          <h2 className="mb-3 font-semibold text-ink">Trust</h2>
-          <ul className="space-y-2 text-ink2">
-            <li><Link href="/security/" className="hover:text-navy">Security</Link></li>
-            <li><Link href="/accessibility/" className="hover:text-navy">Accessibility</Link></li>
-            <li><Link href="/contact/" className="hover:text-navy">Contact</Link></li>
-            <li><Link href="/status/" className="hover:text-navy">Status</Link></li>
-          </ul>
-        </nav>
+        <div className="grid gap-10 sm:grid-cols-2">
+          <nav aria-label="Trust" className="text-sm">
+            <h2 className="mb-3 font-semibold text-ink">Trust</h2>
+            <ul className="space-y-2 text-ink2">
+              <li><Link href="/security/" className="hover:text-navy">Security</Link></li>
+              <li><Link href="/accessibility/" className="hover:text-navy">Accessibility</Link></li>
+              <li><Link href="/privacy/" className="hover:text-navy">Privacy</Link></li>
+              <li><Link href="/terms/" className="hover:text-navy">Terms</Link></li>
+              <li><Link href="/status/" className="hover:text-navy">Status</Link></li>
+            </ul>
+          </nav>
+          <nav aria-label="More" className="text-sm">
+            <h2 className="mb-3 font-semibold text-ink">More</h2>
+            <ul className="space-y-2 text-ink2">
+              <li><Link href="/contact/" className="hover:text-navy">Contact</Link></li>
+              <li><a href="https://github.com/Chinonsocheq21/Zenai" className="hover:text-navy">Source on GitHub</a></li>
+            </ul>
+          </nav>
+        </div>
       </div>
       <p className="border-t border-line px-5 py-5 text-center text-xs text-muted">
         ZenAI · Built at Morgan State University · {new Date().getFullYear()}

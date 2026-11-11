@@ -62,7 +62,7 @@ export default function PilotForm() {
           className="w-full rounded-full bg-navy px-6 py-3.5 font-semibold text-white hover:bg-navy2 disabled:opacity-60 md:w-auto">
           {state === "sending" ? "Sending..." : "Request a pilot"}
         </button>
-        <p className="mt-3 text-xs text-muted">We use these details only to reply to you. This form is for staff; students don't need to sign up for anything.</p>
+        <p className="mt-3 text-xs text-muted">We use these details only to reply to you. This form is for staff: students sign in to ZenAI itself with their Morgan email or an invite code, not through this form.</p>
       </div>
     </form>
   );
