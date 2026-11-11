@@ -125,6 +125,9 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     # is thrown away if the screen escalates.
     quick = assess(redacted, earlier, checkin, screen=False)
     route_job = None
+    # Independent of this message: today's date against the campus's own
+    # exam_windows (campuses.json), read in its own timezone.
+    season_window = specialists.exam_season()
     if quick["risk"] < settings.CRISIS_THRESHOLD:
         tm = time.perf_counter()
         dist = classify(redacted)
@@ -133,7 +136,7 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
 
         pool = ThreadPoolExecutor(1)
         t_route = time.perf_counter()
-        route_job = pool.submit(specialists.route, redacted, mood)
+        route_job = pool.submit(specialists.route, redacted, mood, True, season_window)
         pool.shutdown(wait=False)
         a = assess(redacted, earlier, checkin, screen=True)
     else:
@@ -147,7 +150,7 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
         for s in ("mood", "route", "memory", "conversation", "fidelity", "send"):
             add(s, "skipped", detail="not run — the crisis rail stops the turn here")
         out = {"escalate": True, "crisis_risk": risk, "redacted_text": redacted, "reply": None,
-               "attempts": [], "trace": trace,
+               "attempts": [], "trace": trace, "season": "exams" if season_window else None,
                "escalation": {"hotline": settings.CRISIS_HOTLINE, "campus": settings.CAMPUS_COUNSELING_NAME,
                               "phone": settings.CAMPUS_COUNSELING_PHONE or "NOT CONFIGURED",
                               "action": "human_handoff"},
@@ -166,7 +169,7 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     try:
         spec = route_job.result(timeout=max(0.0, min(15.0, deadline - time.perf_counter() - 5)))
     except FutureTimeout:   # the router is a nicety; the rules route instantly
-        spec = {**specialists.route_rules(redacted, mood), "by": "rules"}
+        spec = {**specialists.route_rules(redacted, mood, season=season_window), "by": "rules"}
     cards = resources.cards(spec["resources"]) if spec["id"] == "referral" else []
     add("route", "done", _ms(t_route), f"{spec['name']} · {spec['why']}",
         specialist=spec["name"], by=spec.get("by"), resources=[c["name"] for c in cards])
@@ -236,7 +239,9 @@ def run(text: str, history: list[dict] | None = None, monitor: bool = True,
     out = {"escalate": False, "crisis_risk": risk, "redacted_text": redacted, "distress": dist,
            "primary_emotion": mood, "specialist": {k: spec[k] for k in ("id", "name", "why")},
            "resources": cards, "reply": reply, "attempts": attempts, "fallback": fallback,
-           "monitor": monitor, "deadline": late, "trace": trace, "total_ms": _ms(t_draft)}
+           "monitor": monitor, "deadline": late, "trace": trace, "total_ms": _ms(t_draft),
+           # a gentle card the app may show, never advice of its own; null outside exam_windows
+           "season": "exams" if season_window else None}
     events.publish(tid, "turn_end", escalate=False, reply=reply, fallback=fallback, total_ms=_ms(t0),
                    resources=[c["name"] for c in cards])
     _log(out, monitor)
