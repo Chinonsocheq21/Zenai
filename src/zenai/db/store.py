@@ -71,6 +71,9 @@ MIGRATIONS: list[tuple[int, str]] = [
         PRIMARY KEY (week, campus, metric)
     );
     """),
+    (3, """
+    ALTER TABLE users ALTER COLUMN email_hmac DROP NOT NULL;
+    """),
 ]
 
 LOGIN_TTL = timedelta(minutes=15)
@@ -175,6 +178,14 @@ def consume_login_token(conn, raw: str) -> int | None:
         "INSERT INTO users (email_hmac) VALUES (%s) ON CONFLICT (email_hmac) DO UPDATE SET last_seen_at = now() "
         "RETURNING id", (row[0],)).fetchone()[0]
     return int(uid)
+
+
+def create_invite_user(conn, campus: str) -> int:
+    """An anonymous member made by redeeming an invite code: no email at all, just
+    a campus and a random id (email_hmac stays NULL; migration 3 dropped its
+    NOT NULL so this and the email sign-in can share the same table)."""
+    row = conn.execute("INSERT INTO users (campus) VALUES (%s) RETURNING id", (campus,)).fetchone()
+    return int(row[0])
 
 
 def create_session(conn, user_id: int, ttl: timedelta = SESSION_TTL) -> str:

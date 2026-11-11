@@ -54,7 +54,8 @@ def test_only_morgan_addresses(pg):
 def test_link_signs_in_once(pg):
     c = client()
     sign_in(c)
-    assert c.get("/auth/me").json() == {"signed_in": True, "campus": "morgan.edu", "sync_checkins": False}
+    assert c.get("/auth/me").json() == {"signed_in": True, "campus": "morgan.edu", "sync_checkins": False,
+                                        "required": False}
     again = press(client(), token_of(auth.OUTBOX[-1]["link"]))
     assert again.headers["location"] == "/app/?signin=expired"
     assert press(client(), "made-up").headers["location"] == "/app/?signin=expired"
@@ -121,7 +122,7 @@ def test_database_down_is_calm_and_chat_still_works(monkeypatch):
     r = c.post("/auth/start", json={"email": "kim@morgan.edu"})
     assert r.status_code == 503 and "keep using ZenAI" in r.json()["detail"]["message"]
     c.cookies.set(auth.COOKIE, "something")
-    assert c.get("/auth/me").json() == {"signed_in": False, "available": False}
+    assert c.get("/auth/me").json() == {"signed_in": False, "available": False, "required": False}
     monkeypatch.setattr(llm, "available", lambda: False)
     r = c.post("/chat", json={"text": "I want to end my life"})
     assert r.status_code == 200 and r.json()["escalate"] is True
