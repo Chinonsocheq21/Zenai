@@ -1108,7 +1108,11 @@ document.addEventListener("zenai:account", e => {
   if (!bootAccountHandled) {
     bootAccountHandled = true;
     if (me.required && !me.signed_in) { openSigninGate(); return; }
-    if (me.required && me.signed_in) { S.set("welcomed", true); if (!$("talk").classList.contains("on")) go("talk"); }
+    if (me.required && me.signed_in) {
+      S.set("welcomed", true);
+      closeSigninGate();             // it may have opened from the cached "sign-in required" before this answer
+      if (!$("talk").classList.contains("on")) go("talk");
+    }
     return;
   }
   if (me.required && !me.signed_in && $("talk").classList.contains("on")) openSigninGate();
