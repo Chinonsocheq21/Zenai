@@ -59,18 +59,20 @@ async function goTab(page, key) {
 // Returns true once the app is past sign-in (or was already past it, for a returning
 // session), false if a screen behind sign-in cannot be reached this run.
 async function enterApp(page) {
-  if (await waitVisible(page, "#start", 4000)) await page.locator("#start").click();
-  if (!(await waitVisible(page, "#signinGate", 3000))) return true; // no gate: already signed in
-
-  if (!INVITE) {
-    console.warn("SMOKE_INVITE is not set: skipping sign-in, screens behind it will be missed this run.");
-    return false;
+  const me = await (await page.request.get(`${BASE}/api/auth/me`)).json().catch(() => ({}));
+  if (me.required && !me.signed_in) {
+    if (!INVITE) {
+      console.warn("SMOKE_INVITE is not set: skipping sign-in, screens behind it will be missed this run.");
+      return false;
+    }
+    // Sign in through the API (the same cookie the gate sets), then load the app signed in.
+    const r = await page.request.post(`${BASE}/api/auth/invite`, {
+      data: { code: INVITE }, headers: { "X-ZenAI-Device": "site-media-" + Math.random().toString(36).slice(2, 10) } });
+    if (r.status() !== 200) { console.warn(`  invite sign-in failed (${r.status()})`); return false; }
+    await page.reload({ waitUntil: "networkidle" });
   }
-  const toggle = page.locator("#sgInviteToggle");
-  if (await toggle.count()) await toggle.click();
-  await page.locator("#sgCode").fill(INVITE);
-  await page.locator("#sgCodeGo").click();
-  await waitVisible(page, "#talk", 10_000);
+  // Signed-in students skip the welcome; where sign-in is not required it may still show.
+  if (await waitVisible(page, "#start", 2500)) await page.locator("#start").click();
   return true;
 }
 
@@ -88,7 +90,7 @@ async function main() {
 
   // Phone: the chat screen, for the hero's phone frame and the /students/ page.
   {
-    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
     await page.goto(`${BASE}/app/`, { waitUntil: "networkidle" });
     const in_ = await enterApp(page);
     if (in_ && (await goTab(page, "talk"))) await shoot(page, "app-chat.png");
@@ -98,7 +100,7 @@ async function main() {
 
   // Laptop: Talk home, for the hero's laptop frame, behind the phone.
   {
-    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+    const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 2 });
     await page.goto(`${BASE}/app/`, { waitUntil: "networkidle" });
     const in_ = await enterApp(page);
     if (in_ && (await goTab(page, "talk"))) await shoot(page, "app-laptop-talk.png");
@@ -108,7 +110,7 @@ async function main() {
 
   // Phone: Check in and Find help, for the /students/ page.
   {
-    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
     await page.goto(`${BASE}/app/`, { waitUntil: "networkidle" });
     const in_ = await enterApp(page);
     if (in_ && (await goTab(page, "checkin"))) await shoot(page, "app-checkin.png");
@@ -121,9 +123,8 @@ async function main() {
   // Phone: the crisis hand-off, reached straight from Get help now. Needs no sign-in,
   // so it is shot in its own page without calling enterApp's sign-in step.
   {
-    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
     await page.goto(`${BASE}/app/`, { waitUntil: "networkidle" });
-    if (await waitVisible(page, "#start", 4000)) await page.locator("#start").click();
     // Get help now exists in two places: the header once past welcome, or inside the
     // sign-in gate itself when sign-in is required. Either one opens the same crisis screen.
     const helpBtn = (await waitVisible(page, "#signinGate", 3000)) ? page.locator("#sgHelp") : page.locator("#helpBtn");
