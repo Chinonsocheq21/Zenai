@@ -106,7 +106,6 @@ def test_no_values_cue_leaves_focus_untouched():
 
 
 def test_exam_season_context_only_reaches_the_academic_specialist():
-    from zenai.agents import specialists
 
     window = {"label": "Fall 2026 final exams", "start": "2026-12-11", "end": "2026-12-18"}
     r = route("I have two midterms Friday and my professor already said I'm failing", season=window)
