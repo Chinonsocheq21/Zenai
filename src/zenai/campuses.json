@@ -21,6 +21,14 @@
         "verified": "2026-10-15"
       },
       "resources_verified": "2026-10-29",
+      "exam_windows_source": "https://www.morgan.edu/academic-calendar",
+      "exam_windows_verified": "2026-11-11",
+      "exam_windows": [
+        {"label": "Fall 2026 midterms", "start": "2026-10-12", "end": "2026-10-17"},
+        {"label": "Fall 2026 final exams", "start": "2026-12-11", "end": "2026-12-18"},
+        {"label": "Spring 2027 midterms", "start": "2027-03-07", "end": "2027-03-13"},
+        {"label": "Spring 2027 final exams", "start": "2027-05-08", "end": "2027-05-14"}
+      ],
       "resources": {
         "counseling": {
           "name": "Counseling Center",
@@ -52,10 +60,67 @@
         },
         "support": {
           "name": "Student Support and Outreach Services (S.O.S.)",
-          "what": "One person who helps you sort out what's getting in the way: money, housing, school or health.",
+          "what": "One person who helps you sort out what's getting in the way: money, housing, school or health. Also known as the CARE team, for reporting a concern about a student.",
           "phone": "443-885-4670",
           "detail": "McMechen Hall 634 · sos@morgan.edu",
-          "url": "https://www.morgan.edu/student-support-and-outreach"
+          "url": "https://www.morgan.edu/student-support-and-outreach",
+          "verified": "2026-11-11"
+        },
+        "financial_aid": {
+          "name": "Office of Financial Aid",
+          "what": "Financial aid applications, FAFSA questions and your award letter.",
+          "phone": "443-885-3170",
+          "detail": "Tyler Hall, Suite 206 · finaid@morgan.edu",
+          "url": "https://www.morgan.edu/financialaid",
+          "verified": "2026-11-11"
+        },
+        "health": {
+          "name": "Harriet A. Woolford University Health Center",
+          "what": "Medical care and health services for Morgan students.",
+          "phone": "443-885-3236",
+          "detail": "1700 E. Cold Spring Lane · healthcenter@morgan.edu",
+          "url": "https://www.morgan.edu/healthcenter",
+          "verified": "2026-11-11"
+        },
+        "housing": {
+          "name": "Office of Residence Life and Housing",
+          "what": "Housing assignments, room changes and questions about living on campus.",
+          "phone": "443-885-3218",
+          "detail": "Historic Jenkins Building, Suite 340 · reslife@morgan.edu",
+          "url": "https://www.morgan.edu/residencelife",
+          "verified": "2026-11-11"
+        },
+        "title_ix": {
+          "name": "Title IX Office",
+          "what": "Reports and questions about sex-based discrimination, harassment or assault.",
+          "phone": "443-885-3580",
+          "detail": "Tyler Hall, Suite 503 · titleixcoordinator@morgan.edu",
+          "url": "https://www.morgan.edu/titleix",
+          "verified": "2026-11-11"
+        },
+        "career": {
+          "name": "Center for Career Development",
+          "what": "Resume help, internships, job searches and career planning.",
+          "phone": "443-885-3110",
+          "detail": "Tyler Hall, Suite 307 · careers@morgan.edu",
+          "url": "https://www.morgan.edu/careerdevelopment",
+          "verified": "2026-11-11"
+        },
+        "veterans": {
+          "name": "Veterans Engagement Services",
+          "what": "Support for veteran, active-duty and military-connected students.",
+          "phone": "443-885-2046",
+          "detail": "Weekdays 8 to 5 · veterans@morgan.edu",
+          "url": "https://www.morgan.edu/veteranservices",
+          "verified": "2026-11-11"
+        },
+        "international": {
+          "name": "Office of International Students and Scholars",
+          "what": "Visa guidance, immigration status and support for international students.",
+          "phone": "443-885-4033",
+          "detail": "Earl S. Richardson Library, Suite 212 · international.affairs@morgan.edu",
+          "url": "https://www.morgan.edu/oisfs",
+          "verified": "2026-11-11"
         }
       }
     }

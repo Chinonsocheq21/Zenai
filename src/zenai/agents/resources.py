@@ -21,9 +21,19 @@ VERIFIED = _DEFAULT["resources_verified"]
 RESOURCES = _DEFAULT["resources"]
 
 
+def _normalize(topic: str) -> str:
+    """A loose key for topic matching: lowercase, spaces/dashes to underscores.
+
+    Lets a caller pass a phrase like 'financial aid' or 'Housing' and still
+    land on the resource keyed 'financial_aid' or 'housing'.
+    """
+    return str(topic).strip().lower().replace(" ", "_").replace("-", "_")
+
+
 def cards(topics: list[str], campus_id: str | None = None) -> list[dict]:
     """The cards for these topics, in order, with S.O.S. as the catch-all."""
     campus = (campuses.get(campus_id) if campus_id else None) or _DEFAULT
     res, verified = campus["resources"], campus["resources_verified"]
-    keys = [t for t in topics if t in res] or ["support"]
-    return [{"id": k, **res[k], "verified": verified} for k in dict.fromkeys(keys)]
+    by_norm = {_normalize(k): k for k in res}
+    keys = [by_norm[_normalize(t)] for t in topics if _normalize(t) in by_norm] or ["support"]
+    return [{"id": k, **res[k], "verified": res[k].get("verified", verified)} for k in dict.fromkeys(keys)]

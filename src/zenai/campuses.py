@@ -78,6 +78,26 @@ def validate(campus: dict) -> dict:
         for k in RESOURCE_FIELDS:
             _need(r, k, rw)
         _phone(r["phone"], rw)
+        if "verified" in r and not DATE.match(str(r["verified"])):
+            raise CampusError(f"{rw}: verified must be YYYY-MM-DD")
+
+    if "exam_windows" in campus:
+        windows = campus["exam_windows"]
+        ew = f"{w} exam_windows"
+        if not isinstance(windows, list) or not windows:
+            raise CampusError(f"{ew}: must be a non-empty list")
+        _need(campus, "exam_windows_source", w)
+        exam_verified = _need(campus, "exam_windows_verified", w)
+        if not DATE.match(str(exam_verified)):
+            raise CampusError(f"{w}: exam_windows_verified must be YYYY-MM-DD")
+        for win in windows:
+            ww = f"{ew} {win.get('label') if isinstance(win, dict) else win!r}"
+            for k in ("label", "start", "end"):
+                _need(win, k, ww)
+            if not DATE.match(str(win["start"])) or not DATE.match(str(win["end"])):
+                raise CampusError(f"{ww}: start/end must be YYYY-MM-DD")
+            if str(win["start"]) > str(win["end"]):
+                raise CampusError(f"{ww}: start must not be after end")
     return campus
 
 
