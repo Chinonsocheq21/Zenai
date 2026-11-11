@@ -74,8 +74,33 @@
   --color-fill-ink: #14233d;
 }
 
+/* Dark tokens apply when the switch is set to Dark outright, or to Match my phone
+   and the OS itself prefers dark (data-theme is set before paint, see layout.tsx). */
+[data-theme="dark"] {
+  --color-paper: #0a1426;
+  --color-paper2: #0e1b33;
+  --color-card: #15233f;
+  --color-ink: #eef1f7;
+  --color-ink2: #c3ccdb;
+  --color-muted: #8e9ab0;
+  --color-line: rgba(200, 214, 240, 0.16);
+  --color-navy: #9bbdf0;
+  --color-navy2: #3b6cb3;
+  --color-orange: #f2a46e;
+  --color-orangefill: #e8792f;
+  --color-crisis: #ff8a73;
+  --color-crisisbg: rgba(255, 138, 115, 0.12);
+  --color-calm: #7fd0b0;
+  --color-ring: #9bbdf0;
+
+  --color-fill-navy: #2b5592;
+  --color-fill-crisis: #b3321f;
+  --color-fill-orange: #b4541a;
+  --color-fill-ink: #15233f;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  [data-theme="system"] {
     --color-paper: #0a1426;
     --color-paper2: #0e1b33;
     --color-card: #15233f;
@@ -100,7 +125,12 @@
 }
 
 @layer base {
-  html { color-scheme: light dark; scroll-behavior: smooth; }
+  /* color-scheme follows the chosen theme, not just the OS, so native form controls
+     and scrollbars match: light by default, dark when the switch says Dark, and only
+     "light dark" (OS decides) when the switch says Match my phone. */
+  html { color-scheme: light; scroll-behavior: smooth; }
+  html[data-theme="dark"] { color-scheme: dark; }
+  html[data-theme="system"] { color-scheme: light dark; }
   body {
     background: var(--color-paper);
     color: var(--color-ink);
@@ -126,17 +156,28 @@
   .text-\[44px\], .md\:text-\[64px\] { font-size: var(--text-5xl); }
 
   /* In dark mode navy, crisis, orange and ink become light text colors, so the places that use
-     them as solid fills behind white text keep a dark fill instead. Same class names, no page edits. */
+     them as solid fills behind white text keep a dark fill instead. Same class names, no page edits.
+     Applies for data-theme=dark outright, and for data-theme=system only when the OS prefers dark. */
+  [data-theme="dark"] .bg-navy, [data-theme="dark"] .focus\:bg-navy:focus, [data-theme="dark"] .hover\:bg-navy:hover { background-color: var(--color-fill-navy); }
+  [data-theme="dark"] .border-navy.bg-navy { border-color: var(--color-fill-navy); }
+  [data-theme="dark"] .bg-crisis, [data-theme="dark"] .hover\:bg-crisis:hover { background-color: var(--color-fill-crisis); }
+  [data-theme="dark"] .bg-orange { background-color: var(--color-fill-orange); }
+  [data-theme="dark"] .bg-ink { background-color: var(--color-fill-ink); }
+  [data-theme="dark"] .border-ink { border-color: var(--color-fill-ink); }
+  [data-theme="dark"] .bg-white { background-color: var(--color-card); }
+  [data-theme="dark"] .bg-orangefill { color: #1a1208; }
+  [data-theme="dark"] .bg-\[\#e6f3ec\] { background-color: rgba(127, 208, 176, 0.12); }
+
   @media (prefers-color-scheme: dark) {
-    .bg-navy, .focus\:bg-navy:focus, .hover\:bg-navy:hover { background-color: var(--color-fill-navy); }
-    .border-navy.bg-navy { border-color: var(--color-fill-navy); }
-    .bg-crisis, .hover\:bg-crisis:hover { background-color: var(--color-fill-crisis); }
-    .bg-orange { background-color: var(--color-fill-orange); }
-    .bg-ink { background-color: var(--color-fill-ink); }
-    .border-ink { border-color: var(--color-fill-ink); }
-    .bg-white { background-color: var(--color-card); }
-    .bg-orangefill { color: #1a1208; }
-    .bg-\[\#e6f3ec\] { background-color: rgba(127, 208, 176, 0.12); }
+    [data-theme="system"] .bg-navy, [data-theme="system"] .focus\:bg-navy:focus, [data-theme="system"] .hover\:bg-navy:hover { background-color: var(--color-fill-navy); }
+    [data-theme="system"] .border-navy.bg-navy { border-color: var(--color-fill-navy); }
+    [data-theme="system"] .bg-crisis, [data-theme="system"] .hover\:bg-crisis:hover { background-color: var(--color-fill-crisis); }
+    [data-theme="system"] .bg-orange { background-color: var(--color-fill-orange); }
+    [data-theme="system"] .bg-ink { background-color: var(--color-fill-ink); }
+    [data-theme="system"] .border-ink { border-color: var(--color-fill-ink); }
+    [data-theme="system"] .bg-white { background-color: var(--color-card); }
+    [data-theme="system"] .bg-orangefill { color: #1a1208; }
+    [data-theme="system"] .bg-\[\#e6f3ec\] { background-color: rgba(127, 208, 176, 0.12); }
   }
 }
 

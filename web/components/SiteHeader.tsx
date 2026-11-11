@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/", label: "Home" },
   { href: "/how-it-works/", label: "How it works" },
   { href: "/safety/", label: "Safety" },
+  { href: "/get-the-app/", label: "Get the app" },
   { href: "/universities/", label: "For universities" },
   { href: "/help/", label: "Help" },
 ];
@@ -52,7 +53,7 @@ export default function SiteHeader() {
             Get help now
           </Link>
           <a href="/app/" className="hidden rounded-full bg-navy px-4 py-2 text-sm font-semibold text-white hover:bg-navy2 sm:inline-block">
-            Try ZenAI
+            Open ZenAI
           </a>
           <button ref={menuBtn} type="button" className="rounded-full p-2 md:hidden" aria-expanded={open} aria-controls="mobile-nav"
             aria-label={open ? "Close menu" : "Open menu"} onClick={() => setOpen(!open)}>
@@ -71,7 +72,8 @@ export default function SiteHeader() {
               {l.label}
             </Link>
           ))}
-          <a href="/app/" className="mt-3 block rounded-full bg-navy px-4 py-3 text-center font-semibold text-white">Try ZenAI</a>
+          <a href="/app/" className="mt-3 block rounded-full bg-navy px-4 py-3 text-center font-semibold text-white">Open ZenAI</a>
+          <p className="mt-2 text-center text-sm text-ink2">Sign in with your Morgan email or an invite code.</p>
         </nav>
       )}
     </header>
