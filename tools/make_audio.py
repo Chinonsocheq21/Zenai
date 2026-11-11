@@ -103,7 +103,7 @@ def check() -> int:
     problems = []
     try:
         index = json.loads((OUT / "index.json").read_text())["sessions"]
-    except Exception as e:                       # missing or malformed
+    except (OSError, ValueError, KeyError) as e:   # missing or malformed
         print(f"FAIL index.json: {e}")
         return 1
     total = 0
