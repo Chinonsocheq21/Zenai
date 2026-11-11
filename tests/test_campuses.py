@@ -1,7 +1,6 @@
 """The campus registry (zenai/campuses.json) and GET /campus."""
 
 import copy
-import hashlib
 import json
 
 import pytest
@@ -10,10 +9,6 @@ from fastapi.testclient import TestClient
 
 from zenai import campuses
 from zenai.agents import resources
-
-# sha256 of the resources output BEFORE they moved into the registry (ZL-32):
-# json.dumps({VERIFIED, RESOURCES, cards(all topics), cards([])}, sort_keys=True).
-BEFORE_SHA256 = "c46697e0571b49a77d13d741f38ed27a99211970fb7caa9eb9ff7b2b3cb84d64"
 
 
 def _morgan():
@@ -71,14 +66,73 @@ def test_duplicate_ids_and_domains_rejected(tmp_path):
         campuses.load(_write(tmp_path, []))
 
 
-def test_morgan_resources_unchanged_byte_for_byte():
-    out = json.dumps({"VERIFIED": resources.VERIFIED, "RESOURCES": resources.RESOURCES,
-                      "cards": resources.cards(list(resources.RESOURCES)),
-                      "none": resources.cards([])}, sort_keys=True)
-    assert hashlib.sha256(out.encode()).hexdigest() == BEFORE_SHA256
+def test_morgan_original_resources_unchanged():
     assert resources.VERIFIED == "2026-10-29"
     assert resources.cards(["counseling"])[0]["detail"] == "Weekdays 8:30 to 5 · 24/7 line: 1-800-422-0009"
+    assert resources.cards(["counseling"])[0]["verified"] == "2026-10-29"
     assert [c["id"] for c in resources.cards(["unknown"])] == ["support"]
+    tutoring = resources.RESOURCES["tutoring"]
+    assert tutoring["name"] == "Center for Academic Success and Achievement (CASA)"
+    assert tutoring["phone"] == "443-885-3380"
+
+
+def test_new_morgan_offices_are_verified_from_morgan_edu():
+    expected = {
+        "financial_aid": ("443-885-3170", "https://www.morgan.edu/financialaid"),
+        "health": ("443-885-3236", "https://www.morgan.edu/healthcenter"),
+        "housing": ("443-885-3218", "https://www.morgan.edu/residencelife"),
+        "title_ix": ("443-885-3580", "https://www.morgan.edu/titleix"),
+        "career": ("443-885-3110", "https://www.morgan.edu/careerdevelopment"),
+        "veterans": ("443-885-2046", "https://www.morgan.edu/veteranservices"),
+        "international": ("443-885-4033", "https://www.morgan.edu/oisfs"),
+    }
+    for rid, (phone, url) in expected.items():
+        r = resources.RESOURCES[rid]
+        assert r["phone"] == phone
+        assert r["url"] == url
+        assert r["url"].startswith("https://www.morgan.edu/") or r["url"].startswith("https://morgan.edu/")
+        assert r["verified"] == "2026-11-11"
+        assert resources.cards([rid])[0]["id"] == rid
+
+
+def test_keyword_matching_finds_the_right_office():
+    assert resources.cards(["financial aid"])[0]["id"] == "financial_aid"
+    assert resources.cards(["Housing"])[0]["id"] == "housing"
+    assert resources.cards(["housing"])[0]["id"] == "housing"
+    assert resources.cards(["unknown-topic"])[0]["id"] == "support"
+
+
+def test_dean_of_students_care_team_is_the_sos_catch_all():
+    support = resources.RESOURCES["support"]
+    assert "CARE team" in support["what"]
+    assert resources.cards(["support"])[0]["name"] == "Student Support and Outreach Services (S.O.S.)"
+
+
+def test_exam_windows_present_and_sourced():
+    m = campuses.default()
+    assert m["exam_windows_source"] == "https://www.morgan.edu/academic-calendar"
+    assert m["exam_windows_verified"] == "2026-11-11"
+    labels = [w["label"] for w in m["exam_windows"]]
+    assert "Fall 2026 final exams" in labels
+    assert "Spring 2027 final exams" in labels
+    fall_finals = next(w for w in m["exam_windows"] if w["label"] == "Fall 2026 final exams")
+    assert (fall_finals["start"], fall_finals["end"]) == ("2026-12-11", "2026-12-18")
+    spring_finals = next(w for w in m["exam_windows"] if w["label"] == "Spring 2027 final exams")
+    assert (spring_finals["start"], spring_finals["end"]) == ("2027-05-08", "2027-05-14")
+
+
+@pytest.mark.parametrize("breaks", [
+    lambda c: c.__setitem__("exam_windows", []),
+    lambda c: c.__setitem__("exam_windows", [{"label": "x", "start": "Dec 1 2026", "end": "2026-12-18"}]),
+    lambda c: c.__setitem__("exam_windows", [{"label": "x", "start": "2026-12-18", "end": "2026-12-11"}]),
+    lambda c: c.pop("exam_windows_source"),
+    lambda c: c.__setitem__("exam_windows_verified", "soon"),
+])
+def test_exam_window_validation_rejects_bad_entries(tmp_path, breaks):
+    m = _morgan()
+    breaks(m)
+    with pytest.raises(campuses.CampusError):
+        campuses.load(_write(tmp_path, [m]))
 
 
 def test_second_campus_is_one_json_entry(tmp_path, monkeypatch):
