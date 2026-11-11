@@ -15,3 +15,5 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - run: python tools/smoke.py https://zenai-app.vercel.app
+        env:
+          SMOKE_INVITE: ${{ secrets.SMOKE_INVITE }}   # signs the check in so it can test a real reply

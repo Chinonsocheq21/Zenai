@@ -19,6 +19,7 @@ Standard library only, so it runs anywhere. Messages are synthetic.
 from __future__ import annotations
 
 import json
+import os
 import sys
 import urllib.error
 import urllib.request
@@ -31,13 +32,19 @@ ORDINARY = "synthetic smoke test: long week, I'm behind on everything"
 class Http:
     def __init__(self, base: str):
         self.base = base.rstrip("/")
+        self.cookie = ""                # the session, once an invite code signs the smoke test in
 
     def req(self, method: str, path: str, body: dict | None = None, headers: dict | None = None):
         data = json.dumps(body).encode() if body is not None else None
         h = {"Content-Type": "application/json", "User-Agent": "zenai-smoke/1", **(headers or {})}
+        if self.cookie:
+            h["Cookie"] = self.cookie
         r = urllib.request.Request(self.base + path, data=data, headers=h, method=method)
         try:
             with urllib.request.urlopen(r, timeout=60) as resp:
+                for c in resp.headers.get_all("Set-Cookie") or []:
+                    if c.startswith("zenai_session="):
+                        self.cookie = c.split(";", 1)[0]
                 return resp.status, resp.read().decode("utf-8", "replace")
         except urllib.error.HTTPError as e:
             return e.code, e.read().decode("utf-8", "replace")
@@ -94,13 +101,25 @@ def run(c, limits_too: bool = False) -> list[tuple[bool, str]]:
     ok = s == 200 and json.loads(t).get("models") == "ok"
     out.append((ok, f"health and models ({s})"))
 
-    s, t = c.req("POST", "/api/chat", {"text": ORDINARY, "client": "smoke"}, dev)
-    d = json.loads(t) if s == 200 else {}
-    out.append((s == 200 and not d.get("escalate") and bool(d.get("reply")), f"ordinary reply ({s})"))
-
     for path in ("/api/present/info", "/api/workflow/recent"):
         s, _ = c.req("GET", path)
         out.append((s in (403, 404), f"{path} closed ({s})"))
+
+    s, t = c.req("GET", "/api/auth/me")
+    required = s == 200 and json.loads(t).get("required") is True
+    if required:
+        s, t = c.req("POST", "/api/chat", {"text": ORDINARY, "client": "smoke"}, dev)
+        refused = s == 401 and "signin_required" in t
+        out.append((refused, f"signed-out ordinary turn asks to sign in ({s})"))
+        code = os.environ.get("SMOKE_INVITE", "")
+        if not code:                    # nothing more can be checked without a way in
+            return out
+        s, _ = c.req("POST", "/api/auth/invite", {"code": code}, dev)
+        out.append((s == 200, f"invite code signs in ({s})"))
+
+    s, t = c.req("POST", "/api/chat", {"text": ORDINARY, "client": "smoke"}, dev)
+    d = json.loads(t) if s == 200 else {}
+    out.append((s == 200 and not d.get("escalate") and bool(d.get("reply")), f"ordinary reply ({s})"))
 
     if limits_too:
         statuses = []
