@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { pageMeta } from "@/components/meta";
+import NextStep from "@/components/NextStep";
 
 export const metadata = pageMeta(
   "/contact/",
@@ -66,6 +67,7 @@ export default function Contact() {
           </div>
         ))}
       </dl>
+      <NextStep href="/help/" label="Get help now" />
     </article>
   );
 }

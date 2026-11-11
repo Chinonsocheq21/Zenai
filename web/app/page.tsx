@@ -38,6 +38,12 @@ const RESULTS = [
   { big: "2.4 s", what: "median reply time, checks included", how: "Down from 8.4 s after moving drafts to a faster model, with no rise in drift." },
 ];
 
+const PROOF = [
+  ["10 of 10", "hidden crises caught on the held-out set"],
+  ["Nothing", "kept unless the student turns it on"],
+  ["2.4 s", "median reply, every one checked first"],
+] as const;
+
 const SCREENS = [
   ["checkin-first.webp", "It starts by asking how heavy today is.", 856],
   ["02-chat.webp", "Then it listens and reflects back what it heard.", 844],
@@ -55,32 +61,45 @@ export default function Home() {
       {/* hero */}
       <section className="relative overflow-hidden">
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_85%_0%,rgba(232,116,46,.18),transparent_70%)]" />
-        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-16 pt-14 md:grid-cols-[1.15fr_1fr] md:pt-24">
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 pb-16 pt-14 md:grid-cols-[1.1fr_1fr] md:pt-20">
           <div>
             <Eyebrow>For Morgan State students</Eyebrow>
-            <h1 className="mt-4 font-serif text-[44px] leading-[1.05] tracking-tight md:text-[64px]">A place to slow down for a minute.</h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink2">
-              ZenAI is a support chat grounded in Acceptance and Commitment Therapy. Every reply is checked against the
-              protocol before you see it, and the moment a conversation needs a person, ZenAI stops and hands you to one.
+            <h1 className="mt-4 font-serif text-[44px] leading-[1.03] tracking-tight md:text-[68px]">A place to slow down for a minute.</h1>
+            <p className="mt-6 max-w-xl text-xl leading-relaxed text-ink2">
+              A private support chat for the hard weeks: it listens, asks one good question, and hands you to a person the
+              moment you need one.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a href="/app/" className="rounded-full bg-navy px-6 py-3.5 font-semibold text-white shadow-lg shadow-navy/20 hover:bg-navy2">Open ZenAI</a>
-              <Link href="/how-it-works/" className="rounded-full border border-line bg-card px-6 py-3.5 font-semibold text-ink hover:border-navy/40">How it works</Link>
+              <Link href="/universities/" className="rounded-full border border-line bg-card px-6 py-3.5 font-semibold text-ink hover:border-navy/40">I run a counseling center</Link>
             </div>
-            <p className="mt-4 text-[15px] text-ink2">Sign in with your Morgan email or an invite code.</p>
-            <p className="mt-5 text-[15px] text-ink2">
-              Work at a counseling center or in student affairs?{" "}
-              <Link href="/universities/" className="font-semibold text-navy underline">See what a pilot looks like</Link>.
-            </p>
-            <p className="mt-6 text-sm text-muted">
-              Free for Morgan students. ZenAI is not a counselor. In crisis, call or text{" "}
+            <p className="mt-5 text-sm text-muted">
+              Free for Morgan students. Not a counselor. In crisis, call or text{" "}
               <a href="tel:988" className="font-semibold text-crisis underline">988</a>.
             </p>
-          </div>
-          <div className="flex justify-center">
-            <div className="relative">
-              <Orb size={300} />
+            <div className="mt-8 grid max-w-xl grid-cols-3 gap-3">
+              {PROOF.map(([big, what]) => (
+                <div key={what} className="rounded-2xl border border-line bg-card/70 px-4 py-3">
+                  <p className="font-serif text-2xl text-navy">{big}</p>
+                  <p className="mt-1 text-[13px] leading-snug text-ink2">{what}</p>
+                </div>
+              ))}
             </div>
+          </div>
+          <div className="relative hidden md:block">
+            <div className="relative mx-auto aspect-[4/3] max-w-lg">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/media/app/app-laptop-talk.png" alt="ZenAI's Talk screen, open on a laptop" width={700} height={437}
+                className="absolute right-0 top-2 w-[82%] rounded-xl border-[8px] border-ink shadow-2xl shadow-ink/25" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/media/app/app-chat.png" alt="ZenAI's Talk screen, open on a phone" width={390} height={844}
+                className="absolute bottom-0 left-0 w-[34%] rounded-[22px] border-[6px] border-ink shadow-2xl shadow-ink/30" />
+            </div>
+          </div>
+          <div className="md:hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/media/app/app-chat.png" alt="ZenAI's Talk screen, open on a phone" width={390} height={844}
+              className="mx-auto w-48 rounded-[22px] border-[6px] border-ink shadow-xl shadow-ink/20" />
           </div>
         </div>
       </section>

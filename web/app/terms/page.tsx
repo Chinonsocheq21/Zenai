@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import NextStep from "@/components/NextStep";
 
 export const metadata: Metadata = {
   title: "Terms",
@@ -34,6 +35,7 @@ export default function Terms() {
           </li>
         ))}
       </ol>
+      <NextStep href="/privacy/" label="Read the privacy policy" />
     </article>
   );
 }

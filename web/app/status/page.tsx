@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { pageMeta } from "@/components/meta";
+import NextStep from "@/components/NextStep";
 
 export const metadata = pageMeta(
   "/status/",
@@ -52,6 +53,7 @@ export default function Status() {
           To report an outage, see <Link href="/contact/" className="font-semibold text-navy underline">Contact</Link>.
         </p>
       </section>
+      <NextStep href="/app/" label="Open ZenAI" />
     </article>
   );
 }

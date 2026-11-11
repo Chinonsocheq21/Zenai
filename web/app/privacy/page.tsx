@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { pageMeta } from "@/components/meta";
+import NextStep from "@/components/NextStep";
 
 export const metadata = pageMeta(
   "/privacy/",
@@ -193,6 +194,7 @@ export default function Privacy() {
           This policy is a draft and will be reviewed before ZenAI is offered to students beyond testing.
         </p>
       </Section>
+      <NextStep href="/security/" label="Read Security and subprocessors" />
     </article>
   );
 }
