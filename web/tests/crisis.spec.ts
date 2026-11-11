@@ -8,7 +8,18 @@ import { expect, test, type Page } from "@playwright/test";
 const PROD = process.env.PROD_URL || "https://zenai-app.vercel.app";
 test.use({ baseURL: PROD });
 
+// The hosted app asks visitors to sign in before they can talk. Tests that type
+// a message sign in first with an invite code (SMOKE_INVITE, the same one the
+// uptime check uses); the sign-in screen's own help is tested signed out.
+const INVITE = process.env.SMOKE_INVITE || "";
+
 async function openApp(page: Page) {
+  const me = await (await page.request.get("/api/auth/me")).json();
+  if (me.required) {
+    test.skip(!INVITE, "sign-in is required here: set SMOKE_INVITE to an invite code");
+    const r = await page.request.post("/api/auth/invite", { data: { code: INVITE } });
+    expect(r.status(), "the invite code signs in").toBe(200);
+  }
   await page.goto("/app/");
   const start = page.locator("#start");
   if (await start.isVisible()) await start.click();
@@ -69,4 +80,20 @@ test("Get help now opens the same help without ending the conversation", async (
   await openApp(page);
   await page.click("#helpBtn");
   await expect(page.locator("#crisis").getByText("Call 988 now")).toBeVisible();
+});
+
+test("signed out, the sign-in screen still offers help and 988", async ({ browser }) => {
+  const ctx = await browser.newContext();                        // no session cookie
+  const page = await ctx.newPage();
+  const me = await (await page.request.get("/api/auth/me")).json();
+  test.skip(!me.required, "this site does not require sign-in");
+  await page.goto("/app/");
+  const start = page.locator("#start");
+  if (await start.isVisible()) await start.click();
+  const gate = page.locator("#signinGate");
+  await expect(gate).toBeVisible();
+  await expect(gate.locator('a[href^="tel:988"], a[href^="sms:988"]').first()).toBeVisible();
+  await gate.getByText(/Get help now/).first().click();
+  await expect(page.locator("#crisis").getByText("Call 988 now")).toBeVisible();
+  await ctx.close();
 });

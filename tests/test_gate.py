@@ -142,3 +142,10 @@ def test_invite_code_ignores_case_and_spaces(monkeypatch):
     assert auth._invite_label("Abcd-EFGH-ijkl-mnop ") == "class"
     assert auth._invite_label("abcd efgh-ijkl-mnop") is None
     assert auth._invite_label("abcd-efgh-ijkl-mnoq") is None
+
+
+def test_a_class_on_one_campus_network_can_all_sign_in(pg):
+    # Campus Wi-Fi puts a whole class behind one IP address: 30 phones must get in.
+    for i in range(30):
+        r = client().post("/auth/invite", json={"code": CODE}, headers={"X-ZenAI-Device": f"phone-{i}"})
+        assert r.status_code == 200, i
