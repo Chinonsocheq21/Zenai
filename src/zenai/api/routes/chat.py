@@ -50,7 +50,8 @@ def _crisis_only(body: ChatIn, note: str) -> dict | None:
     a = assess(redacted, earlier, body.checkin, screen=False, after_crisis=body.after_crisis)
     if a["risk"] >= settings.CRISIS_THRESHOLD:
         return {"escalate": True, "crisis_risk": a["risk"], "redacted_text": redacted, "reply": None, "attempts": [],
-                "trace": [], "escalation": {"hotline": settings.CRISIS_HOTLINE, "campus": settings.CAMPUS_COUNSELING_NAME,
+                "trace": [], "season": None,
+                "escalation": {"hotline": settings.CRISIS_HOTLINE, "campus": settings.CAMPUS_COUNSELING_NAME,
                                             "phone": settings.CAMPUS_COUNSELING_PHONE, "action": "human_handoff"},
                 "note": note}
     return None
