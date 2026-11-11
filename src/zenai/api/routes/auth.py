@@ -56,6 +56,12 @@ def allowed(email: str) -> bool:
     return any(dom == d or dom.endswith("." + d) for d in domains())
 
 
+def _norm_code(code: str) -> str:
+    """Phones capitalize the first letter and people add spaces: compare codes
+    case-insensitively and ignore spaces."""
+    return "".join(code.split()).lower()
+
+
 def invite_codes() -> dict[str, str]:
     """INVITE_CODES="label:code,label2:code2" -> {code: label}, like PILOT_CODES
     in aggregate.py. A code under 12 characters is ignored."""
@@ -63,7 +69,7 @@ def invite_codes() -> dict[str, str]:
     for pair in os.environ.get("INVITE_CODES", "").split(","):
         label, _, code = pair.strip().partition(":")
         if label and len(code) >= 12:
-            out[code] = label
+            out[_norm_code(code)] = label
     return out
 
 
@@ -72,7 +78,7 @@ def _invite_label(code: str) -> str | None:
     the first match, so timing can't reveal which code (or how many) exist."""
     found = None
     for candidate, label in invite_codes().items():
-        if hmac.compare_digest(candidate.encode(), code.encode()):
+        if hmac.compare_digest(candidate.encode(), _norm_code(code).encode()):
             found = label
     return found
 

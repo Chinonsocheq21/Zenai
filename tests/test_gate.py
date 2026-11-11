@@ -134,3 +134,11 @@ def test_store_down_degrades_to_calm_503_for_non_crisis(monkeypatch):
 
 def test_auth_me_reports_required():
     assert client().get("/auth/me").json()["required"] is True
+
+
+def test_invite_code_ignores_case_and_spaces(monkeypatch):
+    from zenai.api.routes import auth
+    monkeypatch.setenv("INVITE_CODES", "class:abcd-efgh-ijkl-mnop")
+    assert auth._invite_label("Abcd-EFGH-ijkl-mnop ") == "class"
+    assert auth._invite_label("abcd efgh-ijkl-mnop") is None
+    assert auth._invite_label("abcd-efgh-ijkl-mnoq") is None
