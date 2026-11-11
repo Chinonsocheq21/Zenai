@@ -64,12 +64,13 @@ test("the app links back to the site", async ({ page, request }) => {
   await page.goto("/app/");
   const start = page.locator("#start");           // the first-visit welcome screen has no header
   if (await start.isVisible()) await start.click();
-  for (const name of ["Home", "Help"]) {
-    await expect(page.getByRole("link", { name }).first()).toBeVisible();
-    const href = await page.getByRole("link", { name }).first().getAttribute("href");
-    expect(href).toBeTruthy();
-    expect((await request.get(href!)).status(), `${name} -> ${href}`).toBe(200);
-  }
+  await expect(page.locator("#helpBtn")).toBeVisible();               // help stays in the header
+  await page.locator('[data-go="you"]:visible').first().click();      // the website link lives in You
+  const site = page.locator("#youWebsite");
+  await expect(site).toBeVisible();
+  const href = await site.getAttribute("href");
+  expect(href).toBeTruthy();
+  expect((await request.get(href!)).status(), `ZenAI website -> ${href}`).toBe(200);
 });
 
 test("the help page needs no sign-in and leads with 988", async ({ page }) => {
