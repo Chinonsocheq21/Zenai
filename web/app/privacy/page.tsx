@@ -103,14 +103,18 @@ export default function Privacy() {
         </p>
         <ul className="list-disc space-y-1 pl-5">
           <li>How many messages were sent and how many conversations were started.</li>
-          <li>How many crisis hand-offs happened.</li>
+          <li>How many crisis hand-offs happened, and which layer caught each one (clear language, the conversation's own context, or a model screen).</li>
           <li>The check-in level conversations started with ("Light" to "I'm not okay").</li>
-          <li>Which focus answered (for example Academic Stress or Stress-Relief).</li>
+          <li>Which focus answered (for example Academic or Stress relief).</li>
+          <li>How many replies were checked before a student saw them, and whether a checked reply passed on the first draft, was rewritten, or was replaced with a safe fallback line.</li>
+          <li>How quickly a checked reply reached the student (fast, ok or slow).</li>
+          <li>How many conversations happened after hours, and how many were signed in versus not signed in.</li>
         </ul>
         <p>
-          Counts are by week only, never by a finer time. Any number under 10 is hidden, so a small group can't be picked
-          out. The dashboard never shows anyone's words, name, email or account, or whether a particular student uses
-          ZenAI. Students who are not signed in are counted together under "open", not under any campus.
+          That is the whole list: nothing finer than these counts, and still only counts, never text. Counts are by week
+          only, never by a finer time. Any number under 10 is hidden, so a small group can't be picked out. The dashboard
+          never shows anyone's words, name, email or account, or whether a particular student uses ZenAI. Students who
+          are not signed in are counted together under "open", not under any campus.
         </p>
       </Section>
 
