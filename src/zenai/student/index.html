@@ -1910,7 +1910,9 @@ async function ask(text) {
     const d = await r.json();
     if (d.season) SERVER_SEASON = d.season;   // "exams" turns on the Talk home card next time
     if (d.escalate) { crisis(); return d; }
-    addZen(d.reply, d.monitor === true, d.trace, d.total_ms);
+    // The Checked mark and its steps view stay off for students; how replies are
+    // checked is reported to pilot staff, as counts, on the campus dashboard.
+    addZen(d.reply);
     lastReply = d;
     if (d.resources && d.resources.length) addCards(d.resources);
     HISTORY.push({role: "user", content: d.redacted_text}, {role: "assistant", content: d.reply});
