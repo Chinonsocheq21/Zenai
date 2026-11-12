@@ -211,6 +211,9 @@ def trends(req: Request, weeks: int = 8) -> dict:
 
 
 DEMO_WEEKS = 12
+# A believable term: a quiet start, a midterm bump, a dip, then finals climbing.
+_DEMO_CONVERSATIONS = (78, 86, 81, 97, 112, 104, 91, 88, 99, 108, 121, 116)
+_DEMO_HANDOFFS = (4, 6, 5, 9, 12, 8, 6, 5, 7, 11, 13, 9)
 
 
 def _demo_week(i: int) -> dict[str, int]:
@@ -220,9 +223,9 @@ def _demo_week(i: int) -> dict[str, int]:
     together the way real ones do: replies checked = messages minus hand-offs,
     check-ins add up to conversations, and some small counts fall under 10 so
     the dashboard shows how hidden groups look."""
-    messages = 220 + (i * 13) % 70
-    conversations = 60 + (i * 5) % 30
-    handoffs = 4 + (i * 3) % 9                      # often under 10, sometimes not
+    conversations = _DEMO_CONVERSATIONS[i % len(_DEMO_CONVERSATIONS)]
+    messages = round(conversations * (2.9 + (i % 4) * 0.15))
+    handoffs = _DEMO_HANDOFFS[i % len(_DEMO_HANDOFFS)]   # often under 10, sometimes not
     by_patterns = round(handoffs * 0.6)
     by_context = round(handoffs * 0.25)
     by_screen = max(0, handoffs - by_patterns - by_context)

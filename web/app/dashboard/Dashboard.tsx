@@ -167,7 +167,7 @@ export default function Dashboard() {
       <div className="flex flex-wrap items-center justify-between gap-4 print:hidden">
         <div>
           <p className="text-sm text-ink2">
-            <b className="text-ink">{data?.campus ?? "..."}</b>{data?.min_group ? ` · any number under ${data.min_group} shows as "fewer than 10"` : ""}
+            <b className="text-ink">{isDemo ? "Sample Campus (demo)" : data?.campus === "morgan.edu" ? "Morgan State University" : data?.campus ?? "..."}</b>{data?.min_group ? ` · any number under ${data.min_group} shows as "fewer than 10"` : ""}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
