@@ -55,71 +55,63 @@ export function fmtPct(v: number | null): string {
   return v === null ? "not enough data" : `${Math.round(v * 100)}%`;
 }
 
-/** Deterministic pseudo-random generator so demo screenshots and tests are stable across runs. */
-function mulberry32(seed: number) {
-  let a = seed;
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+// A believable term: a quiet start, a midterm bump, a dip, then finals climbing.
+// The same series as the server's GET /api/aggregate/demo (src/zenai/api/routes/aggregate.py).
+const DEMO_CONVERSATIONS = [78, 86, 81, 97, 112, 104, 91, 88, 99, 108, 121, 116];
+const DEMO_HANDOFFS = [4, 6, 5, 9, 12, 8, 6, 5, 7, 11, 13, 9];
+const MIN_GROUP = 10;
+
+/** One deterministic demo week, mirroring the server's _demo_week: replies checked are
+ * messages minus hand-offs, check-ins add up to conversations, focus uses the four ids,
+ * and some small counts fall under 10 so the hidden-group treatment shows. */
+function demoWeek(i: number): Record<string, number> {
+  const conversations = DEMO_CONVERSATIONS[i % DEMO_CONVERSATIONS.length];
+  const messages = Math.round(conversations * (2.9 + (i % 4) * 0.15));
+  const handoffs = DEMO_HANDOFFS[i % DEMO_HANDOFFS.length];
+  const byPatterns = Math.round(handoffs * 0.6);
+  const byContext = Math.round(handoffs * 0.25);
+  const checked = messages - handoffs;
+  const rewritten = 11 + ((i * 3) % 9);
+  const fallback = 1 + (i % 3);
+  const fast = Math.round(checked * 0.62);
+  const ok = Math.round(checked * 0.31);
+  const m: Record<string, number> = {
+    messages, conversations, handoffs,
+    "handoff_by:patterns": byPatterns, "handoff_by:context": byContext,
+    "handoff_by:screen": Math.max(0, handoffs - byPatterns - byContext),
+    checked, first_pass: checked - rewritten, rewritten, fallback,
+    after_hours: Math.round(messages * (0.3 + (i % 4) * 0.03)), signed_in: Math.round(messages * 0.72),
+    "speed:fast": fast, "speed:ok": ok, "speed:slow": checked - fast - ok,
   };
+  let left = conversations;
+  [0.3, 0.31, 0.22, 0.11].forEach((share, k) => {
+    m[`checkin:${k}`] = Math.round(conversations * share);
+    left -= m[`checkin:${k}`];
+  });
+  m[`checkin:${CHECKIN_LABELS.length - 1}`] = Math.max(0, left);
+  ([["academic", 0.45], ["stress_relief", 0.25], ["wellness", 0.2], ["referral", 0.1]] as const).forEach(([id, share]) => {
+    m[`focus:${id}`] = Math.round(checked * share);
+  });
+  return m;
 }
 
 /**
- * Client-side sample data with the exact server contract shape, used for demo mode until
- * GET /api/aggregate/demo ships. The endpoint takes precedence once it answers; this is the
- * fallback, built to look like a real, modestly-sized pilot campus.
+ * Client-side sample data with the exact server contract shape, used for demo mode when
+ * GET /api/aggregate/demo doesn't answer (a local static build). The endpoint wins when it
+ * does. Counts under 10 become null, exactly as the server hides them.
  */
 export function demoData(weeks: number): AggregateData {
-  const rand = mulberry32(20261112);
+  const total = 12;
   const since = new Date();
   since.setUTCHours(12, 0, 0, 0);
-  since.setUTCDate(since.getUTCDate() - since.getUTCDay() + 1 - (weeks - 1) * 7); // a Monday, `weeks` back
-
+  since.setUTCDate(since.getUTCDate() - ((since.getUTCDay() + 6) % 7) - (total - 1) * 7); // a Monday, 12 weeks back
   const out: Week[] = [];
-  for (let i = 0; i < weeks; i++) {
+  for (let i = 0; i < total; i++) {
     const d = new Date(since);
     d.setUTCDate(d.getUTCDate() + i * 7);
-    const trend = 1 + i * 0.03; // a gentle upward trend over the term
-    const conversations = Math.round((60 + rand() * 30) * trend);
-    const messages = Math.round(conversations * (3.2 + rand() * 1.4));
-    const handoffs = Math.max(0, Math.round(conversations * (0.02 + rand() * 0.02)));
-    const checked = Math.round(messages * (0.94 + rand() * 0.04));
-    const fallback = Math.max(0, Math.round(checked * (0.01 + rand() * 0.015)));
-    const rewritten = Math.round(checked * (0.08 + rand() * 0.06));
-    const firstPass = Math.max(0, checked - rewritten - fallback);
-    const afterHours = Math.round(conversations * (0.22 + rand() * 0.1));
-    const signedIn = Math.round(conversations * (0.55 + rand() * 0.2));
-
-    const checkinShares = [0.38, 0.3, 0.17, 0.09, 0.06];
-    const focusShares: Record<string, number> = { academic: 0.42, stress_relief: 0.27, wellness: 0.2, referral: 0.11 };
-    const handoffShares: Record<string, number> = { patterns: 0.55, context: 0.3, screen: 0.15 };
-    const speedShares: Record<string, number> = { fast: 0.62, ok: 0.31, slow: 0.07 };
-
     const w: Week = { week: d.toISOString().slice(0, 10) };
-    w.conversations = conversations;
-    w.messages = messages;
-    w.handoffs = handoffs;
-    w.checked = checked;
-    w.first_pass = firstPass;
-    w.rewritten = rewritten;
-    w.fallback = fallback;
-    w.after_hours = afterHours;
-    w.signed_in = signedIn;
-    checkinShares.forEach((s, idx) => (w[`checkin:${idx}`] = Math.round(conversations * s)));
-    Object.entries(focusShares).forEach(([k, s]) => (w[`focus:${k}`] = Math.round(conversations * s)));
-    Object.entries(handoffShares).forEach(([k, s]) => (w[`handoff_by:${k}`] = Math.round(handoffs * s)));
-    Object.entries(speedShares).forEach(([k, s]) => (w[`speed:${k}`] = Math.round(messages * s)));
+    for (const [k, n] of Object.entries(demoWeek(i))) w[k] = n >= MIN_GROUP ? n : null;
     out.push(w);
   }
-
-  // The most recent week of a small pilot is often genuinely under 10 for the rarest counts:
-  // keep that true-to-life even in the sample so the "fewer than 10" treatment is visible.
-  const last = out[out.length - 1];
-  last.handoffs = null;
-  last["handoff_by:screen"] = null;
-
-  return { campus: "Sample Campus (demo)", min_group: 10, weeks: out };
+  return { campus: "Sample Campus (demo)", min_group: MIN_GROUP, weeks: out.slice(-weeks) };
 }
