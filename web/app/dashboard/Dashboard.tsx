@@ -7,7 +7,7 @@ import {
   type AggregateData, type Week, CHECKIN_LABELS, FOCUS_LABELS, HANDOFF_LAYER_LABELS, SPEED_LABELS,
   demoData, metric, safeShare, fmtWeek, fmtCount, fmtPct,
 } from "./data";
-import { TrendChart, StackedBarChart, HBarGroup } from "./charts";
+import { TrendChart, StackedBarChart, HBarGroup, WeeklyBars } from "./charts";
 
 const CODE_KEY = "zenai-pilot-code";
 const RANGE_OPTIONS = [4, 8, 12] as const;
@@ -39,7 +39,7 @@ function weekChange(weeks: Week[], key: string): { value: number | null; delta: 
 }
 
 function afterHoursShareByWeek(w: Week): number | null {
-  return safeShare(metric(w, "after_hours"), metric(w, "conversations"));
+  return safeShare(metric(w, "after_hours"), metric(w, "messages"));
 }
 
 function downloadCsv(data: AggregateData) {
@@ -76,7 +76,15 @@ export default function Dashboard() {
   useEffect(() => {
     let cancelled = false;
     async function run() {
-      if (isDemo) { setData(demoData(range)); setError(""); return; }
+      if (isDemo) {
+        setError("");
+        try {
+          const r = await fetch(`/api/aggregate/demo?weeks=${range}`);
+          const d = r.ok ? await r.json() : null;
+          if (!cancelled) setData(d && Array.isArray(d.weeks) ? { ...d, weeks: d.weeks.slice(-range) } : demoData(range));
+        } catch { if (!cancelled) setData(demoData(range)); }
+        return;
+      }
       if (!code) return;
       setBusy(true); setError("");
       try {
@@ -218,12 +226,18 @@ export default function Dashboard() {
               <KpiTile label="Conversations, this week" value={fmtCount(kpis!.conv.value)} delta={kpis!.conv.delta} />
               <KpiTile label="Messages, this week" value={fmtCount(kpis!.msg.value)} delta={kpis!.msg.delta} />
               <KpiTile label="Crisis hand-offs, this week" value={fmtCount(kpis!.ho.value)} delta={kpis!.ho.delta} />
-              <KpiTile label="Share after hours, this week" value={fmtPct(kpis!.lastShare)} delta={kpis!.shareDelta} help="After 6pm or before 8am, campus local time." />
+              <KpiTile label="Share after hours, this week" value={fmtPct(kpis!.lastShare)} delta={kpis!.shareDelta} help="While the Counseling Center was closed, by its published hours in campus time." />
             </div>
 
             <div className="rounded-3xl border border-line bg-card p-6">
-              <h3 className="font-semibold">Conversations and hand-offs, by week</h3>
+              <h3 className="font-semibold">Conversations, by week</h3>
               <div className="mt-5"><TrendChart weeks={data.weeks} /></div>
+            </div>
+
+            <div className="rounded-3xl border border-line bg-card p-6">
+              <h3 className="font-semibold">Crisis hand-offs, by week</h3>
+              <p className="mt-1 text-sm text-ink2">Each one is a moment ZenAI stopped and showed 988 and your counseling center. Weeks with fewer than 10 are hidden to protect students.</p>
+              <div className="mt-5"><WeeklyBars weeks={data.weeks} metricKey="handoffs" label="Crisis hand-offs" color="var(--color-crisis)" /></div>
             </div>
 
             <div className="rounded-3xl border border-line bg-card p-6">
@@ -241,7 +255,7 @@ export default function Dashboard() {
           <section className={tab === "safety" ? "mt-8 space-y-8" : "hidden print:mt-8 print:block print:space-y-8"} aria-labelledby="safety-h">
             <h2 id="safety-h" className="font-serif text-2xl">Safety</h2>
             <p className="text-ink2">
-              What used to be the student-facing &quot;Checked&quot; mark now lives here, for staff.{" "}
+              Before a student sees any reply, ZenAI checks it for advice, false reassurance and diagnosis, and rewrites it if it drifts. These are your campus&apos;s totals.{" "}
               <Link href="/safety/" className="font-semibold text-navy underline">How the safety check works</Link>.
             </p>
 
@@ -321,7 +335,7 @@ export default function Dashboard() {
               </div>
               <div className="rounded-3xl border border-line bg-card p-6 lg:col-span-2">
                 <h3 className="font-semibold">Share after hours, by week</h3>
-                <p className="mt-1 text-sm text-ink2">After 6pm or before 8am, campus local time.</p>
+                <p className="mt-1 text-sm text-ink2">Share of messages sent while the Counseling Center was closed, by its published hours in campus time.</p>
                 <table className="mt-4 w-full text-left text-sm">
                   <caption className="sr-only">Share of conversations after hours, by week</caption>
                   <thead className="text-muted"><tr><th className="py-1.5 font-medium">Week of</th><th className="font-medium">After hours</th></tr></thead>

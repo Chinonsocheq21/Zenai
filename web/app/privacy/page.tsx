@@ -108,7 +108,7 @@ export default function Privacy() {
           <li>Which focus answered (for example Academic or Stress relief).</li>
           <li>How many replies were checked before a student saw them, and whether a checked reply passed on the first draft, was rewritten, or was replaced with a safe fallback line.</li>
           <li>How quickly a checked reply reached the student (fast, ok or slow).</li>
-          <li>How many conversations happened after hours, and how many were signed in versus not signed in.</li>
+          <li>How many messages arrived while the Counseling Center was closed (by its published hours), and how many came from signed-in students versus students not signed in.</li>
         </ul>
         <p>
           That is the whole list: nothing finer than these counts, and still only counts, never text. Counts are by week

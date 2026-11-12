@@ -15,7 +15,8 @@ test("demo mode renders the console with the sample-data banner", async ({ page 
   await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
   await expect(page.getByText("Conversations, this week")).toBeVisible();
   await expect(page.getByText("Crisis hand-offs, this week")).toBeVisible();
-  await expect(page.getByRole("img", { name: "Conversations and crisis hand-offs by week" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Conversations by week" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Crisis hand-offs by week" })).toBeVisible();
 
   // Safety tab: the old "Checked" idea, now for staff, with a link back to /safety/.
   await page.getByRole("button", { name: "Safety" }).click();

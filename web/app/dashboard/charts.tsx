@@ -30,13 +30,13 @@ const SERIES_COLOR: Record<string, string> = {
   handoffs: "var(--color-crisis)",
 };
 
-/** A two-series line chart (conversations, hand-offs) with direct end labels instead of a legend. */
+/** The weekly conversations line, with a direct end label instead of a legend. Hand-offs
+ * are a different scale (a handful against dozens), so they get their own chart below. */
 export function TrendChart({ weeks }: { weeks: Week[] }) {
   const W = 640, H = 220, PAD_L = 34, PAD_R = 86, PAD_T = 16, PAD_B = 28;
   const plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
   const series: { key: "conversations" | "handoffs"; label: string }[] = [
     { key: "conversations", label: "Conversations" },
-    { key: "handoffs", label: "Crisis hand-offs" },
   ];
   const maxV = Math.max(1, ...weeks.flatMap((w) => series.map((s) => (typeof w[s.key] === "number" ? (w[s.key] as number) : 0))));
   const x = (i: number) => PAD_L + (weeks.length <= 1 ? plotW / 2 : (i / (weeks.length - 1)) * plotW);
@@ -59,7 +59,7 @@ export function TrendChart({ weeks }: { weeks: Week[] }) {
 
   return (
     <figure className="m-0">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Conversations and crisis hand-offs by week" className="h-auto w-full">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Conversations by week" className="h-auto w-full">
         {ticks.map((t) => (
           <g key={t}>
             <line x1={PAD_L} x2={W - PAD_R} y1={y(t)} y2={y(t)} stroke="var(--color-line)" strokeWidth={1} />
@@ -89,14 +89,14 @@ export function TrendChart({ weeks }: { weeks: Week[] }) {
             </g>
           );
         })}
-        {weeks.some((w) => w.handoffs === null || w.conversations === null) && (
+        {weeks.some((w) => w.conversations === null) && (
           <text x={PAD_L} y={14} fontSize={10} fill="var(--color-muted)">Gaps are weeks with fewer than 10</text>
         )}
       </svg>
       <HiddenTable
-        caption="Conversations and crisis hand-offs by week"
-        columns={["Week", "Conversations", "Crisis hand-offs"]}
-        rows={weeks.map((w) => [fmtWeek(w.week), fmtCount(w.conversations as number | null), fmtCount(w.handoffs as number | null)])}
+        caption="Conversations by week"
+        columns={["Week", "Conversations"]}
+        rows={weeks.map((w) => [fmtWeek(w.week), fmtCount(w.conversations as number | null)])}
       />
     </figure>
   );
@@ -198,5 +198,52 @@ export function HBarGroup({
         </div>
       ))}
     </div>
+  );
+}
+
+/** One metric as a bar per week, on its own scale. A week with fewer than 10 is drawn as a
+ * dashed outline marked "<10", never as zero, so a small number is never read as none. */
+export function WeeklyBars({ weeks, metricKey, label, color }: { weeks: Week[]; metricKey: string; label: string; color: string }) {
+  const W = 640, H = 150, PAD_L = 26, PAD_R = 8, PAD_T = 18, PAD_B = 26;
+  const plotW = W - PAD_L - PAD_R, plotH = H - PAD_T - PAD_B;
+  const slot = plotW / Math.max(1, weeks.length);
+  const barW = Math.max(6, slot - 8);
+  const vals = weeks.map((w) => w[metricKey]);
+  const maxV = Math.max(10, ...vals.map((v) => (typeof v === "number" ? v : 0)));
+  const y = (v: number) => PAD_T + plotH - (v / maxV) * plotH;
+  return (
+    <figure className="m-0">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${label} by week`} className="h-auto w-full">
+        {[0, maxV].map((t) => (
+          <g key={t}>
+            <line x1={PAD_L} x2={W - PAD_R} y1={y(t)} y2={y(t)} stroke="var(--color-line)" strokeWidth={1} />
+            <text x={PAD_L - 6} y={y(t)} textAnchor="end" dominantBaseline="middle" fontSize={10} fill="var(--color-muted)">{Math.round(t)}</text>
+          </g>
+        ))}
+        {weeks.map((w, i) => {
+          const v = vals[i];
+          const x0 = PAD_L + i * slot + (slot - barW) / 2;
+          const show = i % Math.ceil(weeks.length / 8 || 1) === 0;
+          return (
+            <g key={w.week}>
+              {typeof v === "number" ? (
+                <>
+                  <rect x={x0} y={y(v)} width={barW} height={Math.max(0, PAD_T + plotH - y(v))} rx={3} fill={color} />
+                  <text x={x0 + barW / 2} y={y(v) - 4} textAnchor="middle" fontSize={10} fontWeight={600} fill="var(--color-ink2)">{v}</text>
+                </>
+              ) : v === null ? (
+                <>
+                  <rect x={x0} y={y(10)} width={barW} height={PAD_T + plotH - y(10)} rx={3} fill="none" stroke="var(--color-muted)" strokeDasharray="3 3" />
+                  <text x={x0 + barW / 2} y={y(10) - 4} textAnchor="middle" fontSize={10} fill="var(--color-muted)">&lt;10</text>
+                </>
+              ) : null}
+              {show && <text x={x0 + barW / 2} y={H - 8} textAnchor="middle" fontSize={10} fill="var(--color-muted)">{fmtWeek(w.week)}</text>}
+            </g>
+          );
+        })}
+      </svg>
+      <HiddenTable caption={`${label} by week`} columns={["Week", label]}
+        rows={weeks.map((w) => [fmtWeek(w.week), fmtCount(w[metricKey] as number | null)])} />
+    </figure>
   );
 }
