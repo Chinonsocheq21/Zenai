@@ -1350,7 +1350,7 @@ function showSteps(t) {
   btn.textContent = "See every step for this reply";
   if (!t) { btn.classList.add("hidden"); list.innerHTML = ""; return; }
   btn.classList.remove("hidden");
-  const plain = v => { const t = String(v || "").replace(/\s*[\u2014\u2013]\s*/g, ": "); return t.charAt(0).toUpperCase() + t.slice(1); };
+  const plain = v => { const t = String(v || "").replace(/\s*[\u2014\u2013]\s*/g, ": ").replace(/\b([a-z]+)_([a-z]+)\b/g, "$1 $2"); return t.charAt(0).toUpperCase() + t.slice(1); };
   list.innerHTML = t.trace.map((st, i) => {
     const ms = typeof st.ms === "number" ? (st.ms >= 1000 ? (st.ms / 1000).toFixed(1) + " s" : Math.round(st.ms) + " ms") : "";
     const word = STATUS_WORDS[st.status] ?? st.status;
