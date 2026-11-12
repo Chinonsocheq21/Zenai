@@ -316,15 +316,18 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="rounded-3xl border border-line bg-card p-6">
-                <h3 className="font-semibold">Signed in versus open, this week</h3>
-                <p className="mt-1 text-sm text-ink2">Signed-in conversations can sync check-ins between devices; open ones never create an account.</p>
+                <h3 className="font-semibold">Signed in versus open, this week (messages)</h3>
+                <p className="mt-1 text-sm text-ink2">Messages from signed-in students versus students who are not signed in. Signed-in students can sync check-ins between devices.</p>
                 <div className="mt-4">
                   <HBarGroup
                     color="var(--color-calm)"
                     items={(() => {
-                      const conv = metric(last!, "conversations");
+                      // signed_in is counted per message, so "open" is messages minus signed in.
+                      // A difference under 10 is hidden too: subtracting must not reveal a small group.
+                      const msgs = metric(last!, "messages");
                       const signedIn = metric(last!, "signed_in");
-                      const open = conv === null || signedIn === null ? null : Math.max(0, conv - signedIn);
+                      const diff = msgs === null || signedIn === null ? null : Math.max(0, msgs - signedIn);
+                      const open = diff !== null && diff > 0 && diff < 10 ? null : diff;
                       return [
                         { label: "Signed in", value: signedIn },
                         { label: "Open (not signed in)", value: open },
@@ -337,7 +340,7 @@ export default function Dashboard() {
                 <h3 className="font-semibold">Share after hours, by week</h3>
                 <p className="mt-1 text-sm text-ink2">Share of messages sent while the Counseling Center was closed, by its published hours in campus time.</p>
                 <table className="mt-4 w-full text-left text-sm">
-                  <caption className="sr-only">Share of conversations after hours, by week</caption>
+                  <caption className="sr-only">Share of messages after hours, by week</caption>
                   <thead className="text-muted"><tr><th className="py-1.5 font-medium">Week of</th><th className="font-medium">After hours</th></tr></thead>
                   <tbody>
                     {data.weeks.map((w) => (
