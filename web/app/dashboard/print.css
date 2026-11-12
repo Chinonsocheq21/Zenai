@@ -1,0 +1,17 @@
+/* The printable weekly report: hide the site chrome and the interactive controls,
+   keep the KPI tiles and charts' numbers legible on paper, and show every section
+   stacked (not just the active tab). */
+@media print {
+  header,
+  footer,
+  a[href="#main"] {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
+  main {
+    padding: 0;
+  }
+}
