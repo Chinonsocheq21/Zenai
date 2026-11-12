@@ -170,7 +170,7 @@ function SignedInGaugeCard({ weeks, className = "" }: { weeks: Week[]; className
 
 function FocusCard({ weeks, className = "" }: { weeks: Week[]; className?: string }) {
   const items = Object.entries(FOCUS_LABELS).map(([k, label]) => ({ label, value: total(weeks, `focus:${k}`).value, color: FOCUS_COLORS[k] }));
-  const top = items.reduce<(typeof items)[number] | null>((b, i) => (i.value !== null && (b === null || i.value > (b.value ?? 0)) ? i : b), null);
+  const top = items.reduce<(typeof items)[number] | null>((b, i) => (i.value !== null && i.value > 0 && (b === null || i.value > (b.value ?? 0)) ? i : b), null);
   const [al, ap] = lastTwo(weeks, "focus:academic");
   const ac = countChange(al, ap, null);
   return (

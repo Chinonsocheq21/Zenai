@@ -105,7 +105,8 @@ export function AreaTrend({ weeks, series, caption, height = 240 }: { weeks: Wee
     const segs: [number, number][][] = [];
     let cur: [number, number][] = [];
     weeks.forEach((w, i) => {
-      const v = num(w[key]);
+      // a missing key is a quiet week (0); only null is "fewer than 10", drawn as a gap
+      const v = w[key] === undefined ? 0 : num(w[key]);
       if (v === null) { if (cur.length) segs.push(cur); cur = []; return; }
       cur.push([x(i), y(v)]);
     });
@@ -154,6 +155,7 @@ export function AreaTrend({ weeks, series, caption, height = 240 }: { weeks: Wee
               <path d={`${line(pts)} L${pts[pts.length - 1][0].toFixed(1)},${y(0)} L${pts[0][0].toFixed(1)},${y(0)} Z`} fill={`url(#${gradId}-${s.key})`} />
             )}
             <path d={line(pts)} fill="none" stroke={s.color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+            {pts.length === 1 && <circle cx={pts[0][0]} cy={pts[0][1]} r={4} fill={s.color} />}
           </g>
         )))}
         {a !== null && (
