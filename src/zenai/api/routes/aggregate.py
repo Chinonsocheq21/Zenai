@@ -216,34 +216,38 @@ DEMO_WEEKS = 12
 def _demo_week(i: int) -> dict[str, int]:
     """One deterministic, clearly synthetic week of demo data (no randomness,
     no clock finer than "which week of the 12"), so /aggregate/demo always
-    answers the same shape without touching the database."""
-    messages = 120 + (i * 7) % 40
-    conversations = 20 + (i * 3) % 10
-    handoffs = 2 + (i % 4)
-    by_patterns = 1 + (i % 2)
-    by_context = max(0, (i % 3) - 1)
+    answers the same shape without touching the database. The numbers hang
+    together the way real ones do: replies checked = messages minus hand-offs,
+    check-ins add up to conversations, and some small counts fall under 10 so
+    the dashboard shows how hidden groups look."""
+    messages = 220 + (i * 13) % 70
+    conversations = 60 + (i * 5) % 30
+    handoffs = 4 + (i * 3) % 9                      # often under 10, sometimes not
+    by_patterns = round(handoffs * 0.6)
+    by_context = round(handoffs * 0.25)
     by_screen = max(0, handoffs - by_patterns - by_context)
-    checked = conversations - (i % 2)
-    rejected = 2 + (i % 3)
-    first_pass = max(0, checked - rejected)
-    rewritten = checked - first_pass
-    fallback = 1 if i % 5 == 0 else 0
-    signed_in = conversations - (i % 3)
-    speed_fast = int(messages * 0.6)
-    speed_ok = int(messages * 0.3)
-    speed_slow = max(0, messages - speed_fast - speed_ok)
+    checked = messages - handoffs
+    rewritten = 11 + (i * 3) % 9
+    fallback = 1 + i % 3                            # always under 10
+    first_pass = checked - rewritten
+    speed_fast = round(checked * 0.62)
+    speed_ok = round(checked * 0.31)
+    speed_slow = checked - speed_fast - speed_ok
 
     m = {
         "messages": messages, "conversations": conversations, "handoffs": handoffs,
         "handoff_by:patterns": by_patterns, "handoff_by:context": by_context, "handoff_by:screen": by_screen,
         "checked": checked, "first_pass": first_pass, "rewritten": rewritten, "fallback": fallback,
-        "after_hours": 5 + (i * 2) % 9, "signed_in": signed_in,
+        "after_hours": round(messages * (0.30 + (i % 4) * 0.03)), "signed_in": round(messages * 0.72),
         "speed:fast": speed_fast, "speed:ok": speed_ok, "speed:slow": speed_slow,
     }
-    for k in range(len(CHECKINS)):
-        m[f"checkin:{k}"] = max(0, 6 - abs(k - 2) + i % 3)
-    for sid, base in (("academic", 8), ("wellbeing", 6), ("basic_needs", 1), ("referral", 2)):
-        m[f"focus:{sid}"] = base + i % (base + 3)
+    left = conversations
+    for k, share in enumerate((0.30, 0.31, 0.22, 0.11)):
+        m[f"checkin:{k}"] = round(conversations * share)
+        left -= m[f"checkin:{k}"]
+    m[f"checkin:{len(CHECKINS) - 1}"] = max(0, left)  # "I'm not okay": the remainder, usually under 10
+    for sid, share in (("academic", 0.45), ("stress_relief", 0.25), ("wellness", 0.2), ("referral", 0.1)):
+        m[f"focus:{sid}"] = round(checked * share)
     return m
 
 
