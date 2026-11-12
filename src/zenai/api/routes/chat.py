@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
@@ -53,8 +54,29 @@ def _crisis_only(body: ChatIn, note: str) -> dict | None:
                 "trace": [], "season": None,
                 "escalation": {"hotline": settings.CRISIS_HOTLINE, "campus": settings.CAMPUS_COUNSELING_NAME,
                                             "phone": settings.CAMPUS_COUNSELING_PHONE, "action": "human_handoff"},
-                "note": note}
+                "note": note, "_why": a["why"]}
     return None
+
+
+def _handoff_by(out: dict) -> str | None:
+    """Which layer caught this hand-off, for the weekly metrics only: "patterns"
+    (the message itself), "context" (patterns, escalated by an earlier message,
+    a check-in or an after-crisis rule) or "screen" (the model screen). Reads
+    the crisis stage's "why" -- from turn.run's trace when the full turn ran,
+    or from `_crisis_only`'s own assessment when it didn't -- and is never
+    sent to the client."""
+    if not isinstance(out, dict) or not out.get("escalate"):
+        return None
+    why = out.get("_why")
+    if why is None:
+        stage = next((s for s in (out.get("trace") or []) if s.get("stage") == "crisis"), None)
+        detail = (stage or {}).get("detail") or ""
+        why = detail.split(" · ", 1)[1] if " · " in detail else detail
+    if why.startswith("model screen:"):
+        return "screen"
+    if why.startswith(("an earlier message", "warning sign soon after", "indirect warning sign, escalated by context")):
+        return "context"
+    return "patterns"
 
 
 def _limited_turn(body: ChatIn) -> dict:
@@ -73,12 +95,24 @@ def _local_tool(req: Request) -> bool:
     return limits.is_local(req) and not req.headers.get("x-zenai-device")
 
 
+def _elapsed_ms(t0: float) -> float:
+    """Its own function (rather than inlining time.perf_counter twice) so a
+    test can hold the whole-turn speed still without touching the real clock
+    that everything else in the process also reads."""
+    return (time.perf_counter() - t0) * 1000
+
+
 @router.post("/chat")
 def chat(body: ChatIn, req: Request) -> dict:
+    t0 = time.perf_counter()
     out = _chat(body, req)
+    elapsed_ms = _elapsed_ms(t0)
+    handoff_by = _handoff_by(out)
+    if isinstance(out, dict):
+        out.pop("_why", None)                   # internal; never sent to the client
     from zenai.api.routes import aggregate
 
-    aggregate.record_turn(req, body, out)       # weekly counts only; can never fail the reply
+    aggregate.record_turn(req, body, out, elapsed_ms, handoff_by)  # weekly counts only; can never fail the reply
     return out
 
 
