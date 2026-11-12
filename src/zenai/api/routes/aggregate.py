@@ -156,7 +156,10 @@ def _metrics(body, out: dict, elapsed_ms: float | None, handoff_by: str | None,
 def record_turn(req: Request, body, out: dict, elapsed_ms: float | None = None,
                  handoff_by: str | None = None) -> None:
     global _down_until, _ready
-    if getattr(body, "client", "") != "student" or not isinstance(out, dict) or time.time() < _down_until:
+    # Automated checks (crisis.spec, the uptime run) mark themselves with X-ZenAI-Synthetic
+    # so a campus's trends are real students only. Sending it can only lower a count.
+    synthetic = bool(req.headers.get("x-zenai-synthetic"))
+    if getattr(body, "client", "") != "student" or synthetic or not isinstance(out, dict) or time.time() < _down_until:
         return
     try:
         with store.connect() as conn:

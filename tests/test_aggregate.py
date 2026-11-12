@@ -74,6 +74,13 @@ def test_only_the_real_app_is_counted(pg):
     assert pg.execute("SELECT count(*) FROM usage_weekly").fetchone()[0] == 0
 
 
+def test_synthetic_checks_are_never_counted(pg):
+    c = signed_in()
+    c.post("/chat", json={"text": "synthetic test", "history": [], "client": "student"},
+           headers={"X-ZenAI-Device": "d", "X-ZenAI-Synthetic": "1"})
+    assert pg.execute("SELECT count(*) FROM usage_weekly").fetchone()[0] == 0
+
+
 def test_signed_out_counts_as_open(pg):
     chat(TestClient(app))
     assert {r[0] for r in pg.execute("SELECT DISTINCT campus FROM usage_weekly")} == {"open"}

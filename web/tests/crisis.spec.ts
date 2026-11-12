@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
 // (crisis-rules.js); "I can't go on" is caught by the server's rules, so both
 // halves of the safety net are exercised. Neither ever reaches a language model.
 const PROD = process.env.PROD_URL || "https://zenai-app.vercel.app";
-test.use({ baseURL: PROD });
+test.use({ baseURL: PROD, extraHTTPHeaders: { "X-ZenAI-Synthetic": "1" } });   // never counted in campus trends
 
 // The hosted app asks visitors to sign in before they can talk. Tests that type
 // a message sign in first with an invite code (SMOKE_INVITE, the same one the
