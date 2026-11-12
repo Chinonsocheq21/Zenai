@@ -483,6 +483,18 @@
   .checkmark{display:inline-flex;align-items:center;gap:5px;min-height:28px;padding:2px 8px 2px 2px;border-radius:14px;font-size:12px;color:var(--muted)}
   .checkmark svg{width:14px;height:14px;stroke:var(--ok);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
   .checkmark:hover{color:var(--ink2)}
+  #checkSheet{overflow-y:auto}
+  #checkStepsBtn{min-height:48px;height:auto;padding:12px 18px;font-size:15px}
+  .steps .n{font-style:normal}
+  .steps{list-style:none;margin:12px 0 4px;padding:0;border:1px solid var(--line2);border-radius:16px;background:var(--surface);text-align:left}
+  .steps li{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:start;padding:11px 14px;border-bottom:1px solid var(--line)}
+  .steps li:last-child{border-bottom:0}
+  .steps .n{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:700;background:var(--chip);color:var(--ink2)}
+  .steps li.done .n{background:var(--accent);color:var(--accentInk,#fff)}
+  .steps b{display:block;font-size:14.5px;color:var(--ink)}
+  .steps span{display:block;font-size:13px;color:var(--muted);line-height:1.4;margin-top:2px}
+  .steps em{font-style:normal;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  .steps li.total{grid-template-columns:1fr auto;background:transparent}
   /* class code */
   .gate,.acct{position:absolute;inset:0;z-index:18;display:flex;flex-direction:column;justify-content:center;padding:0 30px;background:var(--bg)}
   .gate h2,.acct h2{font-family:var(--serif);font-weight:400;font-size:30px;margin:18px 0 8px}
@@ -895,6 +907,8 @@
     <div class="orb" style="width:64px;height:64px" aria-hidden="true"><i></i></div>
     <h2>Checked</h2>
     <p>Before you saw this, ZenAI checked it for advice, false reassurance and diagnosis. If it had drifted, it would have been rewritten.</p>
+    <button type="button" class="alt press" id="checkStepsBtn" aria-expanded="false" aria-controls="checkSteps">See every step for this reply</button>
+    <ol class="steps hidden" id="checkSteps" aria-label="How this reply was made"></ol>
     <a class="alt press" href="/safety/" target="_blank" rel="noopener noreferrer">Read about how ZenAI stays safe</a>
     <button class="close press" id="checkClose">Close</button>
   </section>
@@ -1307,15 +1321,48 @@ const paras = text => tidy(text).trim().split(/\n\s*\n/).map(p => `<p>${esc(p.re
 const CHECK_IC = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 // checked = true only for a reply whose /chat JSON shows the Fidelity Monitor
 // actually ran on it (d.monitor, and never on a crisis hand-off or an error)
-function addZen(text, checked) {
+// The stages this reply went through, from its own /chat answer. Kept in memory
+// for this page only, never stored or sent anywhere: it is the student's own reply.
+const TRACES = [];
+function addZen(text, checked, trace, totalMs) {
   $("log").querySelector(".hello")?.remove();
   $("log").querySelectorAll(".zenrow.live").forEach(r => r.classList.remove("live"));
+  const ti = Array.isArray(trace) && trace.length ? TRACES.push({trace, totalMs}) - 1 : -1;
   $("log").insertAdjacentHTML("beforeend", `<div class="zenrow live msg">${ORB()}<div class="zen">${paras(text)}</div></div>` +
-    (checked ? `<div class="checkrow msg"><button type="button" class="checkmark press" aria-haspopup="dialog">${CHECK_IC}Checked</button></div>` : ""));
+    (checked ? `<div class="checkrow msg"><button type="button" class="checkmark press" aria-haspopup="dialog" data-trace="${ti}">${CHECK_IC}Checked</button></div>` : ""));
   scrollDown();
 }
 // one listener for every checkmark, present or future
-$("log").addEventListener("click", e => { if (e.target.closest(".checkmark")) toggleCheckSheet(true); });
+$("log").addEventListener("click", e => {
+  const b = e.target.closest(".checkmark");
+  if (!b) return;
+  showSteps(TRACES[Number(b.dataset.trace)]);
+  toggleCheckSheet(true);
+});
+// "See every step": the eight stages this one reply passed through, the same
+// view as the presenter's workflow viewer, drawn only from this reply's own trace.
+const STAGE_NAMES = {privacy: "Privacy", crisis: "Crisis check", mood: "Mood", route: "Route",
+  memory: "Memory", conversation: "Draft", fidelity: "Fidelity Monitor", send: "Send"};
+const STATUS_WORDS = {done: "", skipped: "Skipped", escalated: "Handed to a person"};
+function showSteps(t) {
+  const btn = $("checkStepsBtn"), list = $("checkSteps");
+  list.classList.add("hidden"); btn.setAttribute("aria-expanded", "false");
+  btn.textContent = "See every step for this reply";
+  if (!t) { btn.classList.add("hidden"); list.innerHTML = ""; return; }
+  btn.classList.remove("hidden");
+  const plain = v => { const t = String(v || "").replace(/\s*[\u2014\u2013]\s*/g, ": "); return t.charAt(0).toUpperCase() + t.slice(1); };
+  list.innerHTML = t.trace.map((st, i) => {
+    const ms = typeof st.ms === "number" ? (st.ms >= 1000 ? (st.ms / 1000).toFixed(1) + " s" : Math.round(st.ms) + " ms") : "";
+    const word = STATUS_WORDS[st.status] ?? st.status;
+    const detail = [word, plain(st.detail)].filter(Boolean).join(". ");
+    return `<li class="${st.status === "done" ? "done" : ""}"><i class="n">${i + 1}</i><div><b>${esc(STAGE_NAMES[st.stage] || st.stage)}</b>${detail ? `<span>${esc(detail)}</span>` : ""}</div><em>${ms}</em></li>`;
+  }).join("") + (typeof t.totalMs === "number" ? `<li class="total"><div><b>Writing and checking, together</b></div><em>${(t.totalMs / 1000).toFixed(1)} s</em></li>` : "");
+}
+$("checkStepsBtn").onclick = () => {
+  const list = $("checkSteps"), open = list.classList.toggle("hidden") === false;
+  $("checkStepsBtn").setAttribute("aria-expanded", String(open));
+  $("checkStepsBtn").textContent = open ? "Hide the steps" : "See every step for this reply";
+};
 // "Did this help?" once, when the student closes the conversation. Kept on this
 // phone; sent only if the student turned on "Share whether replies helped" in
 // Privacy, and then only yes/no, which specialist answered last, and ZenAI's own
@@ -1862,7 +1909,7 @@ async function ask(text) {
     const d = await r.json();
     if (d.season) SERVER_SEASON = d.season;   // "exams" turns on the Talk home card next time
     if (d.escalate) { crisis(); return d; }
-    addZen(d.reply, d.monitor === true);
+    addZen(d.reply, d.monitor === true, d.trace, d.total_ms);
     lastReply = d;
     if (d.resources && d.resources.length) addCards(d.resources);
     HISTORY.push({role: "user", content: d.redacted_text}, {role: "assistant", content: d.reply});
