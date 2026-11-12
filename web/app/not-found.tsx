@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import SiteFooter from "@/components/SiteFooter";
+import SiteHeader from "@/components/SiteHeader";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -8,7 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default function NotFound() {
+  // The root 404 renders under the root layout only, so it brings the site frame itself.
   return (
+    <>
+    <SiteHeader />
+    <main id="main">
     <div className="mx-auto max-w-2xl px-5 pb-16 pt-16 text-center md:pt-24">
       <div
         aria-hidden="true"
@@ -32,5 +38,8 @@ export default function NotFound() {
         If you might not be safe, call or text <a href="tel:988" className="font-semibold text-crisis underline">988</a>, any time.
       </p>
     </div>
+    </main>
+    <SiteFooter />
+    </>
   );
 }

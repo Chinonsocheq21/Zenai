@@ -1,17 +1,17 @@
-/* The printable weekly report: hide the site chrome and the interactive controls,
-   keep the KPI tiles and charts' numbers legible on paper, and show every section
-   stacked (not just the active tab). */
+/* The printable weekly report: the console frame and controls carry print:hidden;
+   here the page goes white with dark ink, whatever the screen theme. */
 @media print {
-  header,
-  footer,
-  a[href="#main"] {
-    display: none !important;
+  html {
+    --color-paper: #fff;
+    --color-paper2: #fff;
+    --color-card: #fff;
+    --color-ink: #000;
+    --color-ink2: #222;
+    --color-muted: #444;
+    --color-line: rgba(0, 0, 0, 0.2);
   }
   body {
     background: #fff;
     color: #000;
-  }
-  main {
-    padding: 0;
   }
 }

@@ -1,6 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import SiteFooter from "@/components/SiteFooter";
-import SiteHeader from "@/components/SiteHeader";
 import SiteAnalytics from "./analytics";
 import { OG_IMAGE, SITE } from "@/components/meta";
 import "./globals.css";
@@ -42,9 +40,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-navy focus:px-4 focus:py-2 focus:text-white">
           Skip to content
         </a>
-        <SiteHeader />
-        <main id="main">{children}</main>
-        <SiteFooter />
+        {/* Each section brings its own frame: (site)/layout.tsx is the marketing header and
+            footer, dashboard/layout.tsx is the staff console. Both put the content in #main. */}
+        {children}
         <SiteAnalytics />
       </body>
     </html>
